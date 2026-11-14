@@ -3,7 +3,7 @@
 [![Release](https://img.shields.io/badge/Release-v1.0.0-00E5FF.svg?style=for-the-badge&logo=android&logoColor=black)](https://github.com/nasibullo03/PyBionic-Hub/releases/latest)
 [![Python](https://img.shields.io/badge/Python-3.14.10_Bionic-FFD700.svg?style=for-the-badge&logo=python&logoColor=black)](https://python.org)
 [![Platform](https://img.shields.io/badge/Platform-Android_8.0+-3DDC84.svg?style=for-the-badge&logo=android&logoColor=white)](https://android.com)
-[![License](https://img.shields.io/badge/License-GPL_v3-blue.svg?style=for-the-badge)](LICENSE)
+[![License](https://img.shields.io/badge/License-AGPL_v3-blue.svg?style=for-the-badge)](LICENSE)
 
 ---
 
@@ -79,5 +79,5 @@ PyBionic is fully optimized for programmatic inspection and autonomous bot deplo
 
 ## 📄 License & Credits
 
-- Licensed under **GNU General Public License v3.0 (GPL-3.0)**.
+- Licensed under **GNU Affero General Public License v3.0 (AGPL-3.0)**.
 - Developed by **Nasibullo Khalilov** ([@nasibullo03](https://github.com/nasibullo03)).
