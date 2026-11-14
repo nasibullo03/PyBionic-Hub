@@ -1,0 +1,1562 @@
+{
+  "schemaVersion": 1,
+  "bots": [
+    {
+      "id": "media_downloader",
+      "category": "DOWNLOADERS",
+      "entryFile": "main.py",
+      "platforms": [
+        "Telegram",
+        "Web UI"
+      ],
+      "systemPackages": [
+        "ffmpeg"
+      ],
+      "pipPackages": [
+        "pyTelegramBotAPI",
+        "yt-dlp"
+      ],
+      "useSystemSitePackages": true,
+      "defaultCron": "",
+      "fields": [
+        {
+          "key": "BOT_TOKEN",
+          "required": false,
+          "secret": true,
+          "hint": "123456:ABC..."
+        },
+        {
+          "key": "WEB_PORT",
+          "required": false,
+          "secret": false,
+          "defaultValue": "8088",
+          "hint": "8088"
+        },
+        {
+          "key": "ALLOWED_USER_IDS",
+          "required": false,
+          "secret": false,
+          "defaultValue": "",
+          "hint": "12345678,87654321"
+        }
+      ]
+    },
+    {
+      "id": "sticker_studio",
+      "category": "MEDIA_STICKERS",
+      "entryFile": "main.py",
+      "platforms": [
+        "Telegram",
+        "Web UI"
+      ],
+      "systemPackages": [
+        "ffmpeg",
+        "python-pillow"
+      ],
+      "pipPackages": [
+        "pyTelegramBotAPI"
+      ],
+      "useSystemSitePackages": true,
+      "defaultCron": "",
+      "fields": [
+        {
+          "key": "BOT_TOKEN",
+          "required": false,
+          "secret": true,
+          "hint": "123456:ABC..."
+        },
+        {
+          "key": "WEB_PORT",
+          "required": false,
+          "secret": false,
+          "defaultValue": "8091",
+          "hint": "8091"
+        }
+      ]
+    },
+    {
+      "id": "meme_studio",
+      "category": "MEDIA_STICKERS",
+      "entryFile": "main.py",
+      "platforms": [
+        "Telegram",
+        "Web UI"
+      ],
+      "systemPackages": [
+        "python-pillow"
+      ],
+      "pipPackages": [
+        "pyTelegramBotAPI"
+      ],
+      "useSystemSitePackages": true,
+      "defaultCron": "",
+      "fields": [
+        {
+          "key": "BOT_TOKEN",
+          "required": false,
+          "secret": true,
+          "hint": "123456:ABC..."
+        },
+        {
+          "key": "WEB_PORT",
+          "required": false,
+          "secret": false,
+          "defaultValue": "8089",
+          "hint": "8089"
+        }
+      ]
+    },
+    {
+      "id": "motivator_pro",
+      "category": "PRODUCTIVITY",
+      "entryFile": "main.py",
+      "platforms": [
+        "Telegram",
+        "SQLite",
+        "Web UI"
+      ],
+      "systemPackages": [
+        "python-pillow"
+      ],
+      "pipPackages": [
+        "pyTelegramBotAPI"
+      ],
+      "useSystemSitePackages": true,
+      "defaultCron": "",
+      "fields": [
+        {
+          "key": "BOT_TOKEN",
+          "required": false,
+          "secret": true,
+          "hint": "123456:ABC..."
+        },
+        {
+          "key": "WEB_PORT",
+          "required": false,
+          "secret": false,
+          "defaultValue": "8092",
+          "hint": "8092"
+        }
+      ]
+    },
+    {
+      "id": "discord_guardian",
+      "category": "DISCORD_MULTI",
+      "entryFile": "main.py",
+      "platforms": [
+        "Discord",
+        "SQLite",
+        "Web UI"
+      ],
+      "systemPackages": [],
+      "pipPackages": [],
+      "useSystemSitePackages": true,
+      "defaultCron": "",
+      "fields": [
+        {
+          "key": "DISCORD_TOKEN",
+          "required": true,
+          "secret": true,
+          "hint": "MT..."
+        },
+        {
+          "key": "COMMAND_PREFIX",
+          "required": false,
+          "secret": false,
+          "defaultValue": "!",
+          "hint": "!"
+        },
+        {
+          "key": "WEB_PORT",
+          "required": false,
+          "secret": false,
+          "defaultValue": "8113",
+          "hint": "8113"
+        }
+      ]
+    },
+    {
+      "id": "multi_relay",
+      "category": "DISCORD_MULTI",
+      "entryFile": "main.py",
+      "platforms": [
+        "Telegram",
+        "Discord",
+        "Webhook",
+        "Web UI"
+      ],
+      "systemPackages": [],
+      "pipPackages": [],
+      "useSystemSitePackages": false,
+      "defaultCron": "",
+      "fields": [
+        {
+          "key": "BOT_TOKEN",
+          "required": false,
+          "secret": true,
+          "hint": "123456:ABC..."
+        },
+        {
+          "key": "TG_CHAT_ID",
+          "required": false,
+          "secret": false,
+          "defaultValue": "",
+          "hint": "-1001234567890"
+        },
+        {
+          "key": "DISCORD_WEBHOOK_URL",
+          "required": false,
+          "secret": true,
+          "hint": "https://discord.com/api/webhooks/..."
+        },
+        {
+          "key": "WEBHOOK_URL",
+          "required": false,
+          "secret": true,
+          "hint": "https://..."
+        },
+        {
+          "key": "INITIAL_FEED_URL",
+          "required": false,
+          "secret": false,
+          "defaultValue": "",
+          "hint": "owner/repo"
+        },
+        {
+          "key": "WEB_PORT",
+          "required": false,
+          "secret": false,
+          "defaultValue": "8090",
+          "hint": "8090"
+        }
+      ]
+    },
+    {
+      "id": "round_video_master",
+      "category": "MEDIA_STICKERS",
+      "entryFile": "main.py",
+      "platforms": [
+        "Telegram",
+        "Web UI",
+        "SQLite"
+      ],
+      "systemPackages": [
+        "ffmpeg",
+        "python-pillow"
+      ],
+      "pipPackages": [
+        "pyTelegramBotAPI"
+      ],
+      "useSystemSitePackages": true,
+      "defaultCron": "",
+      "fields": [
+        {
+          "key": "BOT_TOKEN",
+          "required": false,
+          "secret": true,
+          "hint": "123456:ABC..."
+        },
+        {
+          "key": "WEB_PORT",
+          "required": false,
+          "secret": false,
+          "defaultValue": "8093",
+          "hint": "8093"
+        },
+        {
+          "key": "ALLOWED_USER_IDS",
+          "required": false,
+          "secret": false,
+          "defaultValue": "",
+          "hint": "12345678,87654321"
+        }
+      ],
+      "title": {
+        "en": "Round Video Master Studio",
+        "ru": "Round Video Master (Кружочки Telegram)",
+        "tg": "Round Video Master (Паёмҳои мудаввар)",
+        "uz": "Round Video Master (Dumaloq xabarlar)",
+        "tr": "Round Video Master (Yuvarlak Video)",
+        "es": "Round Video Master (Mensajes Redondos)",
+        "de": "Round Video Master (Runde Videos)",
+        "fr": "Round Video Master (Notes Vidéo Rondes)",
+        "it": "Round Video Master (Videomessaggi Tondi)",
+        "pt": "Round Video Master (Vídeos Redondos)",
+        "pl": "Round Video Master (Okrągłe Wideo)",
+        "uk": "Round Video Master (Відеоповідомлення)",
+        "kk": "Round Video Master (Дөңгелек видеолар)",
+        "ky": "Round Video Master (Тегерек видеолор)",
+        "az": "Round Video Master (Dairəvi video)",
+        "ar": "Round Video Master (فيديوهات دائرية)",
+        "fa": "Round Video Master (ویدیوهای دایره‌ای)",
+        "hi": "Round Video Master (राउंड वीडियो)",
+        "zh-cn": "Round Video Master (圆视频制作)",
+        "ja": "Round Video Master (円形ビデオ)",
+        "ko": "Round Video Master (원형 비디오)",
+        "id": "Round Video Master (Video Bulat)",
+        "vi": "Round Video Master (Video Tròn)",
+        "th": "Round Video Master (วิดีโอวงกลม)"
+      },
+      "description": {
+        "en": "Convert any video into a Telegram round video note with 1:1 centering, EBU R128 voice boost, neon rings, and 60s auto-fit.",
+        "ru": "Конвертер любых видео в видеокружочки Telegram: центровка 1:1, усиление речи EBU R128, неоновая рамка и автоускорение в 60с.",
+        "tg": "Табдили ҳама гуна видео ба паёми мудаввари Telegram: марказонии 1:1, садои EBU R128, ҳалқаи неонӣ ва суръат то 60с.",
+        "uz": "Har qanday videoni Telegram dumaloq xabarlariga aylantirish: 1:1 markazlash, EBU R128 ovoz kuchaytirish, neon hoshiya va 60s gacha moslash.",
+        "tr": "Videoları Telegram yuvarlak video mesajına dönüştürün: 1:1 ortalama, EBU R128 ses güçlendirme, neon çerçeve ve 60s sığdırma."
+      }
+    },
+    {
+      "id": "glitch_datamosh_studio",
+      "category": "MEDIA_STICKERS",
+      "entryFile": "main.py",
+      "platforms": [
+        "Telegram",
+        "Web UI",
+        "SQLite"
+      ],
+      "systemPackages": [
+        "ffmpeg",
+        "python-pillow"
+      ],
+      "pipPackages": [
+        "pyTelegramBotAPI"
+      ],
+      "useSystemSitePackages": true,
+      "defaultCron": "",
+      "fields": [
+        {
+          "key": "BOT_TOKEN",
+          "required": false,
+          "secret": true,
+          "hint": "123456:ABC..."
+        },
+        {
+          "key": "WEB_PORT",
+          "required": false,
+          "secret": false,
+          "defaultValue": "8094",
+          "hint": "8094"
+        },
+        {
+          "key": "ALLOWED_USER_IDS",
+          "required": false,
+          "secret": false,
+          "defaultValue": "",
+          "hint": "12345678,87654321"
+        }
+      ],
+      "title": {
+        "en": "Glitch & Datamosh Studio",
+        "ru": "Glitch & Datamosh Studio (Глитч и Датамош)",
+        "tg": "Glitch & Datamosh Studio (Глитч ва Датамош)",
+        "uz": "Glitch & Datamosh Studio (Glitsh va Datamosh)",
+        "tr": "Glitch & Datamosh Studio (Glitç ve Datamosh)",
+        "es": "Glitch & Datamosh Studio (Efectos Glitch)",
+        "de": "Glitch & Datamosh Studio (Glitch Kunst)",
+        "fr": "Glitch & Datamosh Studio (Art Glitch)",
+        "it": "Glitch & Datamosh Studio (Effetti Glitch)",
+        "pt": "Glitch & Datamosh Studio (Efeitos Glitch)",
+        "pl": "Glitch & Datamosh Studio (Efekty Glitch)",
+        "uk": "Glitch & Datamosh Studio (Глітч і Датамош)",
+        "kk": "Glitch & Datamosh Studio (Глитч және Датамош)",
+        "ky": "Glitch & Datamosh Studio (Глитч жана Датамош)",
+        "az": "Glitch & Datamosh Studio (Qliç və Datamoş)",
+        "ar": "Glitch & Datamosh Studio (تأثيرات الجليتش)",
+        "fa": "Glitch & Datamosh Studio (افکت‌های گلیچ)",
+        "hi": "Glitch & Datamosh Studio (ग्लिच और डेटामाश)",
+        "zh-cn": "Glitch & Datamosh Studio (故障艺术与数据损坏)",
+        "ja": "Glitch & Datamosh Studio (グリッチ＆データモッシュ)",
+        "ko": "Glitch & Datamosh Studio (글리치 & 데이터모시)",
+        "id": "Glitch & Datamosh Studio (Efek Glitch)",
+        "vi": "Glitch & Datamosh Studio (Hiệu ứng Glitch)",
+        "th": "Glitch & Datamosh Studio (เอฟเฟกต์กลิตช์)"
+      },
+      "description": {
+        "en": "Generate real P-frame Datamosh melting, chromatic RGB Split, VHS tape scanlines, pixel macroblocking and audio bitcrush.",
+        "ru": "Генератор датамошинга с таянием P-кадров, хроматического RGB Split, VHS-плёнки 90-х, битых блоков и биткрашера аудио.",
+        "tg": "Генератори датамошинг, RGB Split, лентаи VHS, блокҳои вайроншуда ва биткрашери садо барои видео ва аксҳо.",
+        "uz": "Datamoshing, RGB Split, 90-yillar VHS lentasi, pikselli bloklar va audio bitkrasher generatori.",
+        "tr": "P-frame datamosh eritme, kromatik RGB Split, VHS kaset tarama çizgileri, piksel makro blokları ve ses bitcrush üretin."
+      }
+    },
+    {
+      "id": "smart_karaoke_subber",
+      "category": "MEDIA_STICKERS",
+      "entryFile": "main.py",
+      "platforms": [
+        "Telegram",
+        "Web UI",
+        "SQLite"
+      ],
+      "systemPackages": [
+        "ffmpeg",
+        "python-pillow"
+      ],
+      "pipPackages": [
+        "pyTelegramBotAPI"
+      ],
+      "useSystemSitePackages": true,
+      "defaultCron": "",
+      "fields": [
+        {
+          "key": "BOT_TOKEN",
+          "required": false,
+          "secret": true,
+          "hint": "123456:ABC..."
+        },
+        {
+          "key": "WEB_PORT",
+          "required": false,
+          "secret": false,
+          "defaultValue": "8095",
+          "hint": "8095"
+        },
+        {
+          "key": "ALLOWED_USER_IDS",
+          "required": false,
+          "secret": false,
+          "defaultValue": "",
+          "hint": "12345678,87654321"
+        }
+      ],
+      "title": {
+        "en": "Smart Karaoke & Subber Studio",
+        "ru": "Smart Karaoke Studio (Караоке и Субтитры)",
+        "tg": "Smart Karaoke Studio (Караоке ва Субтитрҳо)",
+        "uz": "Smart Karaoke Studio (Karaoke va Subtitrlar)",
+        "tr": "Smart Karaoke Studio (Karaoke ve Altyazı)",
+        "es": "Smart Karaoke Studio (Karaoke y Subtítulos)",
+        "de": "Smart Karaoke Studio (Karaoke & Untertitel)",
+        "fr": "Smart Karaoke Studio (Karaoké & Sous-titres)",
+        "it": "Smart Karaoke Studio (Karaoke e Sottotitoli)",
+        "pt": "Smart Karaoke Studio (Karaokê e Legendas)",
+        "pl": "Smart Karaoke Studio (Karaoke i Napisy)",
+        "uk": "Smart Karaoke Studio (Караоке та Субтитри)",
+        "kk": "Smart Karaoke Studio (Караоке және Субтитрлер)",
+        "ky": "Smart Karaoke Studio (Караоке жана Субтитрлер)",
+        "az": "Smart Karaoke Studio (Karaoke və Altyazı)",
+        "ar": "Smart Karaoke Studio (كاريوكي وترجمة)",
+        "fa": "Smart Karaoke Studio (کارائوکه و زیرنویس)",
+        "hi": "Smart Karaoke Studio (कराओके और सबटाइटल)",
+        "zh-cn": "Smart Karaoke Studio (卡拉OK动态歌词字幕)",
+        "ja": "Smart Karaoke Studio (カラオケ字幕スタジオ)",
+        "ko": "Smart Karaoke Studio (노래방 자막 스튜디오)",
+        "id": "Smart Karaoke Studio (Karaoke & Subtitel)",
+        "vi": "Smart Karaoke Studio (Karaoke & Phụ đề)",
+        "th": "Smart Karaoke Studio (คาราโอเกะและคำบรรยาย)"
+      },
+      "description": {
+        "en": "Word-by-word highlighted animated karaoke video generator with ASS/SRT/LRC timing and audio spectrum visualizers.",
+        "ru": "Генератор караоке-видео с динамической пословной подсветкой в такт музыке, стилями ASS, аудио-волной и поддержкой LRC.",
+        "tg": "Генератори караоке-видео бо равшании ҳар як калима, сабкҳои ASS, мавҷи садо ва LRC.",
+        "uz": "Har bir so‘zni alohida yorituvchi animatsion karaoke videolari, ASS stillari va audio to‘lqin generatori.",
+        "tr": "Müzikle senkronize kelime kelime vurgulanan karaoke video üretici, ASS altyazı stilleri ve ses dalgası görselleştirici."
+      }
+    },
+    {
+      "id": "media_target_compressor",
+      "category": "MEDIA_STICKERS",
+      "entryFile": "main.py",
+      "platforms": [
+        "Telegram",
+        "Web UI",
+        "SQLite"
+      ],
+      "systemPackages": [
+        "ffmpeg",
+        "python-pillow"
+      ],
+      "pipPackages": [
+        "pyTelegramBotAPI"
+      ],
+      "useSystemSitePackages": true,
+      "defaultCron": "",
+      "fields": [
+        {
+          "key": "BOT_TOKEN",
+          "required": false,
+          "secret": true,
+          "hint": "123456:ABC..."
+        },
+        {
+          "key": "WEB_PORT",
+          "required": false,
+          "secret": false,
+          "defaultValue": "8096",
+          "hint": "8096"
+        },
+        {
+          "key": "ALLOWED_USER_IDS",
+          "required": false,
+          "secret": false,
+          "defaultValue": "",
+          "hint": "12345678,87654321"
+        }
+      ],
+      "title": {
+        "en": "Media Target Compressor (Exact Size Fitter)",
+        "ru": "Media Target Compressor (Умное Сжатие до Размера)",
+        "tg": "Media Target Compressor (Фишурдани Аниқи Ҳаҷм)",
+        "uz": "Media Target Compressor (Hajmga Mos Siqish)",
+        "tr": "Media Target Compressor (Hedef Boyut Sıkıştırıcı)",
+        "es": "Media Target Compressor (Ajuste de Tamaño Exacto)",
+        "de": "Media Target Compressor (Präzise Zielgröße)",
+        "fr": "Media Target Compressor (Compression Taille Cible)",
+        "it": "Media Target Compressor (Compressione Dimensione Esatta)",
+        "pt": "Media Target Compressor (Ajuste Exato de Tamanho)",
+        "pl": "Media Target Compressor (Kompresja do Rozmiaru)",
+        "uk": "Media Target Compressor (Розумне Стиснення до Розміру)",
+        "kk": "Media Target Compressor (Өлшемге Дәл Сығу)",
+        "ky": "Media Target Compressor (Көлөмгө Так Кысуу)",
+        "az": "Media Target Compressor (Hədəf Ölçüyə Uyğun Sıxılma)",
+        "ar": "Media Target Compressor (ضغط فيديو لحجم محدد)",
+        "fa": "Media Target Compressor (فشرده‌سازی ویدیویی به حجم دلخواه)",
+        "hi": "Media Target Compressor (सटीक साइज़ कंप्रेसर)",
+        "zh-cn": "Media Target Compressor (精准目标文件大小压缩)",
+        "ja": "Media Target Compressor (指定サイズ動画圧縮)",
+        "ko": "Media Target Compressor (목표 용량 맞춤 압축)",
+        "id": "Media Target Compressor (Kompresi Ukuran Tepat)",
+        "vi": "Media Target Compressor (Nén đúng dung lượng mục tiêu)",
+        "th": "Media Target Compressor (บีบอัดวิดีโอตามขนาดที่กำหนด)"
+      },
+      "description": {
+        "en": "2-Pass precision video and audio compressor targeting exact size limits for Discord (8/25 MB), WhatsApp (16 MB), Telegram (50 MB) without overflows.",
+        "ru": "Двухпроходное математическое сжатие видео и аудио точно в лимиты Discord (8/25 МБ), WhatsApp (16 МБ), Telegram (50 МБ) с защитой от артефактов.",
+        "tg": "Фишурдани дақиқи 2-гузариши видео ва аудио мутобиқи лимитҳои Discord, WhatsApp ва Telegram бидуни вайроншавӣ.",
+        "uz": "Discord (8/25 MB), WhatsApp (16 MB) va Telegram (50 MB) limitlariga mos 2 bosqichli aniq video/audio siquvchi.",
+        "tr": "Discord, WhatsApp ve Telegram sınırlarına tam uyan 2 geçişli hassas video ve ses sıkıştırma stüdyosu."
+      }
+    },
+    {
+      "id": "voice_studio_master",
+      "category": "MEDIA_STICKERS",
+      "entryFile": "main.py",
+      "platforms": [
+        "Telegram",
+        "Web UI",
+        "SQLite"
+      ],
+      "systemPackages": [
+        "ffmpeg",
+        "python-pillow"
+      ],
+      "pipPackages": [
+        "pyTelegramBotAPI"
+      ],
+      "useSystemSitePackages": true,
+      "defaultCron": "",
+      "fields": [
+        {
+          "key": "BOT_TOKEN",
+          "required": false,
+          "secret": true,
+          "hint": "123456:ABC..."
+        },
+        {
+          "key": "WEB_PORT",
+          "required": false,
+          "secret": false,
+          "defaultValue": "8097",
+          "hint": "8097"
+        },
+        {
+          "key": "ALLOWED_USER_IDS",
+          "required": false,
+          "secret": false,
+          "defaultValue": "",
+          "hint": "12345678,87654321"
+        }
+      ],
+      "title": {
+        "en": "Voice Studio Master (Vocal FX & Mastering)",
+        "ru": "Voice Studio Master (Студия Обработки Голоса)",
+        "tg": "Voice Studio Master (Студияи Коркарди Овоз)",
+        "uz": "Voice Studio Master (Ovoz Ishlov Berish Studiyasi)",
+        "tr": "Voice Studio Master (Ses Efekt & Mastering)",
+        "es": "Voice Studio Master (Efectos de Voz y Mastering)",
+        "de": "Voice Studio Master (Vocal FX & Mastering)",
+        "fr": "Voice Studio Master (Effets Vocaux & Mastering)",
+        "it": "Voice Studio Master (Effetti Vocali e Mastering)",
+        "pt": "Voice Studio Master (Efeitos de Voz e Masterização)",
+        "pl": "Voice Studio Master (Studio Obróbki Głosu)",
+        "uk": "Voice Studio Master (Студія Обробки Голосу)",
+        "kk": "Voice Studio Master (Дауыс Өңдеу Студиясы)",
+        "ky": "Voice Studio Master (Үн Иштетүү Студиясы)",
+        "az": "Voice Studio Master (Səs Emalı Studiyası)",
+        "ar": "Voice Studio Master (استوديو معالجة الصوت)",
+        "fa": "Voice Studio Master (استودیو افکت و پردازش صدا)",
+        "hi": "Voice Studio Master (वॉयस स्टूडियो और वोकल इफेक्ट्स)",
+        "zh-cn": "Voice Studio Master (专业人声音效与母带处理)",
+        "ja": "Voice Studio Master (ボイスエフェクトスタジオ)",
+        "ko": "Voice Studio Master (보이스 이펙트 스튜디오)",
+        "id": "Voice Studio Master (Studio Efek Suara & Vokal)",
+        "vi": "Voice Studio Master (Studio Hiệu Ứng Giọng Nói)",
+        "th": "Voice Studio Master (สตูดิโอแต่งเสียงและเอฟเฟกต์)"
+      },
+      "description": {
+        "en": "Studio vocal post-production & FX: broadcast podcast clean (EBU R128), radio air, vocoder, deep pitch, chipmunk, cathedral reverb, megaphone, and lo-fi tape.",
+        "ru": "Студийная постобработка голоса: подкаст-мастеринг (EBU R128), радио-эфир, вокодер/робот, глубокий бас, бурундук, соборное эхо, рация и лоу-фай кассета.",
+        "tg": "Коркарди студиявии овоз: мастеринги подкаст (EBU R128), радио, вокодер, баси чуқур, бурундук, акси садо ва ратсия.",
+        "uz": "Professional ovoz studiyasi: podkast masteringi (EBU R128), radio, vokoder, chuqur bas, burunduq, aks-sado va ratsiya effektlari.",
+        "tr": "Stüdyo ses işleme ve vokal efektleri: podcast mastering (EBU R128), radyo yayını, robot, derin bas, katedral yankısı ve megafon."
+      }
+    },
+    {
+      "id": "spatial_audio_8d",
+      "category": "MEDIA_STICKERS",
+      "entryFile": "main.py",
+      "platforms": [
+        "Telegram",
+        "Web UI",
+        "SQLite"
+      ],
+      "systemPackages": [
+        "ffmpeg",
+        "python-pillow"
+      ],
+      "pipPackages": [
+        "pyTelegramBotAPI"
+      ],
+      "useSystemSitePackages": true,
+      "defaultCron": "",
+      "fields": [
+        {
+          "key": "BOT_TOKEN",
+          "required": false,
+          "secret": true,
+          "hint": "123456:ABC..."
+        },
+        {
+          "key": "WEB_PORT",
+          "required": false,
+          "secret": false,
+          "defaultValue": "8098",
+          "hint": "8098"
+        },
+        {
+          "key": "ALLOWED_USER_IDS",
+          "required": false,
+          "secret": false,
+          "defaultValue": "",
+          "hint": "12345678,87654321"
+        }
+      ],
+      "title": {
+        "en": "8D Spatial Audio Studio (360° Binaural Orbit)",
+        "ru": "8D Spatial Audio Studio (360° Звук и Орбиты)",
+        "tg": "8D Spatial Audio Studio (Овози 360° ва Орбитаҳо)",
+        "uz": "8D Spatial Audio Studio (360° Aylanma Ovoz)",
+        "tr": "8D Spatial Audio Studio (360° Dönen Ses)",
+        "es": "8D Spatial Audio Studio (Audio Espacial 360°)",
+        "de": "8D Spatial Audio Studio (360° Raumklang)",
+        "fr": "8D Spatial Audio Studio (Audio Spatial 360°)",
+        "it": "8D Spatial Audio Studio (Audio Spaziale 360°)",
+        "pt": "8D Spatial Audio Studio (Áudio Espacial 360°)",
+        "pl": "8D Spatial Audio Studio (Dźwięk Przestrzenny 360°)",
+        "uk": "8D Spatial Audio Studio (360° Просторовий Звук)",
+        "kk": "8D Spatial Audio Studio (360° Кеңістіктік Дыбыс)",
+        "ky": "8D Spatial Audio Studio (360° Мейкиндик Үнү)",
+        "az": "8D Spatial Audio Studio (360° Məkan Səsi)",
+        "ar": "8D Spatial Audio Studio (صوت ثلاثي الأبعاد 360 درجة)",
+        "fa": "8D Spatial Audio Studio (صدای ۳۶۰ درجه و فضایی ۸ بعدی)",
+        "hi": "8D Spatial Audio Studio (360° 8D ऑडियो और स्पेसियल साउंड)",
+        "zh-cn": "8D Spatial Audio Studio (360°环绕8D全景空间音频)",
+        "ja": "8D Spatial Audio Studio (360度8D立体音響)",
+        "ko": "8D Spatial Audio Studio (360° 8D 공간 입체 음향)",
+        "id": "8D Spatial Audio Studio (Audio Spasial 360° 8D)",
+        "vi": "8D Spatial Audio Studio (Âm thanh không gian 8D 360°)",
+        "th": "8D Spatial Audio Studio (เสียงรอบทิศทาง 8D 360°)"
+      },
+      "description": {
+        "en": "360° binaural 8D spatial audio generator with rotating orbits, Lissajous trajectories, hall modeling, and visual radar.",
+        "ru": "Генератор 360° бинаурального 8D-звука с вращением вокруг головы, траекториями Лиссажу, акустикой зала и стерео-радаром.",
+        "tg": "Генератори садои 8D-и бинауралӣ бо чархиши 360° дар гирди сар, траекторияҳои Лиссажу ва акси садо.",
+        "uz": "Quloqchinlarda bosh atrofida aylanuvchi 360° 8D binaural ovoz, Lissaju trayektoriyalari va akustik zallar.",
+        "tr": "Kulaklıkta baş etrafında dönen 360° 8D binaural ses, Lissajous yörüngeleri ve mekan akustiği."
+      }
+    },
+    {
+      "id": "audiobook_chapterizer",
+      "category": "MEDIA_STICKERS",
+      "entryFile": "main.py",
+      "platforms": [
+        "Telegram",
+        "Web UI",
+        "SQLite"
+      ],
+      "systemPackages": [
+        "ffmpeg",
+        "python-pillow"
+      ],
+      "pipPackages": [
+        "pyTelegramBotAPI"
+      ],
+      "useSystemSitePackages": true,
+      "defaultCron": "",
+      "fields": [
+        {
+          "key": "BOT_TOKEN",
+          "required": false,
+          "secret": true,
+          "hint": "123456:ABC..."
+        },
+        {
+          "key": "WEB_PORT",
+          "required": false,
+          "secret": false,
+          "defaultValue": "8099",
+          "hint": "8099"
+        },
+        {
+          "key": "ALLOWED_USER_IDS",
+          "required": false,
+          "secret": false,
+          "defaultValue": "",
+          "hint": "12345678,87654321"
+        }
+      ],
+      "title": {
+        "en": "Audiobook & Podcast Chapterizer (M4B & Splitter)",
+        "ru": "Audiobook Chapterizer (Разбивка на главы M4B и MP3 ZIP)",
+        "tg": "Audiobook Chapterizer (Тақсими китобҳои савтӣ ба фаслҳо)",
+        "uz": "Audiobook Chapterizer (M4B boblar va MP3 ZIP ga bo'lish)",
+        "tr": "Audiobook Chapterizer (M4B Bölümleme ve MP3 ZIP Ayrıştırma)",
+        "es": "Audiobook Chapterizer (Capítulos M4B y Separador MP3 ZIP)",
+        "de": "Audiobook Chapterizer (M4B-Kapitel & MP3-ZIP-Teiler)",
+        "fr": "Audiobook Chapterizer (Chapitres M4B & Découpage MP3 ZIP)",
+        "it": "Audiobook Chapterizer (Capitoli M4B e Divisione Tracce MP3)",
+        "pt": "Audiobook Chapterizer (Capítulos M4B e Divisor MP3 ZIP)",
+        "pl": "Audiobook Chapterizer (Rozdziały M4B i Podział na MP3 ZIP)",
+        "uk": "Audiobook Chapterizer (Розбивка аудіокниг на розділи M4B/ZIP)",
+        "kk": "Audiobook Chapterizer (Аудиокітаптарды тарауларға бөлу M4B/ZIP)",
+        "ky": "Audiobook Chapterizer (Аудиокитептерди бөлүмдөргө бөлүү M4B/ZIP)",
+        "az": "Audiobook Chapterizer (M4B Fəsillərə və MP3 ZIP-ə Bölmə)",
+        "ar": "Audiobook Chapterizer (تقسيم الكتب الصوتية لفصول M4B و ZIP)",
+        "fa": "Audiobook Chapterizer (فصل‌بندی کتاب صوتی به M4B و آرشیو ZIP)",
+        "hi": "Audiobook Chapterizer (ऑडियोबुक और पॉдकास्ट चैप्टर कटर M4B/ZIP)",
+        "zh-cn": "Audiobook Chapterizer (有声书静音分章/M4B嵌入/MP3分轨ZIP)",
+        "ja": "Audiobook Chapterizer (オーディオブック無音検知・M4B章埋込・ZIP分割)",
+        "ko": "Audiobook Chapterizer (오디오북 무음 감지 챕터 M4B/MP3 ZIP 분할)",
+        "id": "Audiobook Chapterizer (Pembuat Bab Buku Audio M4B & Pemisah ZIP)",
+        "vi": "Audiobook Chapterizer (Phân chương sách nói M4B & Tách file ZIP)",
+        "th": "Audiobook Chapterizer (แบ่งบทหนังสือเสียง M4B และแยกแทร็ก ZIP)"
+      },
+      "description": {
+        "en": "Smart silence detector for audiobooks and podcasts. Injects native M4B chapter atoms, splits into numbered MP3 tracks (ZIP), and provides atempo narration speedup.",
+        "ru": "Умное детектирование пауз и тишины в аудиокнигах и подкастах. Встраивает атомы глав M4B, нарезает на нумерованные MP3-треки в ZIP и ускоряет темп без изменения тона.",
+        "tg": "Муайянкунии интеллектуалии таваққуфҳо дар китобҳои савтӣ, воридсозии фаслҳои M4B, тақсим ба трекҳои MP3 дар ZIP ва суръатбахшӣ.",
+        "uz": "Audio kitoblar va podkastlarda sukunatni aniqlash, M4B boblarini kiritish, MP3 ZIP ga ajratish va ohangni buzmasdan tezlashtirish.",
+        "tr": "Sesli kitap ve podcastlerde sessizlik tespiti ile M4B bölüm atomları ekleme, numaralı MP3 ZIP parçalama ve hızlandırma."
+      }
+    },
+    {
+      "id": "ghost_lens_sanitizer",
+      "category": "MEDIA_STICKERS",
+      "entryFile": "main.py",
+      "platforms": [
+        "Telegram",
+        "Web UI",
+        "SQLite"
+      ],
+      "systemPackages": [
+        "ffmpeg",
+        "python-pillow"
+      ],
+      "pipPackages": [
+        "pyTelegramBotAPI",
+        "Pillow"
+      ],
+      "useSystemSitePackages": true,
+      "defaultCron": "",
+      "fields": [
+        {
+          "key": "BOT_TOKEN",
+          "required": false,
+          "secret": true,
+          "hint": "123456:ABC..."
+        },
+        {
+          "key": "WEB_PORT",
+          "required": false,
+          "secret": false,
+          "defaultValue": "8100",
+          "hint": "8100"
+        },
+        {
+          "key": "ALLOWED_USER_IDS",
+          "required": false,
+          "secret": false,
+          "defaultValue": "",
+          "hint": "12345678,87654321"
+        }
+      ],
+      "title": {
+        "en": "Ghost Lens Sanitizer (EXIF & Geotag Scrubber)",
+        "ru": "Ghost Lens Sanitizer (Глубокая очистка EXIF и GPS)",
+        "tg": "Ghost Lens Sanitizer (Тозакунии амиқи EXIF ва GPS)",
+        "uz": "Ghost Lens Sanitizer (EXIF va GPS tozalash)",
+        "tr": "Ghost Lens Sanitizer (EXIF ve GPS Konum Temizleyici)",
+        "es": "Ghost Lens Sanitizer (Limpiador de EXIF y Geotags GPS)",
+        "de": "Ghost Lens Sanitizer (EXIF- & GPS-Geotag-Bereiniger)",
+        "fr": "Ghost Lens Sanitizer (Nettoyeur de Métadonnées EXIF et GPS)",
+        "it": "Ghost Lens Sanitizer (Pulitore Metadati EXIF e GPS)",
+        "pt": "Ghost Lens Sanitizer (Limpador de Metadados EXIF e GPS)",
+        "pl": "Ghost Lens Sanitizer (Czyszczenie Metadanych EXIF i GPS)",
+        "uk": "Ghost Lens Sanitizer (Глибока очистка EXIF та GPS)",
+        "kk": "Ghost Lens Sanitizer (EXIF және GPS тазалау құралы)",
+        "ky": "Ghost Lens Sanitizer (EXIF жана GPS тазалоочу)",
+        "az": "Ghost Lens Sanitizer (EXIF və GPS Təmizləyicisi)",
+        "ar": "Ghost Lens Sanitizer (تنظيف عميق لبيانات EXIF و GPS)",
+        "fa": "Ghost Lens Sanitizer (پاکسازی عمیق متادیتا EXIF و GPS)",
+        "hi": "Ghost Lens Sanitizer (EXIF और GPS जियोटैग क्लीनर)",
+        "zh-cn": "Ghost Lens Sanitizer (EXIF/GPS地理标记深度擦除与隐写检测)",
+        "ja": "Ghost Lens Sanitizer (EXIF・GPS位置情報・内嵌サムネイル完全消去)",
+        "ko": "Ghost Lens Sanitizer (EXIF 및 GPS 메타데이터 영구 제거기)",
+        "id": "Ghost Lens Sanitizer (Pembersih Metadata EXIF & Geotag GPS)",
+        "vi": "Ghost Lens Sanitizer (Xóa siêu dữ liệu EXIF & Định vị GPS)",
+        "th": "Ghost Lens Sanitizer (ลบข้อมูลเมตา EXIF และพิกัด GPS)"
+      },
+      "description": {
+        "en": "Deep EXIF, XMP, IPTC, ICC, and thumbnail scrubber for photos and lossless MP4/MOV container atom sanitizer. Includes LSB steganographic canary analyzer.",
+        "ru": "Глубокая очистка EXIF, XMP, IPTC, ICC и миниатюр для фото, а также чистка атомов MP4/MOV без перекодирования. Включает стеганографический анализатор LSB.",
+        "tg": "Тозакунии амиқи EXIF, GPS ва миниатюраҳо барои аксҳо ва видеоҳо бо таҳлили стеганографии LSB.",
+        "uz": "Rasmlar uchun EXIF, GPS va kesh tozalash hamda MP4/MOV atomlarini tozalash, steganografik tahlil.",
+        "tr": "Fotoğraflar için EXIF, GPS ve önbellek temizleme, kayıpsız MP4/MOV atom temizliği ve steganografi kontrolü."
+      }
+    },
+    {
+      "id": "stego_vault",
+      "category": "MEDIA_STICKERS",
+      "entryFile": "main.py",
+      "platforms": [
+        "Telegram",
+        "Web UI",
+        "SQLite"
+      ],
+      "systemPackages": [
+        "ffmpeg",
+        "python-pillow"
+      ],
+      "pipPackages": [
+        "pyTelegramBotAPI",
+        "Pillow"
+      ],
+      "useSystemSitePackages": true,
+      "defaultCron": "",
+      "fields": [
+        {
+          "key": "BOT_TOKEN",
+          "required": false,
+          "secret": true,
+          "hint": "123456:ABC..."
+        },
+        {
+          "key": "WEB_PORT",
+          "required": false,
+          "secret": false,
+          "defaultValue": "8101",
+          "hint": "8101"
+        },
+        {
+          "key": "ALLOWED_USER_IDS",
+          "required": false,
+          "secret": false,
+          "defaultValue": "",
+          "hint": "12345678,87654321"
+        }
+      ],
+      "title": {
+        "en": "Stego Vault (Cryptographic LSB Steganography)",
+        "ru": "Stego Vault (Криптографическая LSB-стеганография)",
+        "tg": "Stego Vault (Стеганографияи криптографӣ)",
+        "uz": "Stego Vault (Kriptografik LSB steganografiya)",
+        "tr": "Stego Vault (Kriptografik LSB Steganografi)",
+        "es": "Stego Vault (Esteganografía Criptográfica LSB)",
+        "de": "Stego Vault (Kryptografische LSB-Steganographie)",
+        "fr": "Stego Vault (Stéganographie Cryptographique LSB)",
+        "it": "Stego Vault (Steganografia Crittografica LSB)",
+        "pt": "Stego Vault (Esteganografia Criptográfica LSB)",
+        "pl": "Stego Vault (Kryptograficzna Steganografia LSB)",
+        "uk": "Stego Vault (Криптографічна LSB-стеганографія)",
+        "kk": "Stego Vault (Криптографиялық LSB стеганографиясы)",
+        "ky": "Stego Vault (Криптографиялык LSB стеганография)",
+        "az": "Stego Vault (Kriptoqrafik LSB Steqanoqrafiyası)",
+        "ar": "Stego Vault (إخفاء البيانات وتشفيرها داخل الصور LSB)",
+        "fa": "Stego Vault (استگانوگرافی و پنهان‌نگاری رمزنگاری شده LSB)",
+        "hi": "Stego Vault (क्रिप्टोग्राफिक LSB स्टेग्नोग्राफ़ी वॉल्ट)",
+        "zh-cn": "Stego Vault (密码学LSB图像与音频隐写保险库)",
+        "ja": "Stego Vault (暗号化LSB画像・音声ステガノグラフィ)",
+        "ko": "Stego Vault (암호화 LSB 미디어 스테가노그래피)",
+        "id": "Stego Vault (Steganografi Kriptografi LSB)",
+        "vi": "Stego Vault (Mã hóa và giấu tin LSB trong ảnh/âm thanh)",
+        "th": "Stego Vault (การซ่อนข้อมูลเข้ารหัส LSB ในภาพและเสียง)"
+      },
+      "description": {
+        "en": "Embed and extract encrypted secrets inside PNG, WebP, BMP, and WAV carriers using AES-256-GCM authenticated encryption and keyed pseudorandom LSB scattering.",
+        "ru": "Внедрение и извлечение секретов в PNG, WebP, BMP и WAV с шифрованием AES-256-GCM, солью PBKDF2 и псевдослучайным распределением бит.",
+        "tg": "Пинҳон кардан ва кушодани маълумоти махфӣ дар файлҳои PNG, WebP ва WAV бо рамзгузории AES-256-GCM.",
+        "uz": "PNG, WebP va WAV fayllarda maxfiy sirlarni AES-256-GCM shifrlash bilan yashirish va chiqarish.",
+        "tr": "PNG, WebP ve WAV dosyalarında AES-256-GCM şifreleme ve LSB ile gizli verileri saklama ve çıkarma."
+      }
+    },
+    {
+      "id": "cloud_shard_backup",
+      "category": "MEDIA_STICKERS",
+      "title": {
+        "en": "Cloud Shard Backup (Shamir's Secret Sharing & GF(256) Redundancy)",
+        "ru": "Cloud Shard Backup (Схема разделения секрета Шамира и GF(256))",
+        "uz": "Cloud Shard Backup (Shamir maxfiy bo'laklari va GF(256))",
+        "tg": "Cloud Shard Backup (Тақсимоти махфии Шамир ва GF(256))",
+        "tr": "Cloud Shard Backup (Shamir Gizli Paylaşımı ve GF(256))",
+        "es": "Cloud Shard Backup (División Secreta de Shamir y GF(256))",
+        "de": "Cloud Shard Backup (Shamirs Secret Sharing & GF(256) Redundanz)",
+        "fr": "Cloud Shard Backup (Partage de Secret de Shamir & GF(256))",
+        "it": "Cloud Shard Backup (Condivisione Segreta di Shamir & GF(256))",
+        "pt": "Cloud Shard Backup (Divisão de Segredos de Shamir & GF(256))",
+        "pl": "Cloud Shard Backup (Schemat Dzielenia Sekretu Shamira & GF(256))",
+        "uk": "Cloud Shard Backup (Схема поділу секрету Шаміра та GF(256))",
+        "kk": "Cloud Shard Backup (Шамир құпиясын бөлу схемасы және GF(256))",
+        "ky": "Cloud Shard Backup (Шамир купуя бөлүштүрүү схемасы жана GF(256))",
+        "az": "Cloud Shard Backup (Şamir Gizli Bölünmə Sxemi və GF(256))",
+        "ar": "Cloud Shard Backup (تقسيم الأسرار بطريقة شامير وحقل غالوا)",
+        "fa": "Cloud Shard Backup (طرح اشتراک راز شامیر و میدان گالوا)",
+        "hi": "Cloud Shard Backup (शामिर का सीक्रेट शेयरिंग और GF(256) बैकअप)",
+        "th": "Cloud Shard Backup (การแบ่งความลับของชามีร์และสำรองข้อมูล GF(256))",
+        "zh-cn": "Cloud Shard Backup (沙米尔秘密共享与GF(256)冗余分片备份)",
+        "ja": "Cloud Shard Backup (シャミアの秘密分散法 & GF(256)冗長バックアップ)",
+        "ko": "Cloud Shard Backup (샤미르 비밀 공유 및 GF(256) 중복 분할 백업)",
+        "vi": "Cloud Shard Backup (Chia sẻ bí mật Shamir & Sao lưu mảnh GF(256))",
+        "id": "Cloud Shard Backup (Pembagian Rahasia Shamir & Redundansi GF(256))"
+      },
+      "description": {
+        "en": "Split files into N redundant shards where any K shards restore the original with zero information leaked from K-1 shards using Galois Field GF(2^8) arithmetic.",
+        "ru": "Разделение файлов на N шардов по схеме Шамира: любые K шардов восстанавливают оригинал, при этом K-1 шардов не дают никакой информации (GF(2^8)).",
+        "uz": "Fayllarni Shamir sxemasi bo'yicha N bo'lakka bo'lish: har qanday K bo'lak originalni tiklaydi, K-1 bo'lakdan hech qanday ma'lumot olinmaydi.",
+        "tg": "Тақсим кардани файлҳо ба N қисм бо схемаи Шамир: дилхоҳ K қисм аслро барқарор мекунанд ва K-1 қисм ҳеҷ маълумоте ошкор намекунанд.",
+        "tr": "Dosyaları Shamir şemasıyla N parçaya bölün: herhangi K parça orijinali kurtarır, K-1 parça sıfır bilgi sızdırır (GF(2^8))."
+      },
+      "entryFile": "main.py",
+      "platforms": [
+        "Telegram",
+        "Web UI",
+        "SQLite"
+      ],
+      "pipPackages": [
+        "pyTelegramBotAPI"
+      ],
+      "systemPackages": [],
+      "useSystemSitePackages": true,
+      "defaultCron": "",
+      "fields": [
+        {
+          "key": "BOT_TOKEN",
+          "required": false,
+          "secret": true,
+          "hint": "123456:ABC..."
+        },
+        {
+          "key": "WEB_PORT",
+          "required": false,
+          "secret": false,
+          "defaultValue": "8102",
+          "hint": "8102"
+        },
+        {
+          "key": "ALLOWED_USER_IDS",
+          "required": false,
+          "secret": false,
+          "defaultValue": "",
+          "hint": "12345678,87654321"
+        }
+      ]
+    },
+    {
+      "id": "doc_scanner_lens",
+      "category": "MEDIA_STICKERS",
+      "title": {
+        "en": "Doc Scanner Lens (Shadow Removal & Multi-Page PDF Compiler)",
+        "ru": "Doc Scanner Lens (Устранение теней, отбеливание и сборка PDF)",
+        "uz": "Doc Scanner Lens (Soyalarni yo'qotish va ko'p sahifali PDF)",
+        "tg": "Doc Scanner Lens (Бартарафсозии сояҳо ва сохтани PDF)",
+        "tr": "Doc Scanner Lens (Gölge Temizleme ve Çok Sayfalı PDF)",
+        "es": "Doc Scanner Lens (Eliminación de Sombras y Compilador PDF)",
+        "de": "Doc Scanner Lens (Schattenentfernung & Mehrseitiger PDF-Compiler)",
+        "fr": "Doc Scanner Lens (Suppression des Ombres & Compilateur PDF)",
+        "it": "Doc Scanner Lens (Rimozione Ombre & Compilatore PDF)",
+        "pt": "Doc Scanner Lens (Remoção de Sombras & Compilador PDF)",
+        "pl": "Doc Scanner Lens (Usuwanie Cieni i Kompilator Wielostronicowych PDF)",
+        "uk": "Doc Scanner Lens (Видалення тіней, відбілювання та збірка PDF)",
+        "kk": "Doc Scanner Lens (Көлеңкелерді кетіру және көп бетті PDF құрастыру)",
+        "ky": "Doc Scanner Lens (Көлөкөлөрдү тазалоо жана көп барактуу PDF)",
+        "az": "Doc Scanner Lens (Kölgələrin təmizlənməsi və Çoxsəhifəli PDF)",
+        "ar": "Doc Scanner Lens (إزالة الظلال وتبييض المستندات وتجميع PDF)",
+        "fa": "Doc Scanner Lens (حذف سایه، سفید کردن اسناد و ساخت PDF)",
+        "hi": "Doc Scanner Lens (छाया हटाना, पेपर व्हाइटनिंग और मल्टी-पेज PDF)",
+        "th": "Doc Scanner Lens (ลบเงา ปรับกระดาษขาว และรวมเอกสารเป็น PDF)",
+        "zh-cn": "Doc Scanner Lens (文档阴影去除、纸张增白与多页PDF打包)",
+        "ja": "Doc Scanner Lens (影除去・紙面白レベル補正 & 複数ページPDF結合)",
+        "ko": "Doc Scanner Lens (그림자 제거, 종이 미백 및 다중 페이지 PDF 병합)",
+        "vi": "Doc Scanner Lens (Xóa bóng, làm trắng tài liệu & ghép PDF nhiều trang)",
+        "id": "Doc Scanner Lens (Penghapus Bayangan & Kompiler Dokumen PDF)"
+      },
+      "description": {
+        "en": "Transforms phone camera photos into crisp, professional document scans: removes uneven shadows, whitens paper background, enhances contrast, and bundles multi-page sessions into PDF.",
+        "ru": "Превращает снимки с камеры в четкие профессиональные сканы: устраняет неравномерные тени, отбеливает фон бумаги, повышает резкость текста и собирает многостраничные PDF.",
+        "uz": "Kamera fotosuratlarini sifatli hujjat skaneriga aylantiradi: soyalarni yo'qotadi, qog'ozni oqartiradi va ko'p sahifali PDF hujjatlarini yaratadi.",
+        "tg": "Аксҳои камераро ба скани касбии ҳуҷҷатҳо табдил медиҳад: сояҳоро тоза мекунад, қоғазро сафед мекунад ва PDF месозад.",
+        "tr": "Kamera fotoğraflarını net profesyonel taramalara dönüştürür: gölgeleri kaldırır, kağıt tabanını beyazlatır ve çok sayfalı PDF belgeleri oluşturur."
+      },
+      "entryFile": "main.py",
+      "platforms": [
+        "Telegram",
+        "Web UI",
+        "SQLite"
+      ],
+      "pipPackages": [
+        "pyTelegramBotAPI",
+        "Pillow"
+      ],
+      "systemPackages": [
+        "python-pillow"
+      ],
+      "useSystemSitePackages": true,
+      "defaultCron": "",
+      "fields": [
+        {
+          "key": "BOT_TOKEN",
+          "required": false,
+          "secret": true,
+          "hint": "123456:ABC..."
+        },
+        {
+          "key": "WEB_PORT",
+          "required": false,
+          "secret": false,
+          "defaultValue": "8103",
+          "hint": "8103"
+        },
+        {
+          "key": "ALLOWED_USER_IDS",
+          "required": false,
+          "secret": false,
+          "defaultValue": "",
+          "hint": "12345678,87654321"
+        }
+      ]
+    },
+    {
+      "id": "barcode_matrix_lab",
+      "category": "MEDIA_STICKERS",
+      "title": {
+        "en": "Barcode Matrix Lab (Vector QR, Code128 & Crypto Payment Studio)",
+        "ru": "Barcode Matrix Lab (Векторные QR, Code128 и Криптоплатежи)",
+        "uz": "Barcode Matrix Lab (Vektorli QR, Code128 va Kripto to'lovlar)",
+        "tg": "Barcode Matrix Lab (QR-кодҳои векторӣ, Code128 ва пардохтҳо)",
+        "tr": "Barcode Matrix Lab (Vektör QR, Code128 ve Kripto Ödeme Stüdyosu)",
+        "es": "Barcode Matrix Lab (QR Vectorial, Code128 y Pagos Cripto)",
+        "de": "Barcode Matrix Lab (Vektor-QR, Code128 & Krypto-Zahlungsstudio)",
+        "fr": "Barcode Matrix Lab (QR Vectoriel, Code128 & Studio Paiement Crypto)",
+        "it": "Barcode Matrix Lab (QR Vettoriale, Code128 & Pagamenti Crypto)",
+        "pt": "Barcode Matrix Lab (QR Vetorial, Code128 & Pagamentos Cripto)",
+        "pl": "Barcode Matrix Lab (Wektorowe QR, Code128 i Płatności Krypto)",
+        "uk": "Barcode Matrix Lab (Векторні QR, Code128 та Криптоплатежі)",
+        "kk": "Barcode Matrix Lab (Векторлық QR, Code128 және Криптотөлемдер)",
+        "ky": "Barcode Matrix Lab (Вектордук QR, Code128 жана Криптотөлөмдөр)",
+        "az": "Barcode Matrix Lab (Vektor QR, Code128 və Kripto Ödənişlər)",
+        "ar": "Barcode Matrix Lab (رموز QR الشعاعية والباركود ومدفوعات العملات المشفرة)",
+        "fa": "Barcode Matrix Lab (کدهای برداری QR، بارکد Code128 و پرداخت کریپتو)",
+        "hi": "Barcode Matrix Lab (वेक्टर QR, कोड128 बारकोड और क्रिप्टो भुगतान)",
+        "th": "Barcode Matrix Lab (เวกเตอร์ QR บาร์โค้ด Code128 และการชำระเงินคริปโต)",
+        "zh-cn": "Barcode Matrix Lab (矢量QR码、Code128工业条形码与加密货币支付)",
+        "ja": "Barcode Matrix Lab (ベクターQRコード・Code128バーコード & 暗号資産決済)",
+        "ko": "Barcode Matrix Lab (벡터 QR 코드, Code128 바코드 및 암호화폐 결제)",
+        "vi": "Barcode Matrix Lab (Mã QR vector, Mã vạch Code128 & Thanh toán Crypto)",
+        "id": "Barcode Matrix Lab (Vektor QR, Barcode Code128 & Pembayaran Kripto)"
+      },
+      "description": {
+        "en": "Generates high-density vector QR codes (L/M/Q/H), Wi-Fi connect profiles, crypto payment links (BTC, ETH, TON, USDT), and 1D Code128 barcodes with SVG and PNG export.",
+        "ru": "Генерация векторных QR-кодов (ECC H), профилей Wi-Fi, криптоплатежей (BTC, ETH, TON, USDT) и промышленных штрихкодов Code128 с экспортом в SVG и PNG.",
+        "uz": "Vektorli QR-kodlar (ECC H), Wi-Fi profillari, kripto to'lovlar (BTC, ETH, TON, USDT) va Code128 sanoat shtrix-kodlarini SVG va PNG formatda yaratish.",
+        "tg": "Сохтани QR-кодҳои векторӣ, пайвасти Wi-Fi, пардохтҳои крипто ва штрихкодҳои Code128 бо содирот ба SVG ва PNG.",
+        "tr": "Yüksek yoğunluklu vektör QR kodları, Wi-Fi bağlantı profilleri, kripto ödeme bağlantıları ve 1D Code128 barkodları SVG ve PNG olarak üretir."
+      },
+      "entryFile": "main.py",
+      "platforms": [
+        "Telegram",
+        "Web UI",
+        "SQLite"
+      ],
+      "pipPackages": [
+        "pyTelegramBotAPI",
+        "Pillow",
+        "qrcode"
+      ],
+      "systemPackages": [
+        "python-pillow"
+      ],
+      "useSystemSitePackages": true,
+      "defaultCron": "",
+      "fields": [
+        {
+          "key": "BOT_TOKEN",
+          "required": false,
+          "secret": true,
+          "hint": "123456:ABC..."
+        },
+        {
+          "key": "WEB_PORT",
+          "required": false,
+          "secret": false,
+          "defaultValue": "8104",
+          "hint": "8104"
+        },
+        {
+          "key": "ALLOWED_USER_IDS",
+          "required": false,
+          "secret": false,
+          "defaultValue": "",
+          "hint": "12345678,87654321"
+        }
+      ]
+    },
+    {
+      "id": "site_visual_differ",
+      "category": "MEDIA_STICKERS",
+      "title": {
+        "en": "Site Visual Differ (Pixel UI Regression & Animated GIF Heatmap)",
+        "ru": "Site Visual Differ (Пиксельный анализ UI, Heatmap и GIF сравнение)",
+        "uz": "Site Visual Differ (Pikselli UI tahlili, Heatmap va GIF solishtirish)",
+        "tg": "Site Visual Differ (Муқоисаи пикселии UI ва Heatmap бо GIF)",
+        "tr": "Site Visual Differ (Piksel Hassasiyetli UI Testi ve GIF Fark Haritası)",
+        "es": "Site Visual Differ (Regresión Visual de UI, Mapa de Calor y GIF)",
+        "de": "Site Visual Differ (Pixelgenaue UI-Regression & Animierte GIF-Heatmap)",
+        "fr": "Site Visual Differ (Régression Visuelle UI, Carte Thermique & GIF)",
+        "it": "Site Visual Differ (Regressione Visiva UI, Heatmap & GIF)",
+        "pt": "Site Visual Differ (Regressão Visual de UI, Heatmap e GIF Animado)",
+        "pl": "Site Visual Differ (Pikselowa Regresja Wizualna UI i Heatmapa GIF)",
+        "uk": "Site Visual Differ (Піксельний аналіз UI, Heatmap та GIF порівняння)",
+        "kk": "Site Visual Differ (Пиксельдік UI регрессиясы және GIF Heatmap)",
+        "ky": "Site Visual Differ (Пикселдик UI салыштыруу жана GIF Heatmap)",
+        "az": "Site Visual Differ (Piksel UI Reqressiyası və GIF İstilik Xəritəsi)",
+        "ar": "Site Visual Differ (اختبار الانحدار المرئي لواجهة المستخدم ومخطط حراري GIF)",
+        "fa": "Site Visual Differ (تست رگرسیون بصری رابط کاربری و نقشه حرارتی GIF)",
+        "hi": "Site Visual Differ (पिक्सेल-सटीक UI विज़ुअल रिग्रेशन और GIF हीटमैप)",
+        "th": "Site Visual Differ (การทดสอบภาพ UI และแผนที่ความร้อน GIF เคลื่อนไหว)",
+        "zh-cn": "Site Visual Differ (像素级UI视觉回归对比、差异热力图与动图GIF)",
+        "ja": "Site Visual Differ (ピクセル精度UI回帰テスト・差分ヒートマップ & GIF)",
+        "ko": "Site Visual Differ (픽셀 정밀 UI 시각적 회귀 테스트 및 GIF 히트맵)",
+        "vi": "Site Visual Differ (Kiểm thử hồi quy giao diện, Heatmap & GIF so sánh)",
+        "id": "Site Visual Differ (Regresi Visual UI Presisi Piksel & Heatmap GIF)"
+      },
+      "description": {
+        "en": "Compares baseline vs current screenshots with pixel-by-pixel Euclidean distance, generates fluorescent magenta UI defect heatmaps, and exports 500ms animated flicker GIFs.",
+        "ru": "Попиксельное сравнение снимков экрана, генерация неонового теплового слоя изменений (Heatmap) и создание мерцающих GIF-анимаций (500мс) для мгновенного выявления дефектов верстки.",
+        "uz": "Skrinshotlarni pikselma-piksel solishtirish, o'zgarishlar issiqlik xaritasi (Heatmap) va vizual siljishlarni aniqlash uchun animatsiyali GIF yaratish.",
+        "tg": "Муқоисаи дақиқи аксҳои экран, сохтани харитаи гармии тағйирот (Heatmap) ва тавлиди GIF барои ошкор кардани нуқсонҳои тарҳрезӣ.",
+        "tr": "Ekran görüntülerini piksel piksel karşılaştırır, değişiklikleri neon mor ısı haritasında vurgular ve 500ms aralıklı titreşimli GIF oluşturur."
+      },
+      "entryFile": "main.py",
+      "platforms": [
+        "Telegram",
+        "Web UI",
+        "SQLite"
+      ],
+      "pipPackages": [
+        "pyTelegramBotAPI",
+        "Pillow"
+      ],
+      "systemPackages": [
+        "python-pillow"
+      ],
+      "useSystemSitePackages": true,
+      "defaultCron": "",
+      "fields": [
+        {
+          "key": "BOT_TOKEN",
+          "required": false,
+          "secret": true,
+          "hint": "123456:ABC..."
+        },
+        {
+          "key": "WEB_PORT",
+          "required": false,
+          "secret": false,
+          "defaultValue": "8105",
+          "hint": "8105"
+        },
+        {
+          "key": "ALLOWED_USER_IDS",
+          "required": false,
+          "secret": false,
+          "defaultValue": "",
+          "hint": "12345678,87654321"
+        }
+      ]
+    },
+    {
+      "id": "dex_whale_radar",
+      "category": "DEVELOPER_TOOLS",
+      "title": {
+        "en": "DEX Whale Radar (Multi-Chain Swaps & AMM Price Impact)",
+        "ru": "DEX Whale Radar (Крупные сделки китов и AMM Слиппейдж)",
+        "uz": "DEX Whale Radar (Kitlar yirik bitimlari va AMM Slippage)",
+        "tg": "DEX Whale Radar (Муомилаҳои наҳангҳо ва лағзиши AMM)",
+        "tr": "DEX Whale Radar (Balina İşlemleri ve AMM Fiyat Kayması)",
+        "es": "DEX Whale Radar (Swaps de Ballenas e Impacto de Precio AMM)",
+        "de": "DEX Whale Radar (Wal-Transaktionen & AMM-Preisauswirkung)",
+        "fr": "DEX Whale Radar (Swaps de Baleines & Impact sur le Prix AMM)",
+        "it": "DEX Whale Radar (Operazioni Balene & Impatto Prezzo AMM)",
+        "pt": "DEX Whale Radar (Swaps de Baleias e Impacto de Preço AMM)",
+        "pl": "DEX Whale Radar (Transakcje Wielorybów i Wpływ na Cenę AMM)",
+        "uk": "DEX Whale Radar (Великі угоди китів та AMM Сліппейдж)",
+        "kk": "DEX Whale Radar (Киттердің ірі мәмілелері және AMM баға әсері)",
+        "ky": "DEX Whale Radar (Киттердин ири бүтүмдөрү жана AMM баа таасири)",
+        "az": "DEX Whale Radar (Kitlərin Böyük Əməliyyatları və AMM Sürüşməsi)",
+        "ar": "DEX Whale Radar (صفقات الحيتان الضخمة وتأثير أسعار صانع السوق الآلي)",
+        "fa": "DEX Whale Radar (تراکنش‌های نهنگ‌ها و لغزش قیمت AMM)",
+        "hi": "DEX Whale Radar (व्हेल स्वैप लेनदेन और AMM मूल्य प्रभाव)",
+        "th": "DEX Whale Radar (การติดตามธุรกรรมวาฬและผลกระทบราคา AMM)",
+        "zh-cn": "DEX Whale Radar (多链去中心化巨鲸交易雷达与AMM滑点计算)",
+        "ja": "DEX Whale Radar (マルチチェーン大口クジラ取引 & AMM価格影響度)",
+        "ko": "DEX Whale Radar (멀티체인 고래 트랜잭션 추적 및 AMM 슬리피지)",
+        "vi": "DEX Whale Radar (Theo dõi giao dịch cá voi & Trượt giá AMM)",
+        "id": "DEX Whale Radar (Transaksi Paus Multi-Chain & Dampak Harga AMM)"
+      },
+      "description": {
+        "en": "Tracks massive DEX swaps across TON, Solana, Ethereum, and Bitcoin, calculates exact Constant Product AMM price impact (x * y = k), and delivers configurable whale alerts.",
+        "ru": "Отслеживание крупных свопов китов в сетях TON, Solana, Ethereum и Bitcoin, точный расчет влияния на цену по формуле AMM (x * y = k) и настраиваемые алерты.",
+        "uz": "TON, Solana, Ethereum va Bitcoin tarmoqlarida yirik kitlar svoplarini kuzatish, AMM formulasi (x * y = k) bo'yicha narx siljishini hisoblash.",
+        "tg": "Пайгирии муомилаҳои калони наҳангҳо дар TON, Solana, Ethereum ва Bitcoin, ҳисоби лағзиши нарх бо формулаи AMM (x * y = k).",
+        "tr": "TON, Solana, Ethereum ve Bitcoin üzerindeki büyük balina takaslarını izler, AMM formülüyle fiyat kaymasını hesaplar ve uyarılar sunar."
+      },
+      "entryFile": "main.py",
+      "platforms": [
+        "Telegram",
+        "Web UI",
+        "SQLite"
+      ],
+      "pipPackages": [
+        "pyTelegramBotAPI"
+      ],
+      "systemPackages": [],
+      "useSystemSitePackages": true,
+      "defaultCron": "",
+      "fields": [
+        {
+          "key": "BOT_TOKEN",
+          "required": false,
+          "secret": true,
+          "hint": "123456:ABC..."
+        },
+        {
+          "key": "WEB_PORT",
+          "required": false,
+          "secret": false,
+          "defaultValue": "8106",
+          "hint": "8106"
+        },
+        {
+          "key": "ALLOWED_USER_IDS",
+          "required": false,
+          "secret": false,
+          "defaultValue": "",
+          "hint": "12345678,87654321"
+        }
+      ]
+    },
+    {
+      "id": "osint_recon_warden",
+      "category": "DEVELOPER_TOOLS",
+      "title": {
+        "en": "OSINT Recon Warden (DNS Infrastructure & SSL Deep Audit)",
+        "ru": "OSINT Recon Warden (Разведка DNS, SSL/TLS и Security Headers)",
+        "uz": "OSINT Recon Warden (DNS razvedkasi, SSL/TLS va xavfsizlik sarlavhalari)",
+        "tg": "OSINT Recon Warden (Иктишофи DNS, SSL/TLS ва сарлавҳаҳои амниятӣ)",
+        "tr": "OSINT Recon Warden (DNS Altyapısı, SSL/TLS ve Güvenlik Başlıkları)"
+      },
+      "description": {
+        "en": "Performs deep OSINT reconnaissance on domain infrastructure, resolves IPv4/IPv6, audits X.509 SSL/TLS certificates and cipher suites, and verifies HTTP security headers (HSTS, CSP, XFO).",
+        "ru": "Глубокая OSINT разведка доменной инфраструктуры: резолв IPv4/IPv6, аудит SSL/TLS сертификатов X.509, шифров и проверка HTTP заголовков безопасности (HSTS, CSP, XFO)."
+      },
+      "entryFile": "main.py",
+      "platforms": [
+        "Telegram",
+        "Web UI",
+        "SQLite"
+      ],
+      "pipPackages": [
+        "pyTelegramBotAPI"
+      ],
+      "systemPackages": [],
+      "useSystemSitePackages": true,
+      "defaultCron": "",
+      "fields": [
+        {
+          "key": "BOT_TOKEN",
+          "required": false,
+          "secret": true,
+          "hint": "123456:ABC..."
+        },
+        {
+          "key": "WEB_PORT",
+          "required": false,
+          "secret": false,
+          "defaultValue": "8107",
+          "hint": "8107"
+        },
+        {
+          "key": "ALLOWED_USER_IDS",
+          "required": false,
+          "secret": false,
+          "defaultValue": "",
+          "hint": "12345678,87654321"
+        }
+      ]
+    },
+    {
+      "id": "antiraid_math_shield",
+      "category": "MODERATION",
+      "title": {
+        "en": "Anti-Raid Math Shield (Zero-Inline Keyboard CAPTCHA & Group Defense)",
+        "ru": "Anti-Raid Math Shield (Защита от рейдов и спама с математической капчей)",
+        "uz": "Anti-Raid Math Shield (Guruhlarni reyd va botlardan matematik kapcha bilan himoyalash)",
+        "tg": "Anti-Raid Math Shield (Муҳофизат аз рейдҳо ва спам бо капчаи математикӣ)",
+        "tr": "Anti-Raid Math Shield (Matematiksel CAPTCHA ile Grup Baskını Koruması)"
+      },
+      "description": {
+        "en": "Protects Telegram groups and communities against raids, spam waves, and botnets using timed random math equations on native keyboards (0% inline buttons) and sliding window rate limiting.",
+        "ru": "Защищает Telegram группы от рейдов, наплыва ботнетов и спама с помощью динамических уравнений на системной клавиатуре (0% inline кнопок) и умного флуд-контроля."
+      },
+      "entryFile": "main.py",
+      "platforms": [
+        "Telegram",
+        "Web UI",
+        "SQLite"
+      ],
+      "pipPackages": [
+        "pyTelegramBotAPI"
+      ],
+      "systemPackages": [],
+      "useSystemSitePackages": true,
+      "defaultCron": "",
+      "fields": [
+        {
+          "key": "BOT_TOKEN",
+          "required": false,
+          "secret": true,
+          "hint": "123456:ABC..."
+        },
+        {
+          "key": "WEB_PORT",
+          "required": false,
+          "secret": false,
+          "defaultValue": "8108",
+          "hint": "8108"
+        },
+        {
+          "key": "ALLOWED_USER_IDS",
+          "required": false,
+          "secret": false,
+          "defaultValue": "",
+          "hint": "12345678,87654321"
+        }
+      ]
+    },
+    {
+      "id": "forum_crm_dispatcher",
+      "category": "PRODUCTIVITY",
+      "title": {
+        "en": "Forum CRM Dispatcher (Telegram Forum Topics Support Ticket Routing)",
+        "ru": "Forum CRM Dispatcher (Маршрутизация обращений клиентов в топики форума)",
+        "uz": "Forum CRM Dispatcher (Mijozlar murojaatlarini Telegram Forum mavzulariga yo‘naltirish)",
+        "tg": "Forum CRM Dispatcher (Харитаи дархостҳои муштариён ба мавзӯъҳои форум)",
+        "tr": "Forum CRM Dispatcher (Müşteri Taleplerini Forum Konularına Yönlendirme)"
+      },
+      "description": {
+        "en": "Routes customer support tickets directly into isolated Telegram Forum Topics inside staff supergroups, tracks statuses, logs replies in SQLite, and uses 100% keyboard UI.",
+        "ru": "Маршрутизирует клиентские тикеты в приватные топики супергрупп (Telegram Forum Topics), ведет историю диалога в SQLite и работает на 100% системной клавиатуре."
+      },
+      "entryFile": "main.py",
+      "platforms": [
+        "Telegram",
+        "Web UI",
+        "SQLite"
+      ],
+      "pipPackages": [
+        "pyTelegramBotAPI"
+      ],
+      "systemPackages": [],
+      "useSystemSitePackages": true,
+      "defaultCron": "",
+      "fields": [
+        {
+          "key": "BOT_TOKEN",
+          "required": false,
+          "secret": true,
+          "hint": "123456:ABC..."
+        },
+        {
+          "key": "WEB_PORT",
+          "required": false,
+          "secret": false,
+          "defaultValue": "8109",
+          "hint": "8109"
+        },
+        {
+          "key": "ALLOWED_USER_IDS",
+          "required": false,
+          "secret": false,
+          "defaultValue": "",
+          "hint": "12345678,87654321"
+        }
+      ]
+    },
+    {
+      "id": "content_auto_pipeline",
+      "category": "PRODUCTIVITY",
+      "title": {
+        "en": "Content Auto Pipeline (RSS/Atom Syndicator & Deduplication)",
+        "ru": "Content Auto Pipeline (Автопостинг RSS/Atom потоков и дедупликация)",
+        "uz": "Content Auto Pipeline (RSS/Atom oqimlarini avtoposting va deduplikatsiya)",
+        "tg": "Content Auto Pipeline (Интишори автоматии ҷараёнҳои RSS/Atom)",
+        "tr": "Content Auto Pipeline (RSS/Atom Akışları Otomasyonu ve Çoğaltma Önleme)"
+      },
+      "description": {
+        "en": "Monitors external RSS and Atom feeds, strips unsafe HTML, formats Telegram posts, prevents duplicates with SHA-256 caching, and features 100% keyboard controls.",
+        "ru": "Мониторинг RSS/Atom лент, безопасная очистка HTML, трансформация шаблонов, дедупликация по SHA-256 и 100% клавиатурное управление."
+      },
+      "entryFile": "main.py",
+      "platforms": [
+        "Telegram",
+        "Web UI",
+        "SQLite"
+      ],
+      "pipPackages": [
+        "pyTelegramBotAPI"
+      ],
+      "systemPackages": [],
+      "useSystemSitePackages": true,
+      "defaultCron": "*/15 * * * *",
+      "fields": [
+        {
+          "key": "BOT_TOKEN",
+          "required": false,
+          "secret": true,
+          "hint": "123456:ABC..."
+        },
+        {
+          "key": "WEB_PORT",
+          "required": false,
+          "secret": false,
+          "defaultValue": "8110",
+          "hint": "8110"
+        },
+        {
+          "key": "ALLOWED_USER_IDS",
+          "required": false,
+          "secret": false,
+          "defaultValue": "",
+          "hint": "12345678,87654321"
+        }
+      ]
+    },
+    {
+      "id": "python_sandbox_runner",
+      "category": "DEVELOPER_TOOLS",
+      "title": {
+        "en": "Python Sandbox Runner (AST-Audited Safe Code Execution)",
+        "ru": "Python Sandbox Runner (Безопасное исполнение Python с AST-аудитом)",
+        "uz": "Python Sandbox Runner (AST auditi bilan Python kodini xavfsiz bajarish)",
+        "tg": "Python Sandbox Runner (Иҷрои бехатари рамзи Python бо аудити AST)",
+        "tr": "Python Sandbox Runner (AST Denetimli Güvenli Kod Çalıştırıcı)"
+      },
+      "description": {
+        "en": "Safe execution environment for arbitrary Python code in Telegram with syntax-tree AST inspection, disallowed builtins filtering, execution timeout, and zero-inline UI.",
+        "ru": "Безопасная изолированная среда исполнения Python в Telegram: аудит AST-дерева, блокировка опасных вызовов, таймаут 5.0с и 100% клавиатурное управление."
+      },
+      "entryFile": "main.py",
+      "platforms": [
+        "Telegram",
+        "Web UI",
+        "SQLite"
+      ],
+      "pipPackages": [
+        "pyTelegramBotAPI"
+      ],
+      "systemPackages": [],
+      "useSystemSitePackages": true,
+      "defaultCron": "",
+      "fields": [
+        {
+          "key": "BOT_TOKEN",
+          "required": false,
+          "secret": true,
+          "hint": "123456:ABC..."
+        },
+        {
+          "key": "WEB_PORT",
+          "required": false,
+          "secret": false,
+          "defaultValue": "8111",
+          "hint": "8111"
+        },
+        {
+          "key": "ALLOWED_USER_IDS",
+          "required": false,
+          "secret": false,
+          "defaultValue": "",
+          "hint": "12345678,87654321"
+        }
+      ]
+    },
+    {
+      "id": "chronos_deep_audit",
+      "category": "DEVELOPER_TOOLS",
+      "title": {
+        "en": "Chronos Deep Audit (Network Latency Sonar & SLA Uptime)",
+        "ru": "Chronos Deep Audit (Сонар задержек сети, перцентили и аптайм SLA)",
+        "uz": "Chronos Deep Audit (Tarmoq kechikishi sonari, foizlar va SLA aplaym)",
+        "tg": "Chronos Deep Audit (Сонари таъхири шабака ва мониторинги SLA)",
+        "tr": "Chronos Deep Audit (Ağ Gecikmesi Radarı ve SLA Çalışma Süresi)"
+      },
+      "description": {
+        "en": "High-precision TCP/HTTP network latency sonar, calculates P50/P90/P99 rolling percentiles, renders ASCII histograms, monitors uptime SLA, and operates with 100% keyboard UI.",
+        "ru": "Высокоточный сетевой сонар задержек, расчет перцентилей отклика P50/P90/P99, ASCII-гистограммы латентности, аудит аптайма SLA и 100% клавиатурный интерфейс."
+      },
+      "entryFile": "main.py",
+      "platforms": [
+        "Telegram",
+        "Web UI",
+        "SQLite"
+      ],
+      "pipPackages": [
+        "pyTelegramBotAPI"
+      ],
+      "systemPackages": [],
+      "useSystemSitePackages": true,
+      "defaultCron": "*/5 * * * *",
+      "fields": [
+        {
+          "key": "BOT_TOKEN",
+          "required": false,
+          "secret": true,
+          "hint": "123456:ABC..."
+        },
+        {
+          "key": "WEB_PORT",
+          "required": false,
+          "secret": false,
+          "defaultValue": "8112",
+          "hint": "8112"
+        },
+        {
+          "key": "ALLOWED_USER_IDS",
+          "required": false,
+          "secret": false,
+          "defaultValue": "",
+          "hint": "12345678,87654321"
+        }
+      ]
+    }
+  ]
+}
