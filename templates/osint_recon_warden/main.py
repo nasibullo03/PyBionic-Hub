@@ -4,6 +4,7 @@ if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(line_buffering=True)
 if hasattr(sys.stderr, "reconfigure"):
     sys.stderr.reconfigure(line_buffering=True)
+import html
 import json
 import time
 import threading
@@ -114,14 +115,14 @@ class StudioHandler(BaseHTTPRequestHandler):
         dns = last.get("dns", {})
         ssl_info = last.get("ssl", {})
         hdrs = last.get("headers", {})
-        target = last.get("target", "None")
+        target = html.escape(str(last.get("target", "None")))
         score = last.get("security_score", 0)
-        badge = last.get("score_badge", "N/A")
+        badge = html.escape(str(last.get("score_badge", "N/A"))) + f" ({score}/100)"
 
-        ips_str = ", ".join(dns.get("ipv4", [])) or "None"
-        issuer = ssl_info.get("issuer", "N/A")
-        expires = ssl_info.get("expires", "N/A")
-        cipher = ssl_info.get("cipher", "N/A")
+        ips_str = html.escape(", ".join(dns.get("ipv4", [])) or "None")
+        issuer = html.escape(str(ssl_info.get("issuer", "N/A")))
+        expires = html.escape(str(ssl_info.get("expires", "N/A")))
+        cipher = html.escape(str(ssl_info.get("cipher", "N/A")))
 
         return f"""<!DOCTYPE html>
 <html lang="en">
@@ -330,6 +331,15 @@ def start_bot():
 
     bot = telebot.TeleBot(BOT_TOKEN)
     user_state = {}
+
+    ALLOWED = {int(x) for x in os.environ.get("ALLOWED_USER_IDS", "").replace(" ", "").split(",") if x.isdigit()}
+
+    def is_allowed(user_id: int) -> bool:
+        return not ALLOWED or user_id in ALLOWED
+
+    @bot.message_handler(func=lambda m: not is_allowed(m.from_user.id))
+    def access_denied(m):
+        bot.reply_to(m, f"⛔ Доступ ограничен владельцем бота (ваш ID: {m.from_user.id}).")
 
     def get_user_lang(chat_id):
         return user_state.get(chat_id, {}).get("lang", "ru")

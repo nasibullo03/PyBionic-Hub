@@ -39,7 +39,8 @@ class ThreadedStudioServer(ThreadingHTTPServer):
 
 from pathlib import Path
 from typing import Any
-from urllib.parse import parse_qs, urlparse
+import urllib.parse
+from urllib.parse import parse_qs, urlparse, urlencode
 
 try:
     import telebot

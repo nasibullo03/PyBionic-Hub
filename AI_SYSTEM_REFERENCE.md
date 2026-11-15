@@ -49,25 +49,27 @@
 Every bot project is stored in its own isolated directory:
 ```
 /data/user/0/dev.pybionic.runner/files/projects/<project_id>/
-├── config.json         # Project metadata & run settings
-├── main.py             # Entrypoint script
-├── requirements.txt    # Declared dependencies
-├── .env                # Project environment variables
+├── config.json         # Project metadata, restart policies & hardware limits
+├── main.py             # Entrypoint script (configurable via entryFile)
+├── requirements.txt    # Declared pip dependencies
 └── [custom_files]      # Bot modules, sqlite databases, logs
 ```
+
+> **Security Note:** Secrets and API tokens are **never** stored in plain-text `.env` files. They are encrypted in **Android Keystore** and securely injected into the child process environment (`os.environ`) at launch.
 
 ### `config.json` Specification:
 ```json
 {
   "id": "my_telegram_bot",
   "name": "My Telegram Bot",
-  "entryPoint": "main.py",
-  "watchdogPolicy": "ALWAYS",
-  "webPort": 8080,
-  "autoStartOnBoot": true,
-  "envVars": {
-    "BOT_TOKEN": "YOUR_TOKEN_HERE"
-  }
+  "entryFile": "main.py",
+  "restartPolicy": "ALWAYS",
+  "maxMemoryMb": 256,
+  "stopTimeoutSec": 3,
+  "healthCheckPort": 8080,
+  "dailyScheduleHHmm": "09:00",
+  "autoRestart": true,
+  "envKeys": ["BOT_TOKEN", "ALLOWED_USER_IDS"]
 }
 ```
 
@@ -80,7 +82,7 @@ If your Python code runs a local web server (FastAPI, Flask, aiohttp, Tornado, S
 ```python
 import os
 
-PORT = int(os.environ.get("PORT", 8080))
+PORT = int(os.environ.get("WEB_PORT") or os.environ.get("PORT") or 8080)
 
 # Print signal for PyBionic Android Runner:
 print(f"[PYBIONIC_WEB:{PORT}]", flush=True)
@@ -97,23 +99,22 @@ print(f"[PYBIONIC_WEB:{PORT}]", flush=True)
 
 ### Restart Policies:
 - **`ALWAYS` (Default):** The bot is automatically restarted 24/7 if it exits, crashes, or after phone reboot. Uses exponential backoff (2s ➔ 4s ➔ 8s ➔ ... up to 60s).
-- **`ON_CRASH`:** Restarts only if exit code != 0.
+- **`ON_FAILURE`:** Restarts only if exit code != 0.
 - **`NEVER`:** Does not restart once terminated.
 
 ### Process Termination:
 PyBionic uses `ProcessTreeKiller` to ensure clean shutdowns:
 1. Sends `SIGTERM` to the parent process and all child PIDs.
-2. Waits 2.5 seconds for graceful shutdown.
+2. Waits for graceful shutdown (configurable: 1s, 3s, 5s, or 10s; default **3.0 seconds**).
 3. Sends `SIGKILL` (`kill -9`) to guarantee no orphan worker processes remain in memory.
 
 ---
 
-## 5. Pre-installed & Supported Python Libraries
+## 5. Python Libraries & Dependency Management
 
-- **Asyncio / Networking:** `aiogram==3.*`, `pyTelegramBotAPI (telebot)`, `aiohttp`, `httpx`, `requests`, `urllib3`.
-- **Web Servers:** `fastapi`, `uvicorn`, `flask`.
-- **Data & Parsing:** `sqlite3`, `beautifulsoup4`, `lxml`, `json`, `csv`.
-- **System & Utils:** `psutil`, `schedule`, `dotenv`.
+- **Core Bootstrap:** Provides native Python 3.14.10 linked against Android Bionic libc with `pip` pre-installed.
+- **Dependencies via `requirements.txt`:** All third-party libraries (e.g. `aiogram`, `pyTelegramBotAPI`, `fastapi`, `requests`, `uvicorn`, `beautifulsoup4`) are declared in `requirements.txt` and installed into the bot's isolated environment or system site-packages.
+- **Binary Extension Advisory:** Avoid packages requiring a full C/C++ compiler or glibc-specific headers (such as `lxml`); prefer pure-Python packages or standard library modules (`html.parser`, `xml.etree.ElementTree`).
 
 ---
 
@@ -124,7 +125,7 @@ When an AI writes Python code for PyBionic Runner:
    ```python
    import os
    TOKEN = os.getenv("BOT_TOKEN")
-   PORT = int(os.getenv("PORT", 8080))
+   PORT = int(os.getenv("WEB_PORT") or os.getenv("PORT", 8080))
    ```
 2. **Bind servers to `0.0.0.0` or `127.0.0.1` based on config:**
    ```python
@@ -133,8 +134,10 @@ When an AI writes Python code for PyBionic Runner:
    uvicorn.run("main:app", host="0.0.0.0", port=PORT)
    ```
 3. **Use SQLite for persistent data:**
-   SQLite requires zero setup and runs at native speed under Bionic libc:
+   Store database files in `PROJECT_DATA_DIR` or the project root:
    ```python
-   import sqlite3
-   conn = sqlite3.connect("bot_data.db")
+   import os, sqlite3
+   from pathlib import Path
+   data_dir = Path(os.getenv("PROJECT_DATA_DIR", "."))
+   conn = sqlite3.connect(data_dir / "bot_data.db")
    ```

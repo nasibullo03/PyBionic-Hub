@@ -11,6 +11,7 @@ import io
 import json
 import os
 import random
+import re
 import socketserver
 import sqlite3
 import sys

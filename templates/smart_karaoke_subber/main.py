@@ -346,6 +346,8 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 # Karaoke Video Rendering Pipeline
 # ---------------------------------------------------------------------------
 
+FFMPEG_SLOTS = threading.BoundedSemaphore(1)
+
 def render_karaoke_video(
     media_path: Path,
     lyrics_text: str,
@@ -404,7 +406,8 @@ def render_karaoke_video(
 
     log("log_processing", filename=media_path.name, style=style, bg=background)
     try:
-        res = subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, check=False, timeout=180)
+        with FFMPEG_SLOTS:
+            res = subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, check=False, timeout=180)
         if res.returncode == 0 and out_video_path.is_file() and out_video_path.stat().st_size > 0:
             size_kb = out_video_path.stat().st_size / 1024.0
             log("log_done", out_path=out_video_path.name, size_kb=size_kb)
@@ -853,6 +856,15 @@ def run_bot(token: str) -> None:
     bot = telebot.TeleBot(token, parse_mode="HTML")
     cache_dir = get_cache_dir()
 
+    ALLOWED = {int(x) for x in os.environ.get("ALLOWED_USER_IDS", "").replace(" ", "").split(",") if x.isdigit()}
+
+    def is_allowed(user_id: int) -> bool:
+        return not ALLOWED or user_id in ALLOWED
+
+    @bot.message_handler(func=lambda m: not is_allowed(m.from_user.id))
+    def access_denied(m):
+        bot.reply_to(m, f"⛔ Доступ ограничен владельцем бота (ваш ID: {m.from_user.id}).")
+
     def build_main_reply_kb(uid: int) -> types.ReplyKeyboardMarkup:
         kb = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=False)
         kb.row(
@@ -996,6 +1008,9 @@ def run_bot(token: str) -> None:
             try:
                 bot.send_chat_action(msg.chat.id, "upload_document")
                 f_info = bot.get_file(file_id)
+                if (getattr(f_info, "file_size", 0) or 0) > 20 * 1024 * 1024:
+                    bot.reply_to(msg, "⚠️ Файл слишком большой (> 20 МБ). Telegram Bot API разрешает ботам загружать файлы размером не более 20 МБ.", reply_markup=build_main_reply_kb(uid))
+                    return
                 f_bytes = bot.download_file(f_info.file_path)
 
                 ext = ".mp4" if is_video else ".mp3"

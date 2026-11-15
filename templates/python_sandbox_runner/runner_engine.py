@@ -10,6 +10,7 @@ import re
 import collections
 import itertools
 import functools
+import shutil
 import sqlite3
 import traceback
 from typing import Dict, Tuple, Optional
@@ -67,10 +68,10 @@ def audit_ast(code_str: str) -> Tuple[bool, Optional[str]]:
                 if node.func.id in FORBIDDEN_NAMES:
                     return False, f"Forbidden function call: '{node.func.id}()'"
         
-        # Disallow access to dunder attributes
+        # Disallow access to private and dunder attributes (blocks _sys, __class__, etc.)
         elif isinstance(node, ast.Attribute):
-            if node.attr.startswith("__") and node.attr.endswith("__"):
-                return False, f"Forbidden dunder attribute: '{node.attr}'"
+            if node.attr.startswith("_"):
+                return False, f"Forbidden private attribute: '{node.attr}'"
 
     return True, None
 
@@ -131,6 +132,7 @@ exec(compiled, env_globals, {})
 
     tmp_user = None
     tmp_runner = None
+    sandbox_cwd = None
     try:
         with tempfile.NamedTemporaryFile("w", suffix=".py", delete=False, encoding="utf-8") as f_user:
             f_user.write(code_str)
@@ -139,8 +141,18 @@ exec(compiled, env_globals, {})
             f_run.write(runner_script)
             tmp_runner = f_run.name
 
+        clean_env = {
+            "PATH": os.environ.get("PATH", ""),
+            "PYTHONIOENCODING": "utf-8",
+            "LC_ALL": "en_US.UTF-8",
+            "LANG": "en_US.UTF-8",
+        }
+        sandbox_cwd = tempfile.mkdtemp(prefix="pyb_sandbox_")
+
         proc = subprocess.Popen(
-            [sys.executable, "-u", tmp_runner, tmp_user],
+            [sys.executable, "-I", "-u", tmp_runner, tmp_user],
+            env=clean_env,
+            cwd=sandbox_cwd,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True
@@ -183,6 +195,9 @@ exec(compiled, env_globals, {})
             except Exception: pass
         if tmp_runner and os.path.exists(tmp_runner):
             try: os.unlink(tmp_runner)
+            except Exception: pass
+        if sandbox_cwd and os.path.exists(sandbox_cwd):
+            try: shutil.rmtree(sandbox_cwd, ignore_errors=True)
             except Exception: pass
 
 def _log_run(user_id: int, status: str, elapsed: float, code_len: int):

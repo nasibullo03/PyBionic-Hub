@@ -549,6 +549,26 @@ def run_bot(token: str) -> None:
     init_db()
     bot = telebot.TeleBot(token, parse_mode="HTML")
 
+    web_dir = get_data_dir() / "web_converted"
+    web_dir.mkdir(parents=True, exist_ok=True)
+
+    def purge_old(dir_path: Path, max_age_h: int = 24) -> None:
+        try:
+            edge = time.time() - max_age_h * 3600
+            for p in dir_path.glob("*"):
+                if p.is_file() and p.stat().st_mtime < edge:
+                    try: p.unlink(missing_ok=True)
+                    except Exception: pass
+        except Exception: pass
+
+    purge_old(web_dir, max_age_h=24)
+
+    def _cleanup_loop():
+        while True:
+            time.sleep(3600)
+            purge_old(web_dir, max_age_h=24)
+    threading.Thread(target=_cleanup_loop, daemon=True).start()
+
     def build_main_reply_kb(uid: int) -> types.ReplyKeyboardMarkup:
         kb = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=False)
         kb.row(
@@ -742,6 +762,9 @@ def run_bot(token: str) -> None:
             def run_single():
                 try:
                     finfo = bot.get_file(file_id)
+                    if (getattr(finfo, "file_size", 0) or 0) > 20 * 1024 * 1024:
+                        bot.reply_to(msg, "⚠️ Файл слишком большой (> 20 МБ). Telegram Bot API не позволяет скачивать файлы более 20 МБ.")
+                        return
                     raw = bot.download_file(finfo.file_path)
                     with tempfile.TemporaryDirectory() as tmp:
                         out_file = convert_single_bytes(raw, kind, fmt, "sticker", Path(tmp))

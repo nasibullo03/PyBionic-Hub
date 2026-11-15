@@ -39,7 +39,21 @@
           "defaultValue": "",
           "hint": "12345678,87654321"
         }
-      ]
+      ],
+      "title": {
+        "en": "Media Downloader (YT & Reels)",
+        "ru": "Media Downloader (YouTube, Reels & Shorts)",
+        "tg": "Боргири медиа (YouTube ва Reels)",
+        "uz": "Media yuklovchi (YouTube va Reels)",
+        "tr": "Medya İndirici (YouTube & Reels)"
+      },
+      "description": {
+        "en": "Download videos, audio, and music from YouTube, Instagram Reels, TikTok, and direct URLs.",
+        "ru": "Скачивание видео, аудио и музыки из YouTube, Instagram Reels, TikTok и по прямым ссылкам.",
+        "tg": "Боргирии видео, садо ва мусиқӣ аз YouTube, Instagram Reels ва пайвандҳои мустақим.",
+        "uz": "YouTube, Instagram Reels va to'g'ridan-to'g'ri havolalardan video va musiqa yuklash.",
+        "tr": "YouTube, Instagram Reels ve direkt bağlantılardan video ve müzik indirme."
+      }
     },
     {
       "id": "sticker_studio",
@@ -72,7 +86,21 @@
           "defaultValue": "8091",
           "hint": "8091"
         }
-      ]
+      ],
+      "title": {
+        "en": "Sticker Studio (WebP, GIF & TGS)",
+        "ru": "Студия стикеров (WebP, GIF & TGS)",
+        "tg": "Студияи стикерҳо (WebP ва GIF)",
+        "uz": "Stiker studiyasi (WebP va GIF)",
+        "tr": "Çıkartma Stüdyosu (WebP, GIF & TGS)"
+      },
+      "description": {
+        "en": "Pack converter and sticker generator from WebP, GIF, video, and vector TGS files with web studio.",
+        "ru": "Конвертер наборов и генератор стикеров из WebP, GIF, видео и векторных TGS с веб-студией.",
+        "tg": "Табдилдиҳандаи бастаҳо ва созандаи стикерҳо аз WebP, GIF ва видео бо веб-студия.",
+        "uz": "WebP, GIF va videodan stikerlar to'plamini yaratish va konvertatsiya qilish.",
+        "tr": "WebP, GIF ve videodan çıkartma paketleri oluşturma ve dönüştürme stüdyosu."
+      }
     },
     {
       "id": "meme_studio",
@@ -104,7 +132,21 @@
           "defaultValue": "8089",
           "hint": "8089"
         }
-      ]
+      ],
+      "title": {
+        "en": "Meme Studio (Demotivators & Templates)",
+        "ru": "Meme Studio (Демотиваторы и Мемы)",
+        "tg": "Студияи мемҳо (Демотиваторҳо)",
+        "uz": "Mem studiyasi (Demotivatorlar)",
+        "tr": "Meme Stüdyosu (Demotivatörler)"
+      },
+      "description": {
+        "en": "Generate demotivators, classic memes, watermark overlays, and viral image jokes.",
+        "ru": "Генератор демотиваторов, классических мемов, наложения водяных знаков и вирусных картинок.",
+        "tg": "Созандаи демотиваторҳо, мемҳои классикӣ ва расмҳои вирусӣ.",
+        "uz": "Demotivatorlar, klassik memlar va virusli rasmlar yaratish.",
+        "tr": "Demotivatörler, klasik memeler ve eğlenceli görseller oluşturma aracı."
+      }
     },
     {
       "id": "motivator_pro",
@@ -137,7 +179,21 @@
           "defaultValue": "8092",
           "hint": "8092"
         }
-      ]
+      ],
+      "title": {
+        "en": "Motivator Pro (Habits & Goals)",
+        "ru": "Мотиватор Pro (Привычки и Цели)",
+        "tg": "Мотиватор Pro (Одатҳо ва Ҳадафҳо)",
+        "uz": "Motivator Pro (Odatlar va Maqsadlar)",
+        "tr": "Motivator Pro (Alışkanlıklar & Hedefler)"
+      },
+      "description": {
+        "en": "Habit tracker with SQLite persistence, streak statistics, daily reminders, and quote generator.",
+        "ru": "Трекер привычек на SQLite со статистикой серий, ежедневными напоминаниями и цитатами.",
+        "tg": "Пайгирии одатҳо бо SQLite, омори давраҳо, ёдраскуниҳо ва иқтибосҳои ҳавасмандкунанда.",
+        "uz": "SQLite asosidagi odatlar trekeri, seriyalar statistikasi va eslatmalar.",
+        "tr": "SQLite veritabanlı alışkanlık takipçisi, seri istatistikleri ve hatırlatıcılar."
+      }
     },
     {
       "id": "discord_guardian",
@@ -149,7 +205,9 @@
         "Web UI"
       ],
       "systemPackages": [],
-      "pipPackages": [],
+      "pipPackages": [
+        "discord.py"
+      ],
       "useSystemSitePackages": true,
       "defaultCron": "",
       "fields": [
@@ -173,7 +231,21 @@
           "defaultValue": "8113",
           "hint": "8113"
         }
-      ]
+      ],
+      "title": {
+        "en": "Discord Guardian (Auto-Mod & Logs)",
+        "ru": "Discord Guardian (Модерация и Логи)",
+        "tg": "Discord Guardian (Мудирият ва Гузоришҳо)",
+        "uz": "Discord Guardian (Moderatsiya va Jurnallar)",
+        "tr": "Discord Guardian (Otomatik Moderasyon)"
+      },
+      "description": {
+        "en": "Discord bot with spam filtering, moderation logs, audit records, and offline SQLite storage.",
+        "ru": "Discord-бот с фильтром спама, журналами модерации, аудитом и локальной базой SQLite.",
+        "tg": "Discord-бот бо филтри спам, сабти мудирият ва пойгоҳи додаҳои SQLite.",
+        "uz": "Spam filtri, moderatsiya jurnallari va SQLite bazasiga ega Discord boti.",
+        "tr": "Spam filtresi, denetim kayıtları ve yerel SQLite tabanlı Discord moderasyon botu."
+      }
     },
     {
       "id": "multi_relay",
@@ -229,7 +301,21 @@
           "defaultValue": "8090",
           "hint": "8090"
         }
-      ]
+      ],
+      "title": {
+        "en": "Multi Relay (Telegram-Discord Bridge)",
+        "ru": "Multi Relay (Мост Telegram-Discord)",
+        "tg": "Multi Relay (Кӯпруки Telegram-Discord)",
+        "uz": "Multi Relay (Telegram-Discord Ko'prigi)",
+        "tr": "Multi Relay (Telegram-Discord Köprüsü)"
+      },
+      "description": {
+        "en": "Bi-directional message forwarder between Telegram chats, Discord webhooks, and local web dashboard.",
+        "ru": "Двусторонний ретранслятор сообщений между Telegram, Discord-вебхуками и веб-панелью.",
+        "tg": "Интиқоли дуҷонибаи паёмҳо байни Telegram, Discord ва веб-панел.",
+        "uz": "Telegram, Discord vebxuklari va veb-panel o'rtasida xabarlarni uzatuvchi tizim.",
+        "tr": "Telegram, Discord webhookları ve web kontrol paneli arasında çift yönlü mesaj iletici."
+      }
     },
     {
       "id": "round_video_master",

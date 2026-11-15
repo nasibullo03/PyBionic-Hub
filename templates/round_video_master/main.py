@@ -279,6 +279,20 @@ def probe_video(path: Path) -> dict[str, Any]:
 # Video Conversion Pipeline
 # ---------------------------------------------------------------------------
 
+FFMPEG_SLOTS = threading.BoundedSemaphore(1)
+
+def purge_old(dir_path: Path, max_age_h: int = 24) -> None:
+    try:
+        edge = time.time() - max_age_h * 3600
+        for p in dir_path.glob("*"):
+            if p.is_file() and p.stat().st_mtime < edge:
+                try:
+                    p.unlink(missing_ok=True)
+                except Exception:
+                    pass
+    except Exception:
+        pass
+
 def convert_to_round_video(
     src_path: Path,
     out_path: Path,
@@ -390,7 +404,8 @@ def convert_to_round_video(
 
     log("log_processing", filename=src_path.name, width=info.get("width", 0), height=info.get("height", 0), duration=dur, mode=mode)
     try:
-        res_exec = subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, check=False, timeout=120)
+        with FFMPEG_SLOTS:
+            res_exec = subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, check=False, timeout=120)
         if res_exec.returncode == 0 and out_path.is_file() and out_path.stat().st_size > 0:
             size_kb = out_path.stat().st_size / 1024.0
             log("log_done", out_path=out_path.name, size_kb=size_kb)
@@ -908,6 +923,23 @@ def run_bot(token: str) -> None:
     bot = telebot.TeleBot(token, parse_mode="HTML")
     cache_dir = get_cache_dir()
 
+    purge_old(cache_dir, max_age_h=24)
+
+    def _cleanup_loop():
+        while True:
+            time.sleep(3600)
+            purge_old(cache_dir, max_age_h=24)
+    threading.Thread(target=_cleanup_loop, daemon=True).start()
+
+    ALLOWED = {int(x) for x in os.environ.get("ALLOWED_USER_IDS", "").replace(" ", "").split(",") if x.isdigit()}
+
+    def is_allowed(user_id: int) -> bool:
+        return not ALLOWED or user_id in ALLOWED
+
+    @bot.message_handler(func=lambda m: not is_allowed(m.from_user.id))
+    def access_denied(m):
+        bot.reply_to(m, f"⛔ Доступ ограничен владельцем бота (ваш ID: {m.from_user.id}).")
+
     def build_main_reply_kb(uid: int) -> types.ReplyKeyboardMarkup:
         kb = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=False)
         kb.row(
@@ -1071,6 +1103,9 @@ def run_bot(token: str) -> None:
             try:
                 bot.send_chat_action(msg.chat.id, "upload_document")
                 f_info = bot.get_file(file_id)
+                if (getattr(f_info, "file_size", 0) or 0) > 20 * 1024 * 1024:
+                    bot.reply_to(msg, "⚠️ Файл слишком большой (> 20 МБ). Telegram Bot API разрешает ботам загружать файлы размером не более 20 МБ.", reply_markup=build_main_reply_kb(uid))
+                    return
                 f_bytes = bot.download_file(f_info.file_path)
                 
                 src_path = cache_dir / f"in_{uid}_{int(time.time())}.mp4"
