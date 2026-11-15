@@ -3,7 +3,7 @@
 [![Релиз](https://img.shields.io/badge/Релиз-v1.0.0-00E5FF.svg?style=for-the-badge&logo=android&logoColor=black)](https://github.com/nasibullo03/PyBionic-Hub/releases/latest)
 [![Python](https://img.shields.io/badge/Python-3.14.10_Bionic-FFD700.svg?style=for-the-badge&logo=python&logoColor=black)](https://python.org)
 [![Платформа](https://img.shields.io/badge/Платформа-Android_8.0+-3DDC84.svg?style=for-the-badge&logo=android&logoColor=white)](https://android.com)
-[![Лицензия](https://img.shields.io/badge/Лицензия-GPL_v3-blue.svg?style=for-the-badge)](../../LICENSE)
+[![Лицензия](https://img.shields.io/badge/Лицензия-AGPL_v3-blue.svg?style=for-the-badge)](../../LICENSE)
 
 ---
 
@@ -75,5 +75,5 @@ PyBionic оптимизирован для автономной работы и 
 
 ## 📄 Лицензия и авторство
 
-- Распространяется под свободной лицензией **GNU GPL v3**.
+- Распространяется под свободной лицензией **GNU AGPLv3**.
 - Автор и разработчик: **Насибулло Халилов** ([@nasibullo03](https://github.com/nasibullo03)).
