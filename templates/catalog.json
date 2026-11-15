@@ -60,9 +60,9 @@
         "uz": "YouTube, Instagram Reels va to'g'ridan-to'g'ri havolalardan video va musiqa yuklash.",
         "tr": "YouTube, Instagram Reels ve direkt bağlantılardan video ve müzik indirme."
       },
-      "version": "1.1.0",
-      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/media_downloader-1.1.0.zip",
-      "sha256": "d4d31f36708a453791739a9b7e83033416982281389fba02f85b9c278b791e22"
+      "version": "1.2.0",
+      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/media_downloader-1.2.0.zip",
+      "sha256": "9d011a26d694eaddf18b0be28aef1c572602f505930aca045ea2777554a67d5a"
     },
     {
       "id": "sticker_studio",
@@ -116,9 +116,9 @@
         "uz": "WebP, GIF va videodan stikerlar to'plamini yaratish va konvertatsiya qilish.",
         "tr": "WebP, GIF ve videodan çıkartma paketleri oluşturma ve dönüştürme stüdyosu."
       },
-      "version": "1.1.0",
-      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/sticker_studio-1.1.0.zip",
-      "sha256": "2f2c4c9148a1ce36442de2e285bd0a3212b1c3f441d5e01e89192aac76c5790b"
+      "version": "1.2.0",
+      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/sticker_studio-1.2.0.zip",
+      "sha256": "7d79f3634fb3443b446be45c288a40780a8acd5feccd5093960cbb5f1b08015c"
     },
     {
       "id": "meme_studio",
@@ -171,9 +171,9 @@
         "uz": "Demotivatorlar, klassik memlar va virusli rasmlar yaratish.",
         "tr": "Demotivatörler, klasik memeler ve eğlenceli görseller oluşturma aracı."
       },
-      "version": "1.1.0",
-      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/meme_studio-1.1.0.zip",
-      "sha256": "fe38a63c4e01d42801533448396080f6bdce6ee5eb003ab52555db025d52821f"
+      "version": "1.2.0",
+      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/meme_studio-1.2.0.zip",
+      "sha256": "0001b26d4db920065f46e4bb497205ba0c8f487c089916c117a97ba36b5d30d7"
     },
     {
       "id": "motivator_pro",
@@ -227,9 +227,9 @@
         "uz": "SQLite asosidagi odatlar trekeri, seriyalar statistikasi va eslatmalar.",
         "tr": "SQLite veritabanlı alışkanlık takipçisi, seri istatistikleri ve hatırlatıcılar."
       },
-      "version": "1.1.0",
-      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/motivator_pro-1.1.0.zip",
-      "sha256": "d8a7ab8b2e3c6ee277872aa72f2bce4f77c992d4d979c501a0dd179cad3e7eb2"
+      "version": "1.2.0",
+      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/motivator_pro-1.2.0.zip",
+      "sha256": "c599f65e110d2f6b54334168da981024c95cc7af16a514d11830100021c4c9ac"
     },
     {
       "id": "discord_guardian",
@@ -282,9 +282,9 @@
         "uz": "Spam filtri, moderatsiya jurnallari va SQLite bazasiga ega Discord boti.",
         "tr": "Spam filtresi, denetim kayıtları ve yerel SQLite tabanlı Discord moderasyon botu."
       },
-      "version": "1.1.0",
-      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/discord_guardian-1.1.0.zip",
-      "sha256": "b0b8a035b1c195c798b5756a0f4a760c5240455974212dac10ea17931d27bd72"
+      "version": "1.2.0",
+      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/discord_guardian-1.2.0.zip",
+      "sha256": "21e88104313856301bc38efbff2a9cb29570e4a99d105457adbf4f64ca51a6de"
     },
     {
       "id": "multi_relay",
@@ -361,9 +361,9 @@
         "uz": "Telegram, Discord vebxuklari va veb-panel o'rtasida xabarlarni uzatuvchi tizim.",
         "tr": "Telegram, Discord webhookları ve web kontrol paneli arasında çift yönlü mesaj iletici."
       },
-      "version": "1.1.0",
-      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/multi_relay-1.1.0.zip",
-      "sha256": "d18306f4d92639740aae909ce72fbe7888edd556d95667e656d77e6d5b2261b3"
+      "version": "1.2.0",
+      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/multi_relay-1.2.0.zip",
+      "sha256": "92f26ce22f3348cc43b6420ba485b510cbfaf9ec90ad4743025e86e1cbf85df7"
     },
     {
       "id": "round_video_master",
@@ -444,9 +444,9 @@
         "uz": "Har qanday videoni Telegram dumaloq xabarlariga aylantirish: 1:1 markazlash, EBU R128 ovoz kuchaytirish, neon hoshiya va 60s gacha moslash.",
         "tr": "Videoları Telegram yuvarlak video mesajına dönüştürün: 1:1 ortalama, EBU R128 ses güçlendirme, neon çerçeve ve 60s sığdırma."
       },
-      "version": "1.1.0",
-      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/round_video_master-1.1.0.zip",
-      "sha256": "1a5cd4e634ee954b30e34e3a7fe1bb229762af679c3f92d65e85be0dcdc01fbe"
+      "version": "1.2.0",
+      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/round_video_master-1.2.0.zip",
+      "sha256": "e25707c4a5a9ffe130de084388a76dfcc79aac839966b17f6205ce47c74efebe"
     },
     {
       "id": "glitch_datamosh_studio",
@@ -527,9 +527,9 @@
         "uz": "Datamoshing, RGB Split, 90-yillar VHS lentasi, pikselli bloklar va audio bitkrasher generatori.",
         "tr": "P-frame datamosh eritme, kromatik RGB Split, VHS kaset tarama çizgileri, piksel makro blokları ve ses bitcrush üretin."
       },
-      "version": "1.1.0",
-      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/glitch_datamosh_studio-1.1.0.zip",
-      "sha256": "6c61c70371846294fb49be4a74b4bcb37cf0e43a459a963fc50a8bce3d527823"
+      "version": "1.2.0",
+      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/glitch_datamosh_studio-1.2.0.zip",
+      "sha256": "364e17cdb283f378c5f7125ac34d0ec50d3f23527a742af5c209e5a37e88f4b3"
     },
     {
       "id": "smart_karaoke_subber",
@@ -610,9 +610,9 @@
         "uz": "Har bir so‘zni alohida yorituvchi animatsion karaoke videolari, ASS stillari va audio to‘lqin generatori.",
         "tr": "Müzikle senkronize kelime kelime vurgulanan karaoke video üretici, ASS altyazı stilleri ve ses dalgası görselleştirici."
       },
-      "version": "1.1.0",
-      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/smart_karaoke_subber-1.1.0.zip",
-      "sha256": "d642371d0351b62f8f7593d197346417f87e9f1f7a1e5c1bb51a4577e719c504"
+      "version": "1.2.0",
+      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/smart_karaoke_subber-1.2.0.zip",
+      "sha256": "8cb33aad07bd3b73034fc8987cea4047f124aa0966a0b07022a9a2fab964f46a"
     },
     {
       "id": "media_target_compressor",
@@ -693,9 +693,9 @@
         "uz": "Discord (8/25 MB), WhatsApp (16 MB) va Telegram (50 MB) limitlariga mos 2 bosqichli aniq video/audio siquvchi.",
         "tr": "Discord, WhatsApp ve Telegram sınırlarına tam uyan 2 geçişli hassas video ve ses sıkıştırma stüdyosu."
       },
-      "version": "1.1.0",
-      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/media_target_compressor-1.1.0.zip",
-      "sha256": "3798d4eb540927861db300cdf8c7e7b02719b32094628789e2f3afa14b6dab42"
+      "version": "1.2.0",
+      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/media_target_compressor-1.2.0.zip",
+      "sha256": "626c74645ab3e751b925bdd0ece1c5ff5da12eb998f4730a0c7dffc661a7c8f8"
     },
     {
       "id": "voice_studio_master",
@@ -776,9 +776,9 @@
         "uz": "Professional ovoz studiyasi: podkast masteringi (EBU R128), radio, vokoder, chuqur bas, burunduq, aks-sado va ratsiya effektlari.",
         "tr": "Stüdyo ses işleme ve vokal efektleri: podcast mastering (EBU R128), radyo yayını, robot, derin bas, katedral yankısı ve megafon."
       },
-      "version": "1.1.0",
-      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/voice_studio_master-1.1.0.zip",
-      "sha256": "26da7b2939deac81233de969b301b484d046ff0847312d7a83116936b40e70f9"
+      "version": "1.2.0",
+      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/voice_studio_master-1.2.0.zip",
+      "sha256": "88ac7cd0f136d75e8b2cfc29d1c3484316dec3b137e264c3260e554b3f0d1f14"
     },
     {
       "id": "spatial_audio_8d",
@@ -859,9 +859,9 @@
         "uz": "Quloqchinlarda bosh atrofida aylanuvchi 360° 8D binaural ovoz, Lissaju trayektoriyalari va akustik zallar.",
         "tr": "Kulaklıkta baş etrafında dönen 360° 8D binaural ses, Lissajous yörüngeleri ve mekan akustiği."
       },
-      "version": "1.1.0",
-      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/spatial_audio_8d-1.1.0.zip",
-      "sha256": "e9cb119fad8a3813e8ee06d087949fdba828f1063ebff88c9e90ba953e76dd09"
+      "version": "1.2.0",
+      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/spatial_audio_8d-1.2.0.zip",
+      "sha256": "6ec1f174002ba1909be18fb0d4b84c7464916db129c80e2f9cf1cbc501899ab9"
     },
     {
       "id": "audiobook_chapterizer",
@@ -942,9 +942,9 @@
         "uz": "Audio kitoblar va podkastlarda sukunatni aniqlash, M4B boblarini kiritish, MP3 ZIP ga ajratish va ohangni buzmasdan tezlashtirish.",
         "tr": "Sesli kitap ve podcastlerde sessizlik tespiti ile M4B bölüm atomları ekleme, numaralı MP3 ZIP parçalama ve hızlandırma."
       },
-      "version": "1.1.0",
-      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/audiobook_chapterizer-1.1.0.zip",
-      "sha256": "aa5c3db081480a760dad6aabcd3a5426514a6e3c65042c911816488396cd739e"
+      "version": "1.2.0",
+      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/audiobook_chapterizer-1.2.0.zip",
+      "sha256": "ed10f28ce3c292f138168d07ac177bfe8225e73b3f7e870d06733547d1c06caf"
     },
     {
       "id": "ghost_lens_sanitizer",
@@ -1026,9 +1026,9 @@
         "uz": "Rasmlar uchun EXIF, GPS va kesh tozalash hamda MP4/MOV atomlarini tozalash, steganografik tahlil.",
         "tr": "Fotoğraflar için EXIF, GPS ve önbellek temizleme, kayıpsız MP4/MOV atom temizliği ve steganografi kontrolü."
       },
-      "version": "1.1.0",
-      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/ghost_lens_sanitizer-1.1.0.zip",
-      "sha256": "6e9d1187daa45f8c3fec471de05c8dfb07c354640c8818e6ce9faf696e53b734"
+      "version": "1.2.0",
+      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/ghost_lens_sanitizer-1.2.0.zip",
+      "sha256": "fcb39dbc796765f0fd567e4d7c4f34042c750fbcd2635014655d391c840d3a0a"
     },
     {
       "id": "stego_vault",
@@ -1110,9 +1110,9 @@
         "uz": "PNG, WebP va WAV fayllarda maxfiy sirlarni AES-256-GCM shifrlash bilan yashirish va chiqarish.",
         "tr": "PNG, WebP ve WAV dosyalarında AES-256-GCM şifreleme ve LSB ile gizli verileri saklama ve çıkarma."
       },
-      "version": "1.1.0",
-      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/stego_vault-1.1.0.zip",
-      "sha256": "9c2af4d2c8a272a4f21c69762bcf2f5e558ec8316af6a3fbbbdb6cb6591e6f54"
+      "version": "1.2.0",
+      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/stego_vault-1.2.0.zip",
+      "sha256": "3780f094dbc47365053fd5d7248f6e33ce6d6aadbc8cddd835f845972e30fcc4"
     },
     {
       "id": "cloud_shard_backup",
@@ -1190,9 +1190,9 @@
           "hint": "socks5h://IP:1080 / http://IP:8080 (если Telegram заблокирован)"
         }
       ],
-      "version": "1.1.0",
-      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/cloud_shard_backup-1.1.0.zip",
-      "sha256": "260bc8a1f1139f9b7cc74a4cb74350c9a5b58f021b26bc9fb5f517823f3ccc32"
+      "version": "1.2.0",
+      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/cloud_shard_backup-1.2.0.zip",
+      "sha256": "98647428dee9d915f8697b706600267384a13ac10627b73d99337f28e201f5c0"
     },
     {
       "id": "doc_scanner_lens",
@@ -1273,9 +1273,9 @@
           "hint": "socks5h://IP:1080 / http://IP:8080 (если Telegram заблокирован)"
         }
       ],
-      "version": "1.1.0",
-      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/doc_scanner_lens-1.1.0.zip",
-      "sha256": "4adff720810c33e2c099aecb25d5b63f5796fddc30572526ef3927c82f8672a8"
+      "version": "1.2.0",
+      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/doc_scanner_lens-1.2.0.zip",
+      "sha256": "b5880954459831b20a63c5ee5469303d22ef0abe5389621e0711468378bf7f62"
     },
     {
       "id": "barcode_matrix_lab",
@@ -1357,9 +1357,9 @@
           "hint": "socks5h://IP:1080 / http://IP:8080 (если Telegram заблокирован)"
         }
       ],
-      "version": "1.1.0",
-      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/barcode_matrix_lab-1.1.0.zip",
-      "sha256": "2026f00be5d113bd8b4b914bd1dc9c865b489ce060135fe0610899910fe8053b"
+      "version": "1.2.0",
+      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/barcode_matrix_lab-1.2.0.zip",
+      "sha256": "2b3da165432c0790e85960d01e456c14208d5672a1e5ed8ba47af5be48e11b3f"
     },
     {
       "id": "site_visual_differ",
@@ -1440,9 +1440,9 @@
           "hint": "socks5h://IP:1080 / http://IP:8080 (если Telegram заблокирован)"
         }
       ],
-      "version": "1.1.0",
-      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/site_visual_differ-1.1.0.zip",
-      "sha256": "cf151dafb3ebb1f9c1c92f766c220238105442fe267ac8b688032a9fa2c79794"
+      "version": "1.2.0",
+      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/site_visual_differ-1.2.0.zip",
+      "sha256": "68564b8ad73fb50760e7726aa7d2f895a85d9c302df165556eba51b70e33a92a"
     },
     {
       "id": "dex_whale_radar",
@@ -1520,9 +1520,9 @@
           "hint": "socks5h://IP:1080 / http://IP:8080 (если Telegram заблокирован)"
         }
       ],
-      "version": "1.1.0",
-      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/dex_whale_radar-1.1.0.zip",
-      "sha256": "ea1e7a64f7cf08a21ec792c67222c16fb32fc592d68f4cafeb51520504b3bdeb"
+      "version": "1.2.0",
+      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/dex_whale_radar-1.2.0.zip",
+      "sha256": "f3a74cef84a7f843a962522e15c205819dc63e9ecffa3386ba928b8a1684a7f0"
     },
     {
       "id": "osint_recon_warden",
@@ -1578,9 +1578,9 @@
           "hint": "socks5h://IP:1080 / http://IP:8080 (если Telegram заблокирован)"
         }
       ],
-      "version": "1.1.0",
-      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/osint_recon_warden-1.1.0.zip",
-      "sha256": "a7759ae0102b9743718e3eac96c0712037f4e65d52a50efbb1ec5052c666f154"
+      "version": "1.2.0",
+      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/osint_recon_warden-1.2.0.zip",
+      "sha256": "2907c18539746f4fde72af486d851eed122ec25375ba19c24054a7bbe4f06157"
     },
     {
       "id": "antiraid_math_shield",
@@ -1629,9 +1629,9 @@
           "hint": "socks5h://IP:1080 / http://IP:8080 (если Telegram заблокирован)"
         }
       ],
-      "version": "1.1.0",
-      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/antiraid_math_shield-1.1.0.zip",
-      "sha256": "059a16dbbfdf8aecbb5855ebb4fa28aab393373fd3491530021c2e501a873396"
+      "version": "1.2.0",
+      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/antiraid_math_shield-1.2.0.zip",
+      "sha256": "672c9b4b5b20e84c28d1a4e15ce8e9328e96ed7d81d46962a1e7d57258f6cc84"
     },
     {
       "id": "forum_crm_dispatcher",
@@ -1680,9 +1680,9 @@
           "hint": "socks5h://IP:1080 / http://IP:8080 (если Telegram заблокирован)"
         }
       ],
-      "version": "1.1.0",
-      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/forum_crm_dispatcher-1.1.0.zip",
-      "sha256": "9916bc05b9c60d8583acce6f846bd4a138cfbf396f60de1e87ddff013b87b836"
+      "version": "1.2.0",
+      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/forum_crm_dispatcher-1.2.0.zip",
+      "sha256": "0b47da62f140c874b431c116313c39ccf9a0da0b9394af56ac96d720bb99b657"
     },
     {
       "id": "content_auto_pipeline",
@@ -1738,9 +1738,9 @@
           "hint": "socks5h://IP:1080 / http://IP:8080 (если Telegram заблокирован)"
         }
       ],
-      "version": "1.1.0",
-      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/content_auto_pipeline-1.1.0.zip",
-      "sha256": "64cfe88de86a74b460dd32dea561d4528fe399d60d585df0b454617e2cbdc1c6"
+      "version": "1.2.0",
+      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/content_auto_pipeline-1.2.0.zip",
+      "sha256": "71b20fd2a595678e2fd162af7742fbdbedfcaa90bb0ba16768b9f22b15ede237"
     },
     {
       "id": "python_sandbox_runner",
@@ -1796,9 +1796,9 @@
           "hint": "socks5h://IP:1080 / http://IP:8080 (если Telegram заблокирован)"
         }
       ],
-      "version": "1.1.0",
-      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/python_sandbox_runner-1.1.0.zip",
-      "sha256": "b682dad2e887bfa5d12ed749104e2c809b10e3b4747395581d8cace62fa7e194"
+      "version": "1.2.0",
+      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/python_sandbox_runner-1.2.0.zip",
+      "sha256": "a8337e1f27d69ce7b8a3472b11eaf63e5a3fb2bc8d66875fb7c92765ce99b1f7"
     },
     {
       "id": "chronos_deep_audit",
@@ -1854,9 +1854,9 @@
           "hint": "socks5h://IP:1080 / http://IP:8080 (если Telegram заблокирован)"
         }
       ],
-      "version": "1.1.0",
-      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/chronos_deep_audit-1.1.0.zip",
-      "sha256": "dfb7f90f63be9ad7f598301041cd881fdeabff9d4c661fac224ed78a22958dab"
+      "version": "1.2.0",
+      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/chronos_deep_audit-1.2.0.zip",
+      "sha256": "4626393fe2819d0493fc02533c362f6ef9ce56037a2b3f4964fd87134502023d"
     },
     {
       "id": "ai_assistant",

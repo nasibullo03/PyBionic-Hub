@@ -15,6 +15,7 @@ Features:
 from __future__ import annotations
 
 import pybionic_core as core
+import pybionic_web as web
 import html
 import io
 import json
@@ -835,390 +836,57 @@ def setup_telegram_handlers() -> None:
 # ---------------------------------------------------------------------------
 # Standalone Cyberpunk Web Studio (Port 8100)
 # ---------------------------------------------------------------------------
-WEB_HTML = r"""<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ghost Lens Sanitizer Studio</title>
-<style>
-:root {
-  --bg-dark: #0a0e14;
-  --bg-card: #121824;
-  --neon-cyan: #00f0ff;
-  --neon-red: #ff0055;
-  --neon-green: #00ff66;
-  --neon-gold: #ffb700;
-  --text-main: #f0f6fc;
-  --text-muted: #8b949e;
-  --border: #21262d;
-}
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body {
-  background-color: var(--bg-dark);
-  color: var(--text-main);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
-  padding: 20px;
-  line-height: 1.5;
-}
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid var(--border);
-  padding-bottom: 16px;
-  margin-bottom: 24px;
-}
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.brand h1 {
-  font-size: 22px;
-  font-weight: 700;
-  letter-spacing: 1px;
-  color: var(--neon-cyan);
-  text-shadow: 0 0 10px rgba(0,240,255,0.3);
-}
-.badge {
-  background: rgba(0, 255, 102, 0.15);
-  color: var(--neon-green);
-  border: 1px solid var(--neon-green);
-  padding: 4px 10px;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: 600;
-}
-.grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
-}
-@media (max-width: 900px) {
-  .grid { grid-template-columns: 1fr; }
-}
-.card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 20px;
-}
-.card h2 {
-  font-size: 16px;
-  font-weight: 600;
-  margin-bottom: 16px;
-  color: var(--text-main);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.drop-zone {
-  border: 2px dashed var(--border);
-  border-radius: 8px;
-  padding: 40px 20px;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  background: rgba(255,255,255,0.01);
-}
-.drop-zone:hover, .drop-zone.dragover {
-  border-color: var(--neon-cyan);
-  background: rgba(0,240,255,0.05);
-}
-.btn {
-  background: var(--neon-cyan);
-  color: #000;
-  border: none;
-  border-radius: 4px;
-  padding: 10px 20px;
-  font-weight: 700;
-  font-size: 14px;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  transition: all 0.2s ease;
-}
-.btn:hover {
-  filter: brightness(1.2);
-  box-shadow: 0 0 15px rgba(0,240,255,0.5);
-}
-.btn-red {
-  background: var(--neon-red);
-  color: #fff;
-}
-.btn-red:hover {
-  box-shadow: 0 0 15px rgba(255,0,85,0.5);
-}
-.meta-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 13px;
-  margin-top: 12px;
-}
-.meta-table th, .meta-table td {
-  padding: 8px 12px;
-  text-align: left;
-  border-bottom: 1px solid var(--border);
-}
-.meta-table th {
-  color: var(--text-muted);
-  font-weight: 600;
-}
-.tag-pill {
-  display: inline-block;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 11px;
-  font-weight: 600;
-}
-.pill-danger {
-  background: rgba(255,0,85,0.15);
-  color: var(--neon-red);
-  border: 1px solid var(--neon-red);
-}
-.pill-clean {
-  background: rgba(0,255,102,0.15);
-  color: var(--neon-green);
-  border: 1px solid var(--neon-green);
-}
-.gauge-container {
-  margin: 16px 0;
-}
-.gauge-bar {
-  height: 12px;
-  background: #1c2430;
-  border-radius: 6px;
-  overflow: hidden;
-  position: relative;
-}
-.gauge-fill {
-  height: 100%;
-  width: 0%;
-  background: linear-gradient(90deg, var(--neon-green) 0%, var(--neon-gold) 60%, var(--neon-red) 100%);
-  transition: width 0.5s ease;
-}
-.stat-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 8px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-}
-.stat-label { color: var(--text-muted); }
-.stat-value { font-weight: 600; color: var(--neon-cyan); }
-</style>
-</head>
-<body>
-<div class="header">
-  <div class="brand">
-    <h1>👻 GHOST LENS SANITIZER</h1>
-    <span class="badge" id="botStatus">ONLINE • PORT 8100</span>
-  </div>
-  <div>
-    <button class="btn btn-red" onclick="sanitizeCurrentFile()" id="sanitizeBtn" disabled>
-      🛡 SANITIZE & PURGE ALL
-    </button>
-  </div>
-</div>
+def render_studio(handler: Any) -> None:
+    lang = web.resolve_lang(handler)
+    T = web.translator(lang)
+    css = ("<style>.gl-gauge{height:12px;border-radius:99px;background:var(--surface2);border:1px solid var(--line);overflow:hidden;margin:10px 0 6px}"
+           ".gl-gauge i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,#10b981,#f59e0b 75%,#ef4444);transition:width .8s cubic-bezier(.2,.8,.2,1)}"
+           ".gl-scale{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}"
+           ".gl-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}"
+           ".gl-pill{padding:4px 10px;border-radius:99px;font-size:12.5px;font-weight:600;background:var(--surface2);border:1px solid var(--line)}"
+           ".gl-pill.low{color:#10b981;border-color:#10b98155}.gl-pill.medium{color:#f59e0b;border-color:#f59e0b55}.gl-pill.high{color:#ef4444;border-color:#ef444455}"
+           ".gl-risk{color:#ef4444;font-weight:600}</style>")
+    left = web.card(T("w_card_file"),
+        web.dropzone("f", T("w_drop"), T("w_drop_hint"), accept="image/*,video/*", icon_name="image")
+        + '<div class="pb-row">' + web.button(T("w_sanitize"), "san", icon_name="shield", disabled=True) + "</div>"
+        + web.progress("prog")
+        + '<div class="gl-head" style="margin-top:14px"><b>' + web.esc(T("w_entropy")) + ' <span id="ent">0.0000</span></b>'
+        + '<span class="gl-pill" id="verd">' + web.esc(T("waiting")) + "</span></div>"
+        + '<div class="gl-gauge"><i id="gauge"></i></div>'
+        + '<div class="gl-scale"><span>0 · ' + web.esc(T("w_sc_simple")) + "</span><span>0.75 · " + web.esc(T("w_sc_noise"))
+        + "</span><span>1 · " + web.esc(T("w_sc_stego")) + "</span></div>"
+        + web.note(T("w_entropy_note"), "info", "sparkles"), icon_name="shield")
+    right = web.card(T("w_card_meta"),
+        web.table([T("w_tag"), T("w_value"), T("status")], [], T("w_meta_empty"), id="meta"), icon_name="list", aside='<span class="gl-pill" id="cnt">0</span>')
+    st = web.card(T("statistics"), web.stats([(T("w_st_files"), "0", "s1", "file"), (T("w_st_gps"), "0", "s2", "globe"),
+                                              (T("w_st_tags"), "0", "s3", "list")]), icon_name="chart")
+    hero = web.hero(T("w_title"), T("w_hero"), "👻", chips=["EXIF", "GPS", "JPEG · PNG · WebP", "MP4 · MOV"])
+    web.send_page(handler, lang, title=T("w_title"), emoji="👻", brand="#64748b", port=WEB_PORT,
+                  hero_html=hero, body=css + web.grid(left, right, min_width=330) + st, script=GHOST_JS)
 
-<div class="grid">
-  <!-- Left Column: Upload & Live Stego Canary -->
-  <div class="card">
-    <h2>📁 Media Ingestion & Scanner</h2>
-    <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
-      <div style="font-size: 32px; margin-bottom: 8px;">📷</div>
-      <div style="font-weight: 600;">Click or Drop Image / Video Here</div>
-      <div style="color: var(--text-muted); font-size: 12px; margin-top: 4px;">JPEG, PNG, WebP, TIFF, MP4, MOV</div>
-      <input type="file" id="fileInput" style="display: none;" onchange="handleFileSelect(this.files[0])">
-    </div>
 
-    <div style="margin-top: 24px;">
-      <h2>🔍 Stego Canary Entropy Analyzer</h2>
-      <div class="gauge-container">
-        <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px;">
-          <span id="entropyScore">LSB Entropy: 0.0000</span>
-          <span id="entropyVerdict" class="tag-pill pill-clean">Waiting for Media</span>
-        </div>
-        <div class="gauge-bar">
-          <div class="gauge-fill" id="gaugeFill"></div>
-        </div>
-        <div style="display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); margin-top: 4px;">
-          <span>0.0 (Clean/Simple)</span>
-          <span>0.75 (Normal Sensor Noise)</span>
-          <span>1.0 (Uniform Random / Stego Alert)</span>
-        </div>
-      </div>
-    </div>
-
-    <div style="margin-top: 24px;">
-      <h2>📊 Global Sanitizer Metrics</h2>
-      <div class="stat-row">
-        <span class="stat-label">Total Files Cleaned:</span>
-        <span class="stat-value" id="statFiles">0</span>
-      </div>
-      <div class="stat-row">
-        <span class="stat-label">GPS Geotags Scrubbed:</span>
-        <span class="stat-value" id="statGps">0</span>
-      </div>
-      <div class="stat-row">
-        <span class="stat-label">Metadata Tags Purged:</span>
-        <span class="stat-value" id="statTags">0</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- Right Column: EXIF Metadata Inspector Table -->
-  <div class="card">
-    <h2>🏷 Metadata Inspector & Geotag Diff</h2>
-    <div style="overflow-x: auto; max-height: 480px;">
-      <table class="meta-table" id="metaTable">
-        <thead>
-          <tr>
-            <th>Tag Name</th>
-            <th>Original Value</th>
-            <th>Sanitized State</th>
-          </tr>
-        </thead>
-        <tbody id="metaBody">
-          <tr>
-            <td colspan="3" style="text-align: center; color: var(--text-muted); padding: 30px;">
-              No file loaded. Drop an image or video above to inspect EXIF and GPS tags.
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
-<script>
-let activeFile = null;
-
-async function checkStatus() {
-  try {
-    const res = await fetch('/api/status');
-    const data = await res.json();
-    if (data.status === 'online') {
-      document.getElementById('botStatus').innerText = `ONLINE • PORT ${data.port}`;
-    }
-  } catch (e) {
-    document.getElementById('botStatus').innerText = 'OFFLINE';
-    document.getElementById('botStatus').style.color = '#ff0055';
-    document.getElementById('botStatus').style.borderColor = '#ff0055';
-  }
-}
-
-async function loadStats() {
-  try {
-    const res = await fetch('/api/stats');
-    const data = await res.json();
-    document.getElementById('statFiles').innerText = data.total_jobs;
-    document.getElementById('statGps').innerText = data.total_gps;
-    document.getElementById('statTags').innerText = data.total_tags;
-  } catch (e) {}
-}
-
-const dropZone = document.getElementById('dropZone');
-dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
-dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
-dropZone.addEventListener('drop', (e) => {
-  e.preventDefault();
-  dropZone.classList.remove('dragover');
-  if (e.dataTransfer.files.length) {
-    handleFileSelect(e.dataTransfer.files[0]);
-  }
-});
-
-async function handleFileSelect(file) {
-  if (!file) return;
-  activeFile = file;
-  document.getElementById('sanitizeBtn').disabled = false;
-
-  const formData = new FormData();
-  formData.append('file', file);
-
-  const tbody = document.getElementById('metaBody');
-  tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding: 20px;">🔍 Inspecting EXIF tags & LSB entropy...</td></tr>';
-
-  try {
-    const res = await fetch('/api/inspect', { method: 'POST', body: formData });
-    const data = await res.json();
-    
-    // Render Stego Gauge
-    if (data.stego) {
-      const ent = data.stego.entropy || 0.0;
-      document.getElementById('entropyScore').innerText = `LSB Entropy: ${ent.toFixed(4)}`;
-      document.getElementById('gaugeFill').style.width = `${Math.min(100, ent * 100)}%`;
-      const verd = document.getElementById('entropyVerdict');
-      verd.innerText = data.stego.label;
-      if (data.stego.risk === 'high') {
-        verd.className = 'tag-pill pill-danger';
-      } else {
-        verd.className = 'tag-pill pill-clean';
-      }
-    }
-
-    // Render Table
-    tbody.innerHTML = '';
-    const tags = data.report.raw_tags || {};
-    const keys = Object.keys(tags);
-    if (keys.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color: var(--neon-green); padding: 20px;">✅ Clean file: No EXIF tags or GPS metadata detected!</td></tr>';
-      return;
-    }
-
-    for (const k of keys) {
-      const tr = document.createElement('tr');
-      const isDangerous = k.includes('GPS') || k.includes('Make') || k.includes('Model') || k.includes('Serial') || k.includes('Software');
-      tr.innerHTML = `
-        <td style="font-weight: 600;">${k}</td>
-        <td style="color: ${isDangerous ? 'var(--neon-red)' : 'var(--text-main)'};">${tags[k]}</td>
-        <td><span class="tag-pill pill-danger">PURGED ✂️</span></td>
-      `;
-      tbody.appendChild(tr);
-    }
-
-  } catch (e) {
-    tbody.innerHTML = `<tr><td colspan="3" style="color:var(--neon-red); text-align:center;">Inspection error: ${e.message}</td></tr>`;
-  }
-}
-
-async function sanitizeCurrentFile() {
-  if (!activeFile) return;
-  const btn = document.getElementById('sanitizeBtn');
-  btn.disabled = true;
-  btn.innerText = '🛡 PURGING METADATA...';
-
-  const formData = new FormData();
-  formData.append('file', activeFile);
-
-  try {
-    const res = await fetch('/api/sanitize', { method: 'POST', body: formData });
-    if (!res.ok) throw new Error('Sanitize failed');
-    const blob = await res.blob();
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `clean_${activeFile.name}`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    loadStats();
-  } catch (e) {
-    alert('Sanitize failed: ' + e.message);
-  } finally {
-    btn.disabled = false;
-    btn.innerText = '🛡 SANITIZE & PURGE ALL';
-  }
-}
-
-checkStatus();
-loadStats();
-setInterval(checkStatus, 10000);
-</script>
-</body>
-</html>
+GHOST_JS = r"""
+const $=s=>document.querySelector(s);let file=null;
+async function stats(){const d=await pb.json('/api/stats').catch(()=>null);if(d){pb.count($('#s1'),d.total_jobs||0);pb.count($('#s2'),d.total_gps||0);pb.count($('#s3'),d.total_tags||0)}}
+const risky=k=>/GPS|Make|Model|Serial|Software|Owner|Artist/i.test(k);
+function rows(tags){const tb=$('#meta tbody'),keys=Object.keys(tags||{});$('#cnt').textContent=keys.length;
+  if(!keys.length){tb.innerHTML=`<tr class="pb-empty-row"><td colspan="3">✅ ${pb.esc(pb.t('w_clean'))}</td></tr>`;return}
+  tb.innerHTML=keys.map(k=>`<tr><td><b>${pb.esc(k)}</b></td><td class="${risky(k)?'gl-risk':''}">${pb.esc(String(tags[k]))}</td><td><span class="gl-pill high">✂ ${pb.esc(pb.t('w_will_purge'))}</span></td></tr>`).join('')}
+async function inspect(f){if(!f)return;file=f;$('#san').disabled=false;const fd=new FormData();fd.append('file',f);
+  pb.progress('prog',null,pb.t('w_inspecting'));
+  try{const d=await pb.upload('/api/inspect',fd);pb.hide('prog');
+    const s=d.stego||{};const e=+s.entropy||0;$('#ent').textContent=e.toFixed(4);$('#gauge').style.width=Math.min(100,e*100)+'%';
+    const v=$('#verd'),risk=['low','medium','high'].includes(s.risk)?s.risk:'';v.className='gl-pill '+risk;
+    v.textContent=/\.(mp4|mov|mkv|webm)$/i.test(f.name)?pb.t('w_video_na'):risk?pb.t('w_risk_'+risk):pb.t('error');
+    rows((d.report||{}).raw_tags)}
+  catch(err){pb.hide('prog');pb.toast(pb.t('error')+': '+err.message,true)}}
+$('#f-zone').addEventListener('pb:files',e=>inspect(e.detail[0]));
+$('#san').onclick=async()=>{if(!file)return;const b=$('#san');pb.busy(b,true);pb.progress('prog',null,pb.t('w_purging'));
+  try{const fd=new FormData();fd.append('file',file);const r=await fetch('/api/sanitize',{method:'POST',body:fd});if(!r.ok)throw new Error('HTTP '+r.status);
+    const blob=await r.blob(),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='clean_'+file.name;document.body.appendChild(a);a.click();a.remove();
+    pb.progress('prog',100,pb.t('w_saved',{name:'clean_'+file.name}));pb.toast(pb.t('done'));stats()}
+  catch(err){pb.hide('prog');pb.toast(pb.t('error')+': '+err.message,true)}finally{pb.busy(b,false)}};
+stats();
 """
 
 
@@ -1229,10 +897,7 @@ class WebStudioHandler(BaseHTTPRequestHandler):
     def do_GET(self) -> None:
         parsed = urlparse(self.path)
         if parsed.path == "/" or parsed.path == "/index.html":
-            self.send_response(HTTPStatus.OK)
-            self.send_header("Content-Type", "text/html; charset=utf-8")
-            self.end_headers()
-            self.wfile.write(WEB_HTML.encode("utf-8"))
+            render_studio(self)
             return
 
         if parsed.path == "/api/status":

@@ -14,6 +14,7 @@ Features:
 from __future__ import annotations
 
 import pybionic_core as core
+import pybionic_web as web
 import hashlib
 import html
 import io
@@ -664,417 +665,74 @@ def setup_telegram_handlers() -> None:
 # ---------------------------------------------------------------------------
 # Standalone Cyberpunk Web Studio (Port 8102)
 # ---------------------------------------------------------------------------
-WEB_HTML = r"""<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cloud Shard Backup Studio</title>
-<style>
-:root {
-  --bg-dark: #0a0e14;
-  --bg-card: #121824;
-  --neon-cyan: #00f0ff;
-  --neon-green: #00ff66;
-  --neon-gold: #ffb700;
-  --neon-purple: #9d00ff;
-  --text-main: #f0f6fc;
-  --text-muted: #8b949e;
-  --border: #21262d;
-}
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body {
-  background-color: var(--bg-dark);
-  color: var(--text-main);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
-  padding: 20px;
-  line-height: 1.5;
-}
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid var(--border);
-  padding-bottom: 16px;
-  margin-bottom: 24px;
-}
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.brand h1 {
-  font-size: 22px;
-  font-weight: 700;
-  letter-spacing: 1px;
-  color: var(--neon-cyan);
-  text-shadow: 0 0 10px rgba(0,240,255,0.3);
-}
-.badge {
-  background: rgba(0, 255, 102, 0.15);
-  color: var(--neon-green);
-  border: 1px solid var(--neon-green);
-  padding: 4px 10px;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: 600;
-}
-.tabs {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 20px;
-}
-.tab-btn {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  color: var(--text-muted);
-  padding: 10px 20px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.2s;
-}
-.tab-btn.active {
-  color: var(--neon-cyan);
-  border-color: var(--neon-cyan);
-  background: rgba(0,240,255,0.08);
-}
-.grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
-}
-@media (max-width: 900px) {
-  .grid { grid-template-columns: 1fr; }
-}
-.card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 20px;
-}
-.card h2 {
-  font-size: 16px;
-  font-weight: 600;
-  margin-bottom: 16px;
-  color: var(--text-main);
-}
-.drop-zone {
-  border: 2px dashed var(--border);
-  border-radius: 8px;
-  padding: 30px 20px;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  background: rgba(255,255,255,0.01);
-}
-.drop-zone:hover {
-  border-color: var(--neon-cyan);
-  background: rgba(0,240,255,0.05);
-}
-.btn {
-  background: var(--neon-cyan);
-  color: #000;
-  border: none;
-  border-radius: 4px;
-  padding: 12px 24px;
-  font-weight: 700;
-  font-size: 14px;
-  cursor: pointer;
-  width: 100%;
-  margin-top: 16px;
-  transition: all 0.2s ease;
-}
-.btn:hover {
-  box-shadow: 0 0 15px rgba(0,240,255,0.5);
-}
-.btn-green {
-  background: var(--neon-green);
-}
-.btn-green:hover {
-  box-shadow: 0 0 15px rgba(0,255,102,0.5);
-}
-.slider-group {
-  margin: 16px 0;
-}
-.slider-group label {
-  display: flex;
-  justify-content: space-between;
-  font-size: 13px;
-  color: var(--text-muted);
-  margin-bottom: 6px;
-}
-input[type="range"] {
-  width: 100%;
-  accent-color: var(--neon-cyan);
-}
-.shard-matrix {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-top: 12px;
-}
-.shard-pill {
-  padding: 6px 12px;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: 600;
-  border: 1px solid var(--border);
-  background: rgba(255,255,255,0.03);
-  color: var(--text-muted);
-}
-.shard-pill.loaded {
-  border-color: var(--neon-green);
-  color: var(--neon-green);
-  background: rgba(0,255,102,0.1);
-}
-.stat-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 8px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-}
-.stat-label { color: var(--text-muted); }
-.stat-value { font-weight: 600; color: var(--neon-cyan); }
-</style>
-</head>
-<body>
-<div class="header">
-  <div class="brand">
-    <h1>🧩 CLOUD SHARD BACKUP</h1>
-    <span class="badge" id="botStatus">ONLINE • PORT 8102</span>
-  </div>
-</div>
+def render_studio(handler: Any) -> None:
+    lang = web.resolve_lang(handler)
+    T = web.translator(lang)
+    css = ("<style>.cs-scheme{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 6px}.cs-dot{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;"
+           "font-size:12px;font-weight:700;background:var(--surface2);border:1px solid var(--line);color:var(--muted);transition:all .25s}"
+           ".cs-dot.k{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;border-color:transparent;box-shadow:0 4px 14px -6px var(--brand)}"
+           ".cs-pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}.cs-pill{padding:5px 10px;border-radius:99px;font-size:12.5px;background:var(--surface2);border:1px solid var(--line)}"
+           ".cs-kv{display:grid;grid-template-columns:auto 1fr;gap:8px 14px;font-size:14px}.cs-kv span{color:var(--muted)}.cs-kv b{word-break:break-all;font-weight:600}"
+           ".cs-sha{font-family:ui-monospace,Consolas,monospace;font-size:12.5px}</style>")
+    tabs = web.segmented("mode", [("shard", T("w_tab_shard")), ("restore", T("w_tab_restore"))], "shard",
+                         sub={"shard": T("w_tab_shard_sub"), "restore": T("w_tab_restore_sub")}, icons={"shard": "zap", "restore": "refresh"})
+    shard = web.grid(
+        web.card(T("w_card_scheme"),
+            web.field(T("w_k"), web.range_("k", 2, 10, 3, 1), hint=T("w_k_hint"))
+            + web.field(T("w_n"), web.range_("n", 2, 15, 5, 1), hint=T("w_n_hint"))
+            + '<div class="cs-scheme" id="scheme"></div>' + web.note(T("w_scheme_note", k="3", n="5"), "info", "shield").replace("<span>", '<span id="scheme-note">', 1),
+            icon_name="settings"),
+        web.card(T("w_card_source"),
+            web.dropzone("src", T("w_drop_src"), T("w_drop_src_hint"), icon_name="file")
+            + '<div class="pb-row">' + web.button(T("w_shard_btn"), "go", icon_name="download", disabled=True) + "</div>" + web.progress("sp")
+            + web.note(T("w_store_note"), "warn"), icon_name="file"), min_width=320)
+    restore = web.grid(
+        web.card(T("w_card_shards"),
+            web.dropzone("sh", T("w_drop_shards"), T("w_drop_shards_hint"), accept=".bin,.zip", multiple=True, icon_name="folder")
+            + '<div class="cs-pills" id="pills"></div>'
+            + '<div class="pb-row">' + web.button(T("w_restore_btn"), "rs", icon_name="refresh", disabled=True) + "</div>" + web.progress("rp"),
+            icon_name="folder"),
+        web.card(T("w_card_verify"),
+            f'<div class="cs-kv"><span>{web.esc(T("file_name"))}</span><b id="r-name">—</b><span>{web.esc(T("file_size"))}</span><b id="r-size">—</b>'
+            f'<span>SHA-256</span><b id="r-sha" class="cs-sha">—</b><span>{web.esc(T("status"))}</span><b id="r-st">{web.esc(T("waiting"))}</b></div>',
+            icon_name="check"), min_width=320)
+    st = web.card(T("statistics"), web.stats([(T("w_st_created"), "0", "s1", "zap"), (T("w_st_restores"), "0", "s2", "refresh")]), icon_name="chart")
+    body = css + web.card(T("mode"), tabs, icon_name="shield") + f'<div id="t-shard">{shard}</div><div id="t-restore" hidden>{restore}</div>' + st
+    hero = web.hero(T("w_title"), T("w_hero"), "🧩", chips=["Shamir K-of-N", "ZIP", "SHA-256"])
+    web.send_page(handler, lang, title=T("w_title"), emoji="🧩", brand="#22c55e", port=WEB_PORT,
+                  hero_html=hero, body=body, script=SHARD_JS)
 
-<div class="tabs">
-  <button class="tab-btn active" onclick="switchTab('shardTab')">🧩 Shard File (Split)</button>
-  <button class="tab-btn" onclick="switchTab('restoreTab')">🔄 Restore from Shards</button>
-</div>
 
-<!-- Tab 1: Shard File -->
-<div id="shardTab" class="grid">
-  <div class="card">
-    <h2>1. Threshold Configuration</h2>
-    <div class="slider-group">
-      <label>Recovery Threshold (K): <span id="valK" style="color: var(--neon-cyan); font-weight: 700;">3</span></label>
-      <input type="range" id="inputK" min="2" max="10" value="3" oninput="updateSliders()">
-    </div>
-    <div class="slider-group">
-      <label>Total Shards (N): <span id="valN" style="color: var(--neon-cyan); font-weight: 700;">5</span></label>
-      <input type="range" id="inputN" min="2" max="15" value="5" oninput="updateSliders()">
-    </div>
-    <div style="font-size: 12px; color: var(--text-muted); margin-top: 8px;">
-      Scheme: Any <b id="schemeText">3 of 5</b> shards can restore original. K-1 shards reveal ZERO bits.
-    </div>
-
-    <div style="margin-top: 24px;">
-      <h2>📊 Global Backup Metrics</h2>
-      <div class="stat-row">
-        <span class="stat-label">Files Sharded:</span>
-        <span class="stat-value" id="statCreated">0</span>
-      </div>
-      <div class="stat-row">
-        <span class="stat-label">Restores Completed:</span>
-        <span class="stat-value" id="statRestores">0</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="card">
-    <h2>2. Source File & Shard Packaging</h2>
-    <div class="drop-zone" onclick="document.getElementById('fileToShard').click()">
-      <div style="font-size: 32px; margin-bottom: 8px;">📁</div>
-      <div style="font-weight: 600;">Select Document, Archive, or Seed Phrase</div>
-      <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;" id="selectedFileName">No file selected</div>
-      <input type="file" id="fileToShard" style="display: none;" onchange="handleFileSelect(this.files[0])">
-    </div>
-    <button class="btn" onclick="shardFile()" id="shardBtn" disabled>
-      🧩 GENERATE & DOWNLOAD SHARDS (ZIP)
-    </button>
-  </div>
-</div>
-
-<!-- Tab 2: Restore from Shards -->
-<div id="restoreTab" class="grid" style="display: none;">
-  <div class="card">
-    <h2>1. Shard Upload & Matrix</h2>
-    <div class="drop-zone" onclick="document.getElementById('shardsInput').click()">
-      <div style="font-size: 32px; margin-bottom: 8px;">📥</div>
-      <div style="font-weight: 600;">Drop Shard Files (.bin) or Recovery ZIP</div>
-      <input type="file" id="shardsInput" multiple style="display: none;" onchange="handleShardsInput(this.files)">
-    </div>
-    <div style="margin-top: 16px;">
-      <label style="font-size: 13px; color: var(--text-muted);">Loaded Shards Matrix:</label>
-      <div class="shard-matrix" id="shardMatrix">
-        <span class="shard-pill">No shards loaded</span>
-      </div>
-    </div>
-    <button class="btn btn-green" onclick="restoreShards()" id="restoreBtn" disabled>
-      🔄 RECONSTRUCT ORIGINAL FILE
-    </button>
-  </div>
-
-  <div class="card">
-    <h2>2. Integrity Verification</h2>
-    <div class="stat-row">
-      <span class="stat-label">Original Filename:</span>
-      <span class="stat-value" id="resFilename">—</span>
-    </div>
-    <div class="stat-row">
-      <span class="stat-label">SHA-256 Checksum:</span>
-      <span class="stat-value" id="resSha">—</span>
-    </div>
-    <div class="stat-row">
-      <span class="stat-label">Recovery Status:</span>
-      <span class="stat-value" id="resStatus" style="color: var(--neon-gold);">Awaiting K Shards</span>
-    </div>
-  </div>
-</div>
-
-<script>
-let sourceFile = null;
-let uploadedShards = [];
-
-function switchTab(tabId) {
-  document.getElementById('shardTab').style.display = tabId === 'shardTab' ? 'grid' : 'none';
-  document.getElementById('restoreTab').style.display = tabId === 'restoreTab' ? 'grid' : 'none';
-  const btns = document.querySelectorAll('.tab-btn');
-  btns[0].classList.toggle('active', tabId === 'shardTab');
-  btns[1].classList.toggle('active', tabId === 'restoreTab');
-}
-
-function updateSliders() {
-  let k = parseInt(document.getElementById('inputK').value);
-  let n = parseInt(document.getElementById('inputN').value);
-  if (k > n) { n = k; document.getElementById('inputN').value = n; }
-  document.getElementById('valK').innerText = k;
-  document.getElementById('valN').innerText = n;
-  document.getElementById('schemeText').innerText = `${k} of ${n}`;
-}
-
-function handleFileSelect(file) {
-  if (!file) return;
-  sourceFile = file;
-  document.getElementById('selectedFileName').innerText = `${file.name} (${file.size} bytes)`;
-  document.getElementById('shardBtn').disabled = false;
-}
-
-async function shardFile() {
-  if (!sourceFile) return;
-  const k = document.getElementById('inputK').value;
-  const n = document.getElementById('inputN').value;
-
-  const btn = document.getElementById('shardBtn');
-  btn.disabled = true;
-  btn.innerText = '🧩 GENERATING SHARDS...';
-
-  const formData = new FormData();
-  formData.append('file', sourceFile);
-  formData.append('k', k);
-  formData.append('n', n);
-
-  try {
-    const res = await fetch('/api/shard', { method: 'POST', body: formData });
-    if (!res.ok) throw new Error(await res.text());
-    const blob = await res.blob();
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `shards_${sourceFile.name}.zip`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    loadStats();
-  } catch (e) {
-    alert('Sharding failed: ' + e.message);
-  } finally {
-    btn.disabled = false;
-    btn.innerText = '🧩 GENERATE & DOWNLOAD SHARDS (ZIP)';
-  }
-}
-
-function handleShardsInput(files) {
-  uploadedShards = Array.from(files);
-  const matrix = document.getElementById('shardMatrix');
-  matrix.innerHTML = '';
-  if (!uploadedShards.length) {
-    matrix.innerHTML = '<span class="shard-pill">No shards loaded</span>';
-    document.getElementById('restoreBtn').disabled = true;
-    return;
-  }
-  uploadedShards.forEach((f, idx) => {
-    const pill = document.createElement('span');
-    pill.className = 'shard-pill loaded';
-    pill.innerText = `Shard #${idx+1} (${f.name})`;
-    matrix.appendChild(pill);
-  });
-  document.getElementById('restoreBtn').disabled = false;
-  document.getElementById('resStatus').innerText = `${uploadedShards.length} Shards Ready`;
-  document.getElementById('resStatus').style.color = '#00ff66';
-}
-
-async function restoreShards() {
-  if (!uploadedShards.length) return;
-  const btn = document.getElementById('restoreBtn');
-  btn.disabled = true;
-  btn.innerText = '🔄 RECONSTRUCTING...';
-
-  const formData = new FormData();
-  uploadedShards.forEach(f => formData.append('shards', f));
-
-  try {
-    const res = await fetch('/api/restore', { method: 'POST', body: formData });
-    if (!res.ok) throw new Error(await res.text());
-    const blob = await res.blob();
-    const disposition = res.headers.get('Content-Disposition') || '';
-    let fname = 'restored_file.bin';
-    const m = disposition.match(/filename="([^"]+)"/);
-    if (m) fname = m[1];
-
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = fname;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    loadStats();
-    document.getElementById('resStatus').innerText = 'Reconstructed & Verified ✅';
-  } catch (e) {
-    alert('Restore failed: ' + e.message);
-    document.getElementById('resStatus').innerText = 'Failed: ' + e.message;
-    document.getElementById('resStatus').style.color = '#ff0055';
-  } finally {
-    btn.disabled = false;
-    btn.innerText = '🔄 RECONSTRUCT ORIGINAL FILE';
-  }
-}
-
-async function checkStatus() {
-  try {
-    const res = await fetch('/api/status');
-    const data = await res.json();
-    if (data.status === 'online') {
-      document.getElementById('botStatus').innerText = `ONLINE • PORT ${data.port}`;
-    }
-  } catch (e) {}
-}
-
-async function loadStats() {
-  try {
-    const res = await fetch('/api/stats');
-    const data = await res.json();
-    document.getElementById('statCreated').innerText = data.total_shards_created;
-    document.getElementById('statRestores').innerText = data.total_restores;
-  } catch (e) {}
-}
-
-checkStatus();
-loadStats();
-setInterval(checkStatus, 10000);
-</script>
-</body>
-</html>
+SHARD_JS = r"""
+const $=s=>document.querySelector(s);let src=null,shards=[];
+$('#mode').addEventListener('change',()=>{const s=$('#mode').dataset.value==='shard';$('#t-shard').hidden=!s;$('#t-restore').hidden=s});
+function scheme(from){let k=+$('#k').value,n=+$('#n').value;if(k>n){if(from==='n'){k=n;$('#k').value=k}else{n=k;$('#n').value=n}
+  ['k','n'].forEach(id=>$('#'+id).dispatchEvent(new Event('input')))}
+  $('#scheme').innerHTML=Array.from({length:n},(_,i)=>`<span class="cs-dot ${i<k?'k':''}">${i+1}</span>`).join('');
+  $('#scheme-note').textContent=pb.t('w_scheme_note',{k,n})}
+$('#k').addEventListener('change',()=>scheme('k'));$('#n').addEventListener('change',()=>scheme('n'));
+$('#k').addEventListener('input',()=>scheme('k'));$('#n').addEventListener('input',()=>scheme('n'));scheme();
+async function stats(){const d=await pb.json('/api/stats').catch(()=>null);if(d){pb.count($('#s1'),d.total_shards_created||0);pb.count($('#s2'),d.total_restores||0)}}
+function save(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove()}
+async function send(url,fd){const r=await fetch(url,{method:'POST',body:fd});if(!r.ok){const t=await r.text();throw new Error(t||('HTTP '+r.status))}return r}
+$('#src-zone').addEventListener('pb:files',e=>{src=e.detail[0];$('#go').disabled=!src});
+$('#go').onclick=async()=>{if(!src)return;const b=$('#go');pb.busy(b,true);pb.progress('sp',null,pb.t('processing'));
+  try{const fd=new FormData();fd.append('file',src);fd.append('k',$('#k').value);fd.append('n',$('#n').value);
+    const blob=await (await send('/api/shard',fd)).blob();save(blob,'shards_'+src.name+'.zip');
+    pb.progress('sp',100,pb.t('w_shard_done',{n:$('#n').value}));pb.toast(pb.t('done'));stats()}
+  catch(err){pb.hide('sp');pb.toast(pb.t('error')+': '+err.message,true)}finally{pb.busy(b,false)}};
+$('#sh-zone').addEventListener('pb:files',e=>{shards=Array.from(e.detail);$('#rs').disabled=!shards.length;
+  $('#pills').innerHTML=shards.map((f,i)=>`<span class="cs-pill">🧩 ${i+1} · ${pb.esc(f.name)}</span>`).join('');
+  $('#r-st').textContent=shards.length?pb.t('w_ready',{n:shards.length}):pb.t('waiting');$('#r-st').style.color=''});
+async function sha(blob){try{const h=await crypto.subtle.digest('SHA-256',await blob.arrayBuffer());return [...new Uint8Array(h)].map(b=>b.toString(16).padStart(2,'0')).join('')}catch(e){return '—'}}
+$('#rs').onclick=async()=>{if(!shards.length)return;const b=$('#rs');pb.busy(b,true);pb.progress('rp',null,pb.t('processing'));
+  try{const fd=new FormData();shards.forEach(f=>fd.append('shards',f));const r=await send('/api/restore',fd);const blob=await r.blob();
+    const m=(r.headers.get('Content-Disposition')||'').match(/filename="([^"]+)"/);const name=m?m[1]:'restored.bin';save(blob,name);
+    $('#r-name').textContent=name;$('#r-size').textContent=pb.bytes(blob.size);$('#r-sha').textContent=await sha(blob);
+    $('#r-st').textContent='✅ '+pb.t('w_restored');$('#r-st').style.color='#22c55e';pb.progress('rp',100,pb.t('done'));stats()}
+  catch(err){pb.hide('rp');$('#r-st').textContent=pb.t('w_restore_fail');$('#r-st').style.color='#ef4444';pb.toast(pb.t('w_restore_fail'),true)}
+  finally{pb.busy(b,false)}};
+stats();
 """
 
 
@@ -1085,10 +743,7 @@ class WebStudioHandler(BaseHTTPRequestHandler):
     def do_GET(self) -> None:
         parsed = urlparse(self.path)
         if parsed.path in ("/", "/index.html"):
-            self.send_response(HTTPStatus.OK)
-            self.send_header("Content-Type", "text/html; charset=utf-8")
-            self.end_headers()
-            self.wfile.write(WEB_HTML.encode("utf-8"))
+            render_studio(self)
             return
 
         if parsed.path == "/api/status":

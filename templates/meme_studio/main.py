@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 import pybionic_core as core
+import pybionic_web as web
 import base64
 import html
 import http.server
@@ -254,6 +255,45 @@ def render_meme(img_bytes: bytes, top_text: str, bottom_text: str, style: str = 
     return out.getvalue()
 
 
+def render_studio(handler: Any, port: int) -> None:
+    lang = web.resolve_lang(handler)
+    T = web.translator(lang)
+    styles = [("classic", T("style_classic")), ("demotivator", T("style_demotivator")), ("quote", T("style_quote")), ("blur", T("style_blur"))]
+    left = web.card(T("w_card_make"),
+        web.field(T("w_style"), web.segmented("style", styles, "classic"))
+        + web.dropzone("fi", T("drop_or_click"), "JPG · PNG · WebP", accept="image/*", icon_name="image")
+        + web.field(T("ph_top"), web.input_("top", T("ph_top")))
+        + web.field(T("ph_bottom"), web.input_("bot", T("ph_bottom")))
+        + '<div class="pb-row">' + web.button(T("btn_generate"), "go", icon_name="sparkles")
+        + web.button(T("w_sample"), "sample", kind="ghost", icon_name="image") + "</div>", icon_name="sparkles")
+    right = web.card(T("web_live_preview"),
+        '<img id="pv" alt="" hidden style="width:100%;border-radius:14px;box-shadow:var(--sh2)">'
+        + web.empty_state(T("w_preview_empty"), "image", id="pv-empty")
+        + '<a class="pb-btn pb-btn-primary" id="dl" hidden download="meme.jpg">' + web.icon("download") + f'<span>{web.esc(T("btn_download"))}</span></a>',
+        icon_name="image")
+    hero = web.hero(T("w_title"), T("web_subtitle"), "🎭", chips=[T("style_classic"), T("style_demotivator"), T("style_quote"), "JPG"])
+    web.send_page(handler, lang, title=T("w_title"), emoji="🎭", brand="#ef4444", port=port,
+                  hero_html=hero, body=web.grid(left, right, min_width=330), script=MEME_JS)
+
+
+MEME_JS = r"""
+const $=s=>document.querySelector(s);let b64='',timer=null;
+async function render(){if(!b64)return;
+  try{const r=await fetch('/render',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},
+      body:new URLSearchParams({b64,style:$('#style').dataset.value,top:$('#top').value,bot:$('#bot').value})});
+    if(!r.ok)throw new Error('HTTP '+r.status);const u=URL.createObjectURL(await r.blob());
+    $('#pv').src=u;$('#pv').hidden=false;$('#pv-empty').hidden=true;$('#dl').href=u;$('#dl').hidden=false}
+  catch(err){pb.toast(pb.t('error')+': '+err.message,true)}}
+const later=()=>{clearTimeout(timer);timer=setTimeout(render,400)};
+$('#top').addEventListener('input',later);$('#bot').addEventListener('input',later);$('#style').addEventListener('change',later);
+$('#fi-zone').addEventListener('pb:files',e=>{const f=e.detail[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{b64=String(rd.result).split(',')[1]||'';render()};rd.readAsDataURL(f)});
+$('#go').onclick=()=>{if(!b64){pb.toast(pb.t('need_file'),true);return}render()};
+$('#sample').onclick=()=>{const c=document.createElement('canvas');c.width=800;c.height=600;const x=c.getContext('2d');
+  const g=x.createLinearGradient(0,0,800,600);g.addColorStop(0,'#0f2027');g.addColorStop(.5,'#203a43');g.addColorStop(1,'#2c5364');x.fillStyle=g;x.fillRect(0,0,800,600);
+  b64=c.toDataURL('image/jpeg',.9).split(',')[1];$('#top').value=pb.t('w_sample_top');$('#bot').value=pb.t('w_sample_bot');render()};
+"""
+
+
 def start_web_studio(port: int) -> None:
     class Handler(http.server.BaseHTTPRequestHandler):
         def log_message(self, fmt: str, *args: Any) -> None:
@@ -261,243 +301,7 @@ def start_web_studio(port: int) -> None:
 
         def do_GET(self) -> None:
             u = urllib.parse.urlparse(self.path)
-            lang = urllib.parse.parse_qs(u.query).get("lang", [current_lang()])[0]
-            rtl_attr = ' dir="rtl"' if is_rtl(lang) else ""
-
-            lang_options = "\n".join(
-                f'<option value="{code}"{" selected" if code == lang else ""}>{html.escape(label)}</option>'
-                for code, label in SUPPORTED_LANGUAGES
-            )
-
-            html_page = f"""<!doctype html>
-<html lang="{lang}"{rtl_attr}>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>{html.escape(t('web_title', lang_override=lang))}</title>
-<style>
-:root {{
-  --bg-deep: #0A0F1A;
-  --bg-card: #121A2B;
-  --bg-input: #0D1322;
-  --accent-cyan: #00D8FF;
-  --accent-emerald: #00E676;
-  --accent-gold: #FFC107;
-  --text-main: #E6F1FF;
-  --text-dim: #8BA0C6;
-  --border: #1F2D4A;
-}}
-* {{ box-sizing: border-box; margin: 0; padding: 0; }}
-body {{
-  background: var(--bg-deep);
-  color: var(--text-main);
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-  padding: 16px;
-  max-width: 640px;
-  margin: 0 auto;
-}}
-header {{
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  border-bottom: 1px solid var(--border);
-  padding-bottom: 12px;
-}}
-.brand {{ font-size: 20px; font-weight: 800; color: var(--accent-cyan); }}
-.lang-sel {{
-  background: var(--bg-input);
-  color: var(--text-main);
-  border: 1px solid var(--border);
-  padding: 6px 10px;
-  border-radius: 8px;
-  font-size: 13px;
-}}
-.card {{
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 20px;
-  margin-bottom: 20px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-}}
-.style-tabs {{
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
-  margin-top: 14px;
-}}
-.style-btn {{
-  background: var(--bg-input);
-  color: var(--text-dim);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 10px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  text-align: center;
-  transition: all 0.2s;
-}}
-.style-btn.active {{
-  background: rgba(0, 216, 255, 0.12);
-  color: var(--accent-cyan);
-  border-color: var(--accent-cyan);
-}}
-input[type="text"], input[type="file"], select, button {{
-  width: 100%;
-  padding: 12px;
-  margin-top: 10px;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: var(--bg-input);
-  color: var(--text-main);
-  font-size: 15px;
-}}
-button.primary {{
-  background: linear-gradient(135deg, #00D8FF, #0088cc);
-  color: #001B2E;
-  font-weight: 700;
-  border: none;
-  cursor: pointer;
-}}
-button.primary:hover {{ opacity: 0.95; }}
-.canvas-wrap {{
-  margin-top: 16px;
-  text-align: center;
-}}
-#preview-img {{
-  max-width: 100%;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  display: block;
-  margin: 0 auto;
-}}
-.btn-group {{
-  display: flex;
-  gap: 10px;
-  margin-top: 12px;
-}}
-.btn-group button {{ margin-top: 0; }}
-</style>
-</head>
-<body>
-<header>
-  <div class="brand">🎭 Meme & Demotivator Studio</div>
-  <select class="lang-sel" onchange="location.href='/?lang='+this.value">
-    {lang_options}
-  </select>
-</header>
-
-<div class="card">
-  <h2>{html.escape(t('web_title', lang_override=lang))}</h2>
-  <p style="color:var(--text-dim);margin-top:6px;font-size:14px">{html.escape(t('web_subtitle', lang_override=lang))}</p>
-
-  <div class="style-tabs">
-    <div class="style-btn active" data-style="classic" onclick="pickStyle('classic')">{html.escape(t('style_classic', lang_override=lang))}</div>
-    <div class="style-btn" data-style="demotivator" onclick="pickStyle('demotivator')">{html.escape(t('style_demotivator', lang_override=lang))}</div>
-    <div class="style-btn" data-style="quote" onclick="pickStyle('quote')">{html.escape(t('style_quote', lang_override=lang))}</div>
-    <div class="style-btn" data-style="blur" onclick="pickStyle('blur')">{html.escape(t('style_blur', lang_override=lang))}</div>
-  </div>
-
-  <input type="file" id="fi" accept="image/*">
-  <input type="text" id="top" placeholder="{html.escape(t('ph_top', lang_override=lang))}" oninput="scheduleRender()">
-  <input type="text" id="bot" placeholder="{html.escape(t('ph_bottom', lang_override=lang))}" oninput="scheduleRender()">
-
-  <div class="btn-group">
-    <button class="primary" onclick="renderNow()">{html.escape(t('btn_generate', lang_override=lang))}</button>
-    <button style="background:#1F2D4A;color:#00D8FF" onclick="useSampleImage()">Образец</button>
-  </div>
-</div>
-
-<div class="card" id="preview-card" style="display:none">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-    <h3>{html.escape(t('web_live_preview', lang_override=lang))}</h3>
-    <a id="dl-link" download="meme.jpg" href="#"><button class="primary" style="padding:6px 14px;font-size:13px;margin:0">{html.escape(t('btn_download', lang_override=lang))}</button></a>
-  </div>
-  <div class="canvas-wrap">
-    <img id="preview-img" src="" alt="Meme Preview">
-  </div>
-</div>
-
-<script>
-let currentStyle = 'classic';
-let currentB64 = '';
-let renderTimer = null;
-
-function pickStyle(st) {{
-  currentStyle = st;
-  document.querySelectorAll('.style-btn').forEach(b => {{
-    b.classList.toggle('active', b.dataset.style === st);
-  }});
-  scheduleRender();
-}}
-
-document.getElementById('fi').onchange = (e) => {{
-  const f = e.target.files[0];
-  if (!f) return;
-  const reader = new FileReader();
-  reader.onload = () => {{
-    currentB64 = reader.result.split(',')[1] || '';
-    renderNow();
-  }};
-  reader.readAsDataURL(f);
-}};
-
-function useSampleImage() {{
-  const cvs = document.createElement('canvas');
-  cvs.width = 800; cvs.height = 600;
-  const ctx = cvs.getContext('2d');
-  const g = ctx.createLinearGradient(0, 0, 800, 600);
-  g.addColorStop(0, '#0f2027');
-  g.addColorStop(0.5, '#203a43');
-  g.addColorStop(1, '#2c5364');
-  ctx.fillStyle = g; ctx.fillRect(0, 0, 800, 600);
-  currentB64 = cvs.toDataURL('image/jpeg', 0.9).split(',')[1];
-  document.getElementById('top').value = 'КОГДА КОД ЗАПУСТИЛСЯ';
-  document.getElementById('bot').value = 'С ПЕРВОЙ ПОПЫТКИ';
-  renderNow();
-}}
-
-function scheduleRender() {{
-  if (renderTimer) clearTimeout(renderTimer);
-  renderTimer = setTimeout(renderNow, 400);
-}}
-
-async function renderNow() {{
-  if (!currentB64) return;
-  const top = document.getElementById('top').value;
-  const bot = document.getElementById('bot').value;
-  try {{
-    const res = await fetch('/render', {{
-      method: 'POST',
-      headers: {{'Content-Type': 'application/x-www-form-urlencoded'}},
-      body: new URLSearchParams({{
-        b64: currentB64,
-        style: currentStyle,
-        top: top,
-        bot: bot
-      }})
-    }});
-    const blob = await res.blob();
-    const url = URL.createObjectURL(blob);
-    document.getElementById('preview-img').src = url;
-    document.getElementById('dl-link').href = url;
-    document.getElementById('preview-card').style.display = 'block';
-  }} catch (err) {{
-    console.error(err);
-  }}
-}}
-</script>
-</body>
-</html>
-"""
-            raw = html_page.encode("utf-8")
-            self.send_response(200)
-            self.send_header("Content-Type", "text/html; charset=utf-8")
-            self.send_header("Content-Length", str(len(raw)))
-            self.end_headers()
-            self.wfile.write(raw)
+            render_studio(self, port)
 
         def do_POST(self) -> None:
             if self.path != "/render":

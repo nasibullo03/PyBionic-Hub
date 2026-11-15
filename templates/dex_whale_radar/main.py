@@ -15,6 +15,7 @@ Features:
 from __future__ import annotations
 
 import pybionic_core as core
+import pybionic_web as web
 import html
 import io
 import json
@@ -487,173 +488,59 @@ def setup_bot() -> telebot.TeleBot | None:
 # ---------------------------------------------------------------------------
 # Web Studio Handler (Cyberpunk Neon UI on Port 8106)
 # ---------------------------------------------------------------------------
-WEB_STUDIO_HTML = """<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>DEX Whale Radar Studio</title>
-<style>
-:root {
-  --bg: #0a0e17;
-  --panel: #111927;
-  --accent: #00e5ff;
-  --accent-glow: rgba(0, 229, 255, 0.3);
-  --green: #00ff66;
-  --red: #ff3366;
-  --text: #e2e8f0;
-  --muted: #64748b;
-  --border: #1e293b;
-}
-* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
-body { background: var(--bg); color: var(--text); padding: 24px; }
-.container { max-width: 1000px; margin: 0 auto; }
-header { margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
-h1 { font-size: 24px; color: var(--accent); text-shadow: 0 0 10px var(--accent-glow); display: flex; align-items: center; gap: 10px; }
-.badge { background: rgba(0, 229, 255, 0.15); color: var(--accent); padding: 4px 12px; border-radius: 999px; font-size: 12px; border: 1px solid var(--accent); }
-.grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 24px; }
-@media (max-width: 800px) { .grid { grid-template-columns: 1fr; } }
-.card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
-.card-title { font-size: 16px; font-weight: 600; margin-bottom: 14px; color: #f8fafc; display: flex; justify-content: space-between; align-items: center; }
-.feed-box { display: flex; flex-direction: column; gap: 10px; max-height: 480px; overflow-y: auto; }
-.feed-item { background: #06090e; border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; }
-.feed-item.buy { border-left: 4px solid var(--green); }
-.feed-item.sell { border-left: 4px solid var(--red); }
-.tag { font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 700; text-transform: uppercase; }
-.tag.buy { background: rgba(0, 255, 102, 0.15); color: var(--green); }
-.tag.sell { background: rgba(255, 51, 102, 0.15); color: var(--red); }
-.form-group { margin-bottom: 14px; }
-label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; font-weight: 600; }
-select, input[type="number"] { width: 100%; background: #06090e; border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; color: #fff; font-size: 14px; outline: none; }
-button.primary { width: 100%; background: var(--accent); color: #000; font-weight: 700; border: none; padding: 12px; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
-button.primary:hover { box-shadow: 0 0 14px var(--accent-glow); }
-.res-box { background: #06090e; border: 1px solid var(--border); border-radius: 8px; padding: 14px; margin-top: 14px; }
-.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; }
-.stat-box { background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border); border-radius: 8px; padding: 14px; text-align: center; }
-.stat-num { font-size: 26px; font-weight: 700; color: var(--accent); }
-.stat-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
-</style>
-</head>
-<body>
-<div class="container">
-  <header>
-    <h1>🐋 DEX Whale Radar Pro</h1>
-    <span class="badge">Port 8106 • Live Stream</span>
-  </header>
+def render_studio(handler: Any) -> None:
+    lang = web.resolve_lang(handler)
+    T = web.translator(lang)
+    css = ("<style>.dx-feed{display:flex;flex-direction:column;gap:8px;min-height:200px}"
+           ".dx-item{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:var(--surface2);animation:dxIn .45s cubic-bezier(.2,.8,.2,1) both}"
+           "@keyframes dxIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}"
+           ".dx-side{font-size:11px;font-weight:800;padding:4px 9px;border-radius:8px;letter-spacing:.04em}.dx-buy .dx-side{background:#22c55e22;color:#22c55e}.dx-sell .dx-side{background:#ef444422;color:#ef4444}"
+           ".dx-main{flex:1;min-width:0}.dx-main b{font-weight:700}.dx-main small{display:block;color:var(--muted);font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}"
+           ".dx-amt{text-align:end;font-weight:800;font-size:16px;white-space:nowrap}.dx-amt small{display:block;font-weight:500;font-size:11.5px;color:var(--muted)}"
+           ".dx-live{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--muted)}.dx-live i{width:8px;height:8px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 0 #22c55e88;animation:dxP 1.8s infinite}"
+           "@keyframes dxP{70%{box-shadow:0 0 0 8px transparent}}"
+           ".dx-res{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}.dx-kpi{padding:14px;border-radius:14px;border:1px solid var(--line);background:var(--surface2)}"
+           ".dx-kpi span{display:block;font-size:12.5px;color:var(--muted)}.dx-kpi b{font-size:22px;font-weight:800}"
+           ".dx-meter{grid-column:1/-1;height:12px;border-radius:99px;background:var(--surface2);border:1px solid var(--line);overflow:hidden}"
+           ".dx-meter i{display:block;height:100%;width:0;border-radius:99px;transition:width .6s cubic-bezier(.2,.8,.2,1),background .3s}</style>")
+    pairs = [(p, f'{p} · {info["chain"]}') for p, info in POOLS.items()]
+    feed = web.card(T("w_card_feed"), web.note(T("w_demo_note"), "warn") + '<div class="dx-feed" id="feed">' + "".join('<div class="pb-skel" style="height:58px"></div>' for _ in range(4)) + "</div>",
+                    icon_name="wave", aside=f'<span class="dx-live"><i></i>{web.esc(T("w_live"))}</span>')
+    sim = web.card(T("w_card_sim"),
+        web.field(T("w_pair"), web.select("pair", pairs, "TON/USDT"))
+        + web.field(T("w_volume"), web.input_("vol", "50000", type="number", value="50000", icon_name="chart", min="100", step="1000"), hint=T("w_volume_hint"))
+        + '<div class="pb-row">' + web.button(T("w_calc"), "calc", icon_name="zap") + "</div>"
+        + '<div class="dx-res"><div class="dx-kpi"><span>' + web.esc(T("w_impact")) + '</span><b id="imp">0.00%</b></div>'
+        + '<div class="dx-kpi"><span>' + web.esc(T("w_exec")) + '</span><b id="exe">$0</b></div>'
+        + '<div class="dx-kpi"><span>' + web.esc(T("w_spot")) + '</span><b id="spot">$0</b></div>'
+        + '<div class="dx-kpi"><span>' + web.esc(T("w_tvl")) + '</span><b id="tvl">$0</b></div>'
+        + '<div class="dx-meter"><i id="meter"></i></div></div>'
+        + '<p class="pb-hint" id="verdict" style="margin-top:10px"></p>', icon_name="chart")
+    st = web.card(T("statistics"), web.stats([(T("w_st_swaps"), "0", "s1", "wave"), (T("w_st_vol"), "$0", "s2", "chart"),
+                                              (T("w_st_pools"), str(len(POOLS)), None, "list")]), icon_name="chart")
+    hero = web.hero(T("w_title"), T("w_hero"), "🐋", chips=["x·y=k", "TON", "Solana", "Ethereum"])
+    web.send_page(handler, lang, title=T("w_title"), emoji="🐋", brand="#3b82f6", port=WEB_PORT,
+                  hero_html=hero, body=css + web.grid(feed, sim, min_width=330) + st, script=DEX_JS)
 
-  <div class="grid">
-    <div>
-      <div class="card">
-        <div class="card-title">
-          <span>Live Whale Transactions</span>
-          <span style="font-size:12px; color:var(--green);">● Auto-Refreshing</span>
-        </div>
-        <div class="feed-box" id="feedBox">
-          <div style="text-align:center; color:var(--muted); padding:20px;">Connecting to telemetry stream...</div>
-        </div>
-      </div>
-    </div>
 
-    <div>
-      <div class="card">
-        <div class="card-title">AMM Constant Product Simulator</div>
-        <div class="form-group">
-          <label>Select Pair</label>
-          <select id="selPair">
-            <option value="TON/USDT">TON / USDT (DeDust / STON.fi)</option>
-            <option value="SOL/USDC">SOL / USDC (Raydium / Orca)</option>
-            <option value="ETH/USDT">ETH / USDT (Uniswap v3)</option>
-            <option value="BTC/USDT">BTC / USDT (Uniswap v3)</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Swap Volume ($ USD)</label>
-          <input type="number" id="tradeVol" value="50000" min="1000" step="5000">
-        </div>
-        <button class="primary" id="btnSimulate">Calculate Price Impact</button>
-
-        <div class="res-box" id="resBox">
-          <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
-            <span style="font-size:13px; color:var(--muted);">Price Impact:</span>
-            <span id="impactVal" style="font-weight:700; color:var(--green);">0.00%</span>
-          </div>
-          <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
-            <span style="font-size:13px; color:var(--muted);">Execution Price:</span>
-            <span id="execPriceVal" style="font-weight:600; color:#fff;">$0.00</span>
-          </div>
-          <div style="font-family:monospace; color:var(--accent); font-size:13px;" id="chartVal">[░░░░░░░░░░░░░░░░░░░░]</div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-title">Engine Statistics</div>
-        <div class="stats-grid">
-          <div class="stat-box"><div class="stat-num" id="statSwaps">0</div><div class="stat-label">Whale Swaps</div></div>
-          <div class="stat-box"><div class="stat-num" id="statVol">$0</div><div class="stat-label">Total Volume</div></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<script>
-function refreshFeed() {
-  fetch('/api/feed').then(r => r.json()).then(items => {
-    const box = document.getElementById('feedBox');
-    box.innerHTML = '';
-    items.forEach(it => {
-      const el = document.createElement('div');
-      el.className = 'feed-item ' + it.type.toLowerCase();
-      el.innerHTML = `
-        <div>
-          <div style="font-weight:600; font-size:14px; margin-bottom:4px;">
-            <span class="tag ${it.type.toLowerCase()}">${it.type}</span> ${it.pair}
-          </div>
-          <div style="font-size:12px; color:var(--muted);">${it.tokens.toFixed(2)} tokens @ $${it.price.toFixed(4)}</div>
-          <div style="font-size:11px; color:#475569; margin-top:2px;">Wallet: ${it.wallet}</div>
-        </div>
-        <div style="text-align:right;">
-          <div style="font-size:16px; font-weight:700; color:#fff;">$${it.amount_usd.toLocaleString()}</div>
-          <div style="font-size:11px; color:var(--muted);">DEX Swap</div>
-        </div>
-      `;
-      box.appendChild(el);
-    });
-  });
-}
-
-function simulate() {
-  const p = document.getElementById('selPair').value;
-  const v = document.getElementById('tradeVol').value || 50000;
-  fetch(`/api/calc?pair=${encodeURIComponent(p)}&vol=${v}`)
-    .then(r => r.json())
-    .then(data => {
-      const impactEl = document.getElementById('impactVal');
-      impactEl.textContent = data.price_impact.toFixed(2) + '%';
-      impactEl.style.color = data.price_impact > 3.0 ? 'var(--red)' : (data.price_impact > 1.0 ? 'orange' : 'var(--green)');
-      document.getElementById('execPriceVal').textContent = '$' + data.exec_price.toFixed(4);
-      document.getElementById('chartVal').textContent = data.chart;
-      refreshStats();
-    });
-}
-
-document.getElementById('btnSimulate').addEventListener('click', simulate);
-
-function refreshStats() {
-  fetch('/api/status').then(r => r.json()).then(data => {
-    if (data.stats) {
-      document.getElementById('statSwaps').textContent = data.stats.total_swaps;
-      document.getElementById('statVol').textContent = '$' + (data.stats.total_vol / 1000000).toFixed(1) + 'M';
-    }
-  });
-}
-
-simulate();
-refreshFeed();
-setInterval(refreshFeed, 8000);
-</script>
-</body>
-</html>
+DEX_JS = r"""
+const $=s=>document.querySelector(s);const nf=new Intl.NumberFormat(PB_LANG);
+const usd=v=>'$'+(Math.abs(v)>=1e6?(v/1e6).toFixed(1)+'M':Math.abs(v)>=1e4?(v/1e3).toFixed(0)+'K':nf.format(+(+v).toPrecision(6)));
+const price=v=>'$'+(v>=1?nf.format(+v.toFixed(2)):(+v).toPrecision(4));
+async function feed(){const d=await pb.json('/api/feed').catch(()=>null);if(!Array.isArray(d))return;
+  $('#feed').innerHTML=d.map((it,i)=>{const buy=it.type==='BUY';const ago=Math.max(0,Math.round(Date.now()/1000-it.timestamp));
+    return `<div class="dx-item ${buy?'dx-buy':'dx-sell'}" style="animation-delay:${i*60}ms"><span class="dx-side">${buy?pb.esc(pb.t('w_buy')):pb.esc(pb.t('w_sell'))}</span>
+    <div class="dx-main"><b>${pb.esc(it.pair)}</b><small>${nf.format(+(+it.tokens).toFixed(2))} @ ${price(+it.price)} · ${pb.esc(it.wallet)}</small></div>
+    <div class="dx-amt">${usd(+it.amount_usd)}<small>${pb.t('w_ago',{s:ago})}</small></div></div>`}).join('')}
+async function stats(){const d=await pb.json('/api/status').catch(()=>({}));if(d.stats){pb.count($('#s1'),d.stats.total_swaps||0);$('#s2').textContent=usd(+d.stats.total_vol||0)}}
+async function calc(){const b=$('#calc');pb.busy(b,true);
+  try{const d=await pb.json(`/api/calc?pair=${encodeURIComponent($('#pair').value)}&vol=${encodeURIComponent($('#vol').value||50000)}`);
+    const p=+d.price_impact;$('#imp').textContent=p.toFixed(2)+'%';$('#exe').textContent=price(+d.exec_price);$('#spot').textContent=price(+d.spot_price);$('#tvl').textContent=usd(+d.pool_tvl);
+    const c=p>3?'#ef4444':p>1?'#f59e0b':'#22c55e';$('#imp').style.color=c;const m=$('#meter');m.style.width=Math.min(100,p*10)+'%';m.style.background=c;
+    $('#verdict').textContent=pb.t(p>3?'w_v_high':p>1?'w_v_mid':'w_v_low');stats()}
+  catch(e){pb.toast(pb.t('error')+': '+e.message,true)}finally{pb.busy(b,false)}}
+$('#calc').onclick=calc;$('#vol').addEventListener('keydown',e=>{if(e.key==='Enter')calc()});$('#pair').addEventListener('change',calc);
+calc();feed();setInterval(feed,8000);
 """
 
 
@@ -679,10 +566,7 @@ class WebStudioHandler(BaseHTTPRequestHandler):
         qs = parse_qs(parsed.query)
 
         if parsed.path == "/":
-            self.send_response(HTTPStatus.OK)
-            self.send_header("Content-Type", "text/html; charset=utf-8")
-            self.end_headers()
-            self.wfile.write(WEB_STUDIO_HTML.encode("utf-8"))
+            render_studio(self)
 
         elif parsed.path == "/api/status":
             self.send_response(HTTPStatus.OK)

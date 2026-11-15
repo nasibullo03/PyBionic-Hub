@@ -1,4 +1,7 @@
 import pybionic_core as core
+import pybionic_web as web
+import sqlite3
+from typing import Any
 import os
 import sys
 if hasattr(sys.stdout, "reconfigure"):
@@ -98,204 +101,65 @@ class StudioHandler(BaseHTTPRequestHandler):
             self.wfile.write(json.dumps(f).encode("utf-8"))
             return
 
-        # Render HTML UI
-        self.send_response(200)
-        self.send_header("Content-Type", "text/html; charset=utf-8")
-        self.end_headers()
-        html = self._render_html()
-        self.wfile.write(html.encode("utf-8"))
+        render_studio(self)
 
-    def _render_html(self):
-        stats = pipeline_engine.get_pipeline_stats()
-        feeds = pipeline_engine.get_all_feeds()
 
-        feed_rows = "".join([
-            f"""<tr>
-                <td>#{f['id']}</td>
-                <td><b>{f['title']}</b></td>
-                <td><code>{f['url']}</code></td>
-                <td>{f['interval']} min</td>
-                <td><span style="color:var(--success)">Active 🟢</span></td>
-            </tr>"""
-            for f in feeds
-        ])
+def render_studio(handler: Any) -> None:
+    lang = web.resolve_lang(handler)
+    T = web.translator(lang)
+    stats = pipeline_engine.get_pipeline_stats()
+    feeds = pipeline_engine.get_all_feeds()
+    conn = sqlite3.connect(pipeline_engine.DB_PATH)
+    try:
+        posts = conn.execute("SELECT p.title, p.link, p.summary, p.published_at, f.title FROM syndicated_posts p LEFT JOIN feeds f ON f.id = p.feed_id "
+                             "ORDER BY p.id DESC LIMIT 8").fetchall()
+    finally:
+        conn.close()
+    css = ("<style>.cp-feed{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:var(--surface2);margin-bottom:8px}"
+           ".cp-feed .ico{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;flex:none;background:color-mix(in srgb,var(--brand) 16%,transparent);color:var(--brand)}"
+           ".cp-feed div{flex:1;min-width:0}.cp-feed b{display:block;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}"
+           ".cp-feed small{display:block;color:var(--muted);font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}"
+           ".cp-int{font-size:12px;color:var(--muted);white-space:nowrap}"
+           ".cp-post{padding:12px 0;border-bottom:1px solid var(--line)}.cp-post:last-child{border:0}.cp-post a{color:var(--text);font-weight:600;text-decoration:none}"
+           ".cp-post a:hover{color:var(--brand)}.cp-post p{margin:4px 0 0;color:var(--muted);font-size:13.5px;line-height:1.5}.cp-post small{color:var(--muted);font-size:12px}"
+           ".cp-pipe{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:13px}.cp-pipe span{padding:7px 11px;border-radius:10px;background:var(--surface2);border:1px solid var(--line)}"
+           ".cp-pipe i{color:var(--brand);font-style:normal}</style>")
+    feed_html = "".join(
+        f'<div class="cp-feed"><span class="ico">{web.icon("wave", 18)}</span><div><b>{web.esc(f["title"])}</b><small>{web.esc(f["url"])}</small></div>'
+        f'<span class="cp-int">{web.esc(T("w_every", n=f["interval"]))}</span></div>' for f in feeds) or web.empty_state(T("w_no_feeds"), "wave")
+    post_html = ""
+    for p in posts:
+        link = p[1] if str(p[1] or "").startswith(("http://", "https://")) else "#"
+        when = time.strftime("%d.%m %H:%M", time.localtime(p[3] or 0))
+        post_html += (f'<div class="cp-post"><a href="{web.esc(link)}" target="_blank" rel="noopener">{web.esc(p[0])}</a>'
+                      f'<p>{web.esc((p[2] or "")[:180])}</p><small>{web.esc(p[4] or "")} · {when}</small></div>')
+    post_html = post_html or web.empty_state(T("w_no_posts"), "list")
+    steps = [T("w_p1"), T("w_p2"), T("w_p3"), T("w_p4")]
+    pipe = '<div class="cp-pipe">' + "<i>→</i>".join(f"<span>{web.esc(s)}</span>" for s in steps) + "</div>"
+    add = web.card(T("w_card_add"),
+        '<form id="f">' + web.field(T("w_feed_title"), web.input_("title", "Hacker News", icon_name="list", autocomplete="off"))
+        + web.field(T("w_feed_url"), web.input_("url", "https://news.ycombinator.com/rss", icon_name="link", type="url", autocomplete="off"))
+        + '<div class="pb-row">' + web.button(T("add"), "addbtn", type="submit", icon_name="plus")
+        + web.button(T("w_sync"), "sync", kind="ghost", icon_name="refresh") + "</div></form>", icon_name="plus")
+    how = web.card(T("w_card_how"), pipe + web.note(T("w_demo_note"), "warn"), icon_name="zap")
+    st = web.stats([(T("w_st_feeds"), str(stats.get("total_feeds", 0)), None, "wave"), (T("w_st_posts"), str(stats.get("total_posts", 0)), None, "list")])
+    hero = web.hero(T("w_title"), T("w_hero"), "🚀", chips=["RSS", "Atom", "SHA-256", T("w_chip_dedup")])
+    body = (css + st + web.grid(add, how, min_width=330)
+            + web.grid(web.card(T("w_card_feeds"), feed_html, icon_name="wave"), web.card(T("w_card_posts"), post_html, icon_name="list"), min_width=330))
+    web.send_page(handler, lang, title=T("w_title"), emoji="🚀", brand="#f43f5e", port=PORT, hero_html=hero, body=body, script=PIPELINE_JS)
 
-        return f"""<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Content Auto Pipeline Studio</title>
-<style>
-  :root {{
-    --bg: #090e17;
-    --card: #121a29;
-    --card-border: #1e2b42;
-    --primary: #00f0ff;
-    --accent: #7000ff;
-    --success: #00e676;
-    --warning: #ffb300;
-    --text: #e0e6ed;
-    --muted: #8492a6;
-  }}
-  * {{ box-sizing: border-box; margin: 0; padding: 0; }}
-  body {{
-    background: var(--bg);
-    color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, monospace;
-    padding: 20px;
-  }}
-  .container {{ max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }}
-  .header {{
-    text-align: center;
-    border-bottom: 1px solid var(--card-border);
-    padding-bottom: 16px;
-  }}
-  .header h1 {{ color: var(--primary); font-size: 26px; }}
-  .header p {{ color: var(--muted); font-size: 14px; margin-top: 4px; }}
-  .card {{
-    background: var(--card);
-    border: 1px solid var(--card-border);
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-  }}
-  .card-title {{
-    color: var(--primary);
-    font-size: 16px;
-    font-weight: 600;
-    margin-bottom: 14px;
-    display: flex;
-    justify-content: space-between;
-  }}
-  .grid {{
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 16px;
-  }}
-  .stat-block {{
-    background: #0b111c;
-    border: 1px solid var(--card-border);
-    border-radius: 8px;
-    padding: 16px;
-    text-align: center;
-  }}
-  .stat-label {{ color: var(--muted); font-size: 12px; margin-bottom: 6px; }}
-  .stat-val {{ font-size: 22px; font-weight: bold; color: #fff; }}
-  table {{
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-    font-size: 14px;
-  }}
-  th, td {{
-    padding: 12px 14px;
-    text-align: left;
-    border-bottom: 1px solid var(--card-border);
-  }}
-  th {{ color: var(--muted); font-weight: 600; }}
-  .action-box {{
-    display: flex;
-    gap: 10px;
-  }}
-  input[type="text"] {{
-    flex: 1;
-    background: #0b111c;
-    border: 1px solid var(--card-border);
-    border-radius: 8px;
-    padding: 12px;
-    color: #fff;
-    outline: none;
-  }}
-  button {{
-    background: var(--primary);
-    color: #000;
-    font-weight: bold;
-    border: none;
-    border-radius: 8px;
-    padding: 12px 20px;
-    cursor: pointer;
-    transition: 0.2s;
-  }}
-  button:hover {{ filter: brightness(1.2); }}
-</style>
-</head>
-<body>
-<div class="container">
-  <div class="header">
-    <h1>🚀 CONTENT AUTO PIPELINE</h1>
-    <p>RSS/Atom Syndication, SHA-256 Deduplication & Broadcast Hub (Offline Web Studio)</p>
-  </div>
 
-  <div class="card">
-    <div class="card-title"><span>📊 SYNDICATION TELEMETRY</span><span style="color:var(--success)">{stats['status']}</span></div>
-    <div class="grid">
-      <div class="stat-block">
-        <div class="stat-label">MONITORED FEEDS</div>
-        <div class="stat-val">{stats['total_feeds']}</div>
-      </div>
-      <div class="stat-block">
-        <div class="stat-label">TOTAL POSTS</div>
-        <div class="stat-val" style="color:var(--primary)">{stats['total_posts']}</div>
-      </div>
-      <div class="stat-block">
-        <div class="stat-label">DUPLICATES BLOCKED</div>
-        <div class="stat-val" style="color:var(--accent)">{stats['duplicates_blocked']}</div>
-      </div>
-      <div class="stat-block">
-        <div class="stat-label">WEB STUDIO PORT</div>
-        <div class="stat-val">{PORT}</div>
-      </div>
-    </div>
-  </div>
+PIPELINE_JS = r"""
+const $=s=>document.querySelector(s);
+$('#f').addEventListener('submit',async e=>{e.preventDefault();const t=$('#title').value.trim(),u=$('#url').value.trim();
+  if(!t||!/^https?:\/\//i.test(u))return pb.toast(pb.t('w_need_feed'),true);const b=$('#addbtn');pb.busy(b,true);
+  try{await pb.json('/api/add_feed?title='+encodeURIComponent(t)+'&url='+encodeURIComponent(u));pb.toast(pb.t('w_added'));setTimeout(()=>location.reload(),600)}
+  catch(err){pb.busy(b,false);pb.toast(pb.t('error')+': '+err.message,true)}});
+$('#sync').onclick=async()=>{const b=$('#sync');pb.busy(b,true);
+  try{const d=await pb.json('/api/sync');pb.toast(pb.t('w_synced',{n:d.new_posts||0}));setTimeout(()=>location.reload(),900)}
+  catch(err){pb.busy(b,false);pb.toast(pb.t('error')+': '+err.message,true)}};
+"""
 
-  <div class="card">
-    <div class="card-title"><span>➕ CONNECT NEW RSS STREAM</span></div>
-    <div class="action-box">
-      <input type="text" id="feedTitle" placeholder="Feed Title (e.g. Hacker News)..." style="max-width:200px">
-      <input type="text" id="feedUrl" placeholder="Feed XML/Atom URL...">
-      <button onclick="addFeed()">ADD FEED</button>
-      <button onclick="syncNow()" style="background:var(--accent);color:#fff">⚡ SYNC NOW</button>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-title"><span>📡 CONFIGURED CHANNELS & PIPELINES</span></div>
-    <table>
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>TITLE</th>
-          <th>FEED URL</th>
-          <th>INTERVAL</th>
-          <th>STATUS</th>
-        </tr>
-      </thead>
-      <tbody>
-        {feed_rows}
-      </tbody>
-    </table>
-  </div>
-</div>
-
-<script>
-function addFeed() {{
-  const title = document.getElementById('feedTitle').value.trim();
-  const url = document.getElementById('feedUrl').value.trim();
-  if(!title || !url) return alert('Enter both title and URL');
-  window.location.href = '/api/add_feed?title=' + encodeURIComponent(title) + '&url=' + encodeURIComponent(url);
-}}
-function syncNow() {{
-  fetch('/api/sync')
-    .then(r => r.json())
-    .then(d => {{
-      alert('Synced! New posts: ' + d.new_posts);
-      location.reload();
-    }});
-}}
-</script>
-</body>
-</html>"""
 
 class ThreadedStudioServer(ThreadingHTTPServer):
     allow_reuse_address = True

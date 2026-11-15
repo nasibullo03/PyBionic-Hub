@@ -14,6 +14,7 @@ Features:
 from __future__ import annotations
 
 import pybionic_core as core
+import pybionic_web as web
 import hashlib
 import hmac
 import html
@@ -693,315 +694,70 @@ def setup_telegram_handlers() -> None:
 # ---------------------------------------------------------------------------
 # Standalone Cyberpunk Web Studio (Port 8101)
 # ---------------------------------------------------------------------------
-WEB_HTML = r"""<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Stego Vault Cryptographic Studio</title>
-<style>
-:root {
-  --bg-dark: #0a0e14;
-  --bg-card: #121824;
-  --neon-cyan: #00f0ff;
-  --neon-magenta: #ff00ff;
-  --neon-green: #00ff66;
-  --neon-gold: #ffb700;
-  --text-main: #f0f6fc;
-  --text-muted: #8b949e;
-  --border: #21262d;
-}
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body {
-  background-color: var(--bg-dark);
-  color: var(--text-main);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
-  padding: 20px;
-  line-height: 1.5;
-}
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid var(--border);
-  padding-bottom: 16px;
-  margin-bottom: 24px;
-}
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.brand h1 {
-  font-size: 22px;
-  font-weight: 700;
-  letter-spacing: 1px;
-  color: var(--neon-magenta);
-  text-shadow: 0 0 10px rgba(255,0,255,0.3);
-}
-.badge {
-  background: rgba(0, 255, 102, 0.15);
-  color: var(--neon-green);
-  border: 1px solid var(--neon-green);
-  padding: 4px 10px;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: 600;
-}
-.tabs {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 20px;
-}
-.tab-btn {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  color: var(--text-muted);
-  padding: 10px 20px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.2s;
-}
-.tab-btn.active {
-  color: var(--neon-cyan);
-  border-color: var(--neon-cyan);
-  background: rgba(0,240,255,0.08);
-  box-shadow: 0 0 10px rgba(0,240,255,0.2);
-}
-.grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
-}
-@media (max-width: 900px) {
-  .grid { grid-template-columns: 1fr; }
-}
-.card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 20px;
-}
-.card h2 {
-  font-size: 16px;
-  font-weight: 600;
-  margin-bottom: 16px;
-  color: var(--text-main);
-}
-.drop-zone {
-  border: 2px dashed var(--border);
-  border-radius: 8px;
-  padding: 30px 20px;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  background: rgba(255,255,255,0.01);
-}
-.drop-zone:hover {
-  border-color: var(--neon-magenta);
-  background: rgba(255,0,255,0.05);
-}
-.input-field {
-  width: 100%;
-  background: #0d1117;
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  color: var(--text-main);
-  padding: 10px 12px;
-  margin-top: 8px;
-  font-family: inherit;
-  font-size: 14px;
-}
-.input-field:focus {
-  outline: none;
-  border-color: var(--neon-cyan);
-}
-.btn {
-  background: var(--neon-magenta);
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  padding: 12px 24px;
-  font-weight: 700;
-  font-size: 14px;
-  cursor: pointer;
-  width: 100%;
-  margin-top: 16px;
-  transition: all 0.2s ease;
-}
-.btn:hover {
-  box-shadow: 0 0 15px rgba(255,0,255,0.5);
-}
-.btn-cyan {
-  background: var(--neon-cyan);
-  color: #000;
-}
-.btn-cyan:hover {
-  box-shadow: 0 0 15px rgba(0,240,255,0.5);
-}
-.stat-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 8px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-}
-.stat-label { color: var(--text-muted); }
-.stat-value { font-weight: 600; color: var(--neon-cyan); }
-</style>
-</head>
-<body>
-<div class="header">
-  <div class="brand">
-    <h1>🔐 STEGO VAULT STUDIO</h1>
-    <span class="badge" id="botStatus">ONLINE • PORT 8101</span>
-  </div>
-</div>
+def render_studio(handler: Any) -> None:
+    lang = web.resolve_lang(handler)
+    T = web.translator(lang)
+    css = ("<style>.sv-cap{display:flex;align-items:center;gap:10px;margin-top:12px;font-size:14px;color:var(--muted)}"
+           ".sv-cap b{color:var(--text);font-size:16px}.sv-bar{flex:1;height:8px;border-radius:99px;background:var(--surface2);overflow:hidden;border:1px solid var(--line)}"
+           ".sv-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--brand),var(--brand2));transition:width .4s}"
+           ".sv-out{font-family:ui-monospace,Consolas,monospace;min-height:180px}</style>")
+    tabs = web.segmented("mode", [("embed", T("w_tab_embed")), ("extract", T("w_tab_extract"))], "embed",
+                         sub={"embed": T("w_tab_embed_sub"), "extract": T("w_tab_extract_sub")}, icons={"embed": "lock", "extract": "unlock"})
+    embed = web.grid(
+        web.card(T("w_card_carrier"),
+            web.dropzone("ce", T("w_drop_carrier"), T("w_drop_carrier_hint"), accept="image/png,image/webp,image/*", icon_name="image")
+            + '<div class="sv-cap">' + web.esc(T("w_capacity")) + ' <b id="cap">—</b><div class="sv-bar"><i id="capbar"></i></div><span id="used"></span></div>'
+            + web.field(T("password"), web.input_("pe", T("w_pass_ph"), type="password", icon_name="lock", autocomplete="new-password"), hint=T("w_pass_hint")),
+            icon_name="image"),
+        web.card(T("w_card_secret"),
+            web.field(T("w_secret"), web.textarea("secret", T("w_secret_ph"), rows=7))
+            + '<div class="pb-row">' + web.button(T("w_embed_btn"), "emb", icon_name="lock") + "</div>" + web.progress("pe-prog"),
+            icon_name="lock"), min_width=320)
+    extract = web.grid(
+        web.card(T("w_card_stego"),
+            web.dropzone("cx", T("w_drop_stego"), T("w_drop_stego_hint"), accept="image/png,image/*", icon_name="search")
+            + web.field(T("password"), web.input_("px", T("w_pass_ph2"), type="password", icon_name="lock", autocomplete="current-password"))
+            + '<div class="pb-row">' + web.button(T("w_extract_btn"), "ext", icon_name="unlock") + "</div>" + web.progress("px-prog"),
+            icon_name="search"),
+        web.card(T("w_card_out"),
+            web.textarea("out", T("w_out_ph"), rows=8, readonly=True, style="font-family:ui-monospace,Consolas,monospace")
+            + '<div class="pb-row">' + web.button(T("copy"), "cp", kind="ghost", icon_name="copy") + "</div>",
+            icon_name="unlock"), min_width=320)
+    st = web.card(T("statistics"), web.stats([(T("w_st_embeds"), "0", "s1", "lock"), (T("w_st_extracts"), "0", "s2", "unlock"),
+                                              (T("w_st_bytes"), "0", "s3", "chart")]), icon_name="chart")
+    body = (css + web.card(T("mode"), tabs, icon_name="shield") + f'<div id="t-embed">{embed}</div><div id="t-extract" hidden>{extract}</div>' + st)
+    hero = web.hero(T("w_title"), T("w_hero"), "🔐", chips=["AES-256-GCM", "PBKDF2", "PNG · WebP"])
+    web.send_page(handler, lang, title=T("w_title"), emoji="🔐", brand="#8b5cf6", port=WEB_PORT,
+                  hero_html=hero, body=body, script=STEGO_JS)
 
-<div class="tabs">
-  <button class="tab-btn active" onclick="switchTab('embedTab')">🔐 Embed Secret</button>
-  <button class="tab-btn" onclick="switchTab('extractTab')">🔓 Extract Secret</button>
-</div>
 
-<div id="embedTab" class="grid">
-  <div class="card">
-    <h2>1. Carrier Image & Key</h2>
-    <div class="drop-zone" onclick="document.getElementById('carrierInput').click()">
-      <div style="font-size: 32px; margin-bottom: 8px;">🖼</div>
-      <div style="font-weight: 600;">Select Carrier PNG or WebP</div>
-      <input type="file" id="carrierInput" style="display: none;" onchange="handleCarrier(this.files[0])">
-    </div>
-    <div style="margin-top: 16px;">
-      <label style="font-size: 13px; color: var(--text-muted);">Passphrase (PBKDF2 100k + AES-256-GCM):</label>
-      <input type="password" id="embedPass" class="input-field" placeholder="Enter strong encryption password">
-    </div>
-    <div style="margin-top: 16px;">
-      <div class="stat-row">
-        <span class="stat-label">Usable Capacity:</span>
-        <span class="stat-value" id="capacityVal">0 B</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="card">
-    <h2>2. Secret Payload & Injection</h2>
-    <label style="font-size: 13px; color: var(--text-muted);">Secret Message Text:</label>
-    <textarea id="secretText" class="input-field" rows="6" placeholder="Enter secret confidential notes or plaintext..."></textarea>
-    <button class="btn" onclick="embedSecret()">🛡 ENCRYPT & EMBED INTO CARRIER</button>
-  </div>
-</div>
-
-<div id="extractTab" class="grid" style="display: none;">
-  <div class="card">
-    <h2>1. Stego Carrier & Passphrase</h2>
-    <div class="drop-zone" onclick="document.getElementById('extractInput').click()">
-      <div style="font-size: 32px; margin-bottom: 8px;">🔍</div>
-      <div style="font-weight: 600;">Select Stego PNG to Decrypt</div>
-      <input type="file" id="extractInput" style="display: none;" onchange="handleExtractCarrier(this.files[0])">
-    </div>
-    <div style="margin-top: 16px;">
-      <label style="font-size: 13px; color: var(--text-muted);">Decryption Passphrase:</label>
-      <input type="password" id="extractPass" class="input-field" placeholder="Enter encryption password">
-    </div>
-    <button class="btn btn-cyan" onclick="extractSecret()">🔓 DECRYPT & EXTRACT SECRET</button>
-  </div>
-
-  <div class="card">
-    <h2>2. Decrypted Secret Output</h2>
-    <textarea id="decryptedOutput" class="input-field" rows="8" readonly placeholder="Decrypted secret text will appear here..."></textarea>
-  </div>
-</div>
-
-<script>
-let carrierFile = null;
-let extractFile = null;
-
-function switchTab(tabId) {
-  document.getElementById('embedTab').style.display = tabId === 'embedTab' ? 'grid' : 'none';
-  document.getElementById('extractTab').style.display = tabId === 'extractTab' ? 'grid' : 'none';
-  const btns = document.querySelectorAll('.tab-btn');
-  btns[0].classList.toggle('active', tabId === 'embedTab');
-  btns[1].classList.toggle('active', tabId === 'extractTab');
-}
-
-async function checkStatus() {
-  try {
-    const res = await fetch('/api/status');
-    const data = await res.json();
-    if (data.status === 'online') {
-      document.getElementById('botStatus').innerText = `ONLINE • PORT ${data.port}`;
-    }
-  } catch (e) {}
-}
-
-async function handleCarrier(file) {
-  if (!file) return;
-  carrierFile = file;
-  const formData = new FormData();
-  formData.append('carrier', file);
-  try {
-    const res = await fetch('/api/capacity', { method: 'POST', body: formData });
-    const data = await res.json();
-    document.getElementById('capacityVal').innerText = `${data.total_capacity_bytes} bytes`;
-  } catch (e) {}
-}
-
-function handleExtractCarrier(file) {
-  extractFile = file;
-}
-
-async function embedSecret() {
-  if (!carrierFile) { alert('Please select a carrier file first.'); return; }
-  const pass = document.getElementById('embedPass').value;
-  if (!pass) { alert('Please enter an encryption passphrase.'); return; }
-  const text = document.getElementById('secretText').value;
-  if (!text) { alert('Please enter a secret message.'); return; }
-
-  const formData = new FormData();
-  formData.append('carrier', carrierFile);
-  formData.append('passphrase', pass);
-  formData.append('secret', text);
-
-  try {
-    const res = await fetch('/api/embed', { method: 'POST', body: formData });
-    if (!res.ok) throw new Error(await res.text());
-    const blob = await res.blob();
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `stego_${carrierFile.name}`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-  } catch (e) {
-    alert('Embed failed: ' + e.message);
-  }
-}
-
-async function extractSecret() {
-  if (!extractFile) { alert('Please select a stego carrier file.'); return; }
-  const pass = document.getElementById('extractPass').value;
-  if (!pass) { alert('Please enter decryption password.'); return; }
-
-  const formData = new FormData();
-  formData.append('carrier', extractFile);
-  formData.append('passphrase', pass);
-
-  try {
-    const res = await fetch('/api/extract', { method: 'POST', body: formData });
-    if (!res.ok) throw new Error(await res.text());
-    const text = await res.text();
-    document.getElementById('decryptedOutput').value = text;
-  } catch (e) {
-    alert('Extract failed: ' + e.message);
-  }
-}
-
-checkStatus();
-setInterval(checkStatus, 10000);
-</script>
-</body>
-</html>
+STEGO_JS = r"""
+const $=s=>document.querySelector(s);let carrier=null,stego=null,cap=0;
+$('#mode').addEventListener('change',()=>{const e=$('#mode').dataset.value==='embed';$('#t-embed').hidden=!e;$('#t-extract').hidden=e});
+async function stats(){const d=await pb.json('/api/stats').catch(()=>null);if(d){pb.count($('#s1'),d.total_embeds||0);pb.count($('#s2'),d.total_extracts||0);pb.count($('#s3'),d.total_bytes_hidden||0)}}
+function used(){const n=new TextEncoder().encode($('#secret').value).length;const p=cap?Math.min(100,n*100/cap):0;$('#capbar').style.width=p+'%';
+  $('#used').textContent=cap?pb.bytes(n)+' / '+pb.bytes(cap):'';$('#capbar').style.background=n>cap&&cap?'#ef4444':''}
+$('#secret').addEventListener('input',used);
+$('#ce-zone').addEventListener('pb:files',async e=>{carrier=e.detail[0];if(!carrier)return;const fd=new FormData();fd.append('carrier',carrier);
+  try{const d=await pb.upload('/api/capacity',fd);cap=+d.total_capacity_bytes||0;$('#cap').textContent=pb.bytes(cap);used()}catch(err){pb.toast(pb.t('error')+': '+err.message,true)}});
+$('#cx-zone').addEventListener('pb:files',e=>{stego=e.detail[0]});
+async function send(url,fd){const r=await fetch(url,{method:'POST',body:fd});if(!r.ok){const t=await r.text();throw new Error(t||('HTTP '+r.status))}return r}
+$('#emb').onclick=async()=>{const pass=$('#pe').value,text=$('#secret').value;
+  if(!carrier)return pb.toast(pb.t('w_need_carrier'),true);if(!pass)return pb.toast(pb.t('w_need_pass'),true);if(!text.trim())return pb.toast(pb.t('w_need_secret'),true);
+  if(cap&&new TextEncoder().encode(text).length>cap)return pb.toast(pb.t('w_too_big'),true);
+  const b=$('#emb');pb.busy(b,true);pb.progress('pe-prog',null,pb.t('w_embedding'));
+  try{const fd=new FormData();fd.append('carrier',carrier);fd.append('passphrase',pass);fd.append('secret',text);
+    const blob=await (await send('/api/embed',fd)).blob(),name='stego_'+carrier.name.replace(/\.[^.]+$/,'')+'.png',a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();
+    pb.progress('pe-prog',100,pb.t('w_embedded',{name}));pb.toast(pb.t('done'));stats()}
+  catch(err){pb.hide('pe-prog');pb.toast(pb.t('error')+': '+err.message,true)}finally{pb.busy(b,false)}};
+$('#ext').onclick=async()=>{const pass=$('#px').value;if(!stego)return pb.toast(pb.t('w_need_stego'),true);if(!pass)return pb.toast(pb.t('w_need_pass'),true);
+  const b=$('#ext');pb.busy(b,true);pb.progress('px-prog',null,pb.t('w_extracting'));
+  try{const fd=new FormData();fd.append('carrier',stego);fd.append('passphrase',pass);$('#out').value=await (await send('/api/extract',fd)).text();
+    pb.progress('px-prog',100,pb.t('done'));stats()}
+  catch(err){pb.hide('px-prog');pb.toast(pb.t('w_extract_fail'),true)}finally{pb.busy(b,false)}};
+$('#cp').onclick=()=>{if($('#out').value)pb.copy($('#out').value)};
+stats();
 """
 
 
@@ -1012,10 +768,7 @@ class WebStudioHandler(BaseHTTPRequestHandler):
     def do_GET(self) -> None:
         parsed = urlparse(self.path)
         if parsed.path in ("/", "/index.html"):
-            self.send_response(HTTPStatus.OK)
-            self.send_header("Content-Type", "text/html; charset=utf-8")
-            self.end_headers()
-            self.wfile.write(WEB_HTML.encode("utf-8"))
+            render_studio(self)
             return
 
         if parsed.path == "/api/status":

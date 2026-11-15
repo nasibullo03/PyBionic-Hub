@@ -1,4 +1,6 @@
 import pybionic_core as core
+import pybionic_web as web
+from typing import Any
 import os
 import sys
 if hasattr(sys.stdout, "reconfigure"):
@@ -70,208 +72,59 @@ class StudioHandler(BaseHTTPRequestHandler):
             self.wfile.write(json.dumps(res).encode("utf-8"))
             return
 
-        # Render HTML UI
-        self.send_response(200)
-        self.send_header("Content-Type", "text/html; charset=utf-8")
-        self.end_headers()
-        html = self._render_html()
-        self.wfile.write(html.encode("utf-8"))
+        render_studio(self)
 
-    def _render_html(self):
-        stats = runner_engine.get_runner_stats()
 
-        return f"""<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Python Sandbox Runner Studio</title>
-<style>
-  :root {{
-    --bg: #0b0f19;
-    --card: #141c2e;
-    --card-border: #202d4a;
-    --primary: #00f0ff;
-    --accent: #ff0055;
-    --success: #00e676;
-    --warning: #ffb300;
-    --text: #e0e6ed;
-    --muted: #8899a6;
-  }}
-  * {{ box-sizing: border-box; margin: 0; padding: 0; }}
-  body {{
-    background: var(--bg);
-    color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, monospace;
-    padding: 20px;
-  }}
-  .container {{ max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }}
-  .header {{
-    text-align: center;
-    border-bottom: 1px solid var(--card-border);
-    padding-bottom: 16px;
-  }}
-  .header h1 {{ color: var(--primary); font-size: 26px; }}
-  .header p {{ color: var(--muted); font-size: 14px; margin-top: 4px; }}
-  .card {{
-    background: var(--card);
-    border: 1px solid var(--card-border);
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-  }}
-  .card-title {{
-    color: var(--primary);
-    font-size: 16px;
-    font-weight: 600;
-    margin-bottom: 14px;
-    display: flex;
-    justify-content: space-between;
-  }}
-  .grid {{
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 16px;
-  }}
-  .stat-block {{
-    background: #0d1322;
-    border: 1px solid var(--card-border);
-    border-radius: 8px;
-    padding: 16px;
-    text-align: center;
-  }}
-  .stat-label {{ color: var(--muted); font-size: 12px; margin-bottom: 6px; }}
-  .stat-val {{ font-size: 22px; font-weight: bold; color: #fff; }}
-  textarea {{
-    width: 100%;
-    height: 180px;
-    background: #0d1322;
-    border: 1px solid var(--card-border);
-    border-radius: 8px;
-    padding: 14px;
-    color: #00ffcc;
-    font-family: 'Courier New', Courier, monospace;
-    font-size: 14px;
-    resize: vertical;
-    outline: none;
-  }}
-  .btn-bar {{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 12px;
-  }}
-  button {{
-    background: var(--primary);
-    color: #000;
-    font-weight: bold;
-    border: none;
-    border-radius: 8px;
-    padding: 12px 24px;
-    cursor: pointer;
-    transition: 0.2s;
-  }}
-  button:hover {{ filter: brightness(1.2); }}
-  pre {{
-    background: #080c14;
-    border: 1px solid var(--card-border);
-    border-radius: 8px;
-    padding: 14px;
-    color: #fff;
-    font-size: 13px;
-    white-space: pre-wrap;
-    word-break: break-all;
-    max-height: 240px;
-    overflow-y: auto;
-  }}
-</style>
-</head>
-<body>
-<div class="container">
-  <div class="header">
-    <h1>🐍 PYTHON SANDBOX RUNNER</h1>
-    <p>Isolated AST-Audited Python Execution Environment (Offline Web Studio)</p>
-  </div>
+SANDBOX_SAMPLES = {
+    "fib": "# Fibonacci\ndef fib(n):\n    a, b = 0, 1\n    out = []\n    for _ in range(n):\n        out.append(a)\n        a, b = b, a + b\n    return out\n\nprint(\"fib(12):\", fib(12))\n",
+    "math": "import math\n\nprint(\"pi =\", math.pi)\nprint(\"8! =\", math.factorial(8))\nprint(\"sin(pi/2) =\", math.sin(math.pi / 2))\n",
+    "text": "words = \"the quick brown fox jumps over the lazy dog the end\".split()\ncounts = {}\nfor w in words:\n    counts[w] = counts.get(w, 0) + 1\nfor w, c in sorted(counts.items(), key=lambda x: -x[1])[:5]:\n    print(f\"{w:>6} {'#' * c} {c}\")\n",
+    "blocked": "import os\nprint(os.listdir('.'))\n",
+}
 
-  <div class="card">
-    <div class="card-title"><span>📊 EXECUTION TELEMETRY</span><span style="color:var(--primary)">PORT {PORT}</span></div>
-    <div class="grid">
-      <div class="stat-block">
-        <div class="stat-label">TOTAL RUNS</div>
-        <div class="stat-val">{stats['total_runs']}</div>
-      </div>
-      <div class="stat-block">
-        <div class="stat-label">SUCCESSFUL</div>
-        <div class="stat-val" style="color:var(--success)">{stats['success_runs']}</div>
-      </div>
-      <div class="stat-block">
-        <div class="stat-label">AST BLOCKED</div>
-        <div class="stat-val" style="color:var(--accent)">{stats['blocked_ast']}</div>
-      </div>
-      <div class="stat-block">
-        <div class="stat-label">AVG TIME</div>
-        <div class="stat-val">{stats['avg_time']:.3f}s</div>
-      </div>
-    </div>
-  </div>
 
-  <div class="card">
-    <div class="card-title"><span>💻 PYTHON CODE EDITOR</span></div>
-    <textarea id="codeEditor"># Compute Fibonacci sequence
-def fib(n):
-    a, b = 0, 1
-    res = []
-    for _ in range(n):
-        res.append(a)
-        a, b = b, a + b
-    return res
+def render_studio(handler: Any) -> None:
+    lang = web.resolve_lang(handler)
+    T = web.translator(lang)
+    css = ("<style>#code{font-family:ui-monospace,'Cascadia Code',Consolas,monospace;font-size:14px;line-height:1.6;min-height:280px;tab-size:4;white-space:pre;resize:vertical}"
+           ".sb-out{font-family:ui-monospace,'Cascadia Code',Consolas,monospace;font-size:13.5px;line-height:1.6;white-space:pre-wrap;word-break:break-word;margin:0;min-height:160px;"
+           "padding:14px 16px;border-radius:14px;background:#0b1020;color:#d1e7ff;border:1px solid var(--line);max-height:460px;overflow:auto}"
+           ".sb-out.err{color:#fca5a5}.sb-badge{font-size:12px;font-weight:700;padding:4px 10px;border-radius:99px;background:var(--surface2);border:1px solid var(--line)}"
+           ".sb-badge.ok{color:#22c55e;border-color:#22c55e55}.sb-badge.bad{color:#ef4444;border-color:#ef444455}.sb-badge.warn{color:#f59e0b;border-color:#f59e0b55}"
+           ".sb-samples{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}</style>")
+    samples = ('<div class="sb-samples">' + "".join(
+        web.button(T(f"w_s_{k}"), cls="pb-btn-sm sb-sample", kind="ghost", icon_name="alert" if k == "blocked" else "code", **{"data-k": k}) for k in SANDBOX_SAMPLES) + "</div>")
+    editor = web.card(T("w_card_editor"), samples + web.textarea("code", "", rows=12, value=SANDBOX_SAMPLES["fib"], spellcheck="false")
+                      + '<div class="pb-row">' + web.button(T("run"), "run", icon_name="play") + '<span class="pb-hint">Ctrl + Enter</span></div>', icon_name="code")
+    out = web.card(T("w_card_output"), '<pre class="sb-out" id="out"></pre>', icon_name="list", aside='<span class="sb-badge" id="badge">—</span>')
+    rules = web.card(T("w_card_rules"), "".join(web.note(T(k), "warn" if k == "w_r_block" else "info", ic) for k, ic in
+                                                (("w_r_iso", "shield"), ("w_r_block", "lock"), ("w_r_time", "clock"))), icon_name="shield")
+    st = web.stats([(T("w_st_runs"), "0", "s1", "play"), (T("w_st_ok"), "0", "s2", "check"), (T("w_st_blocked"), "0", "s3", "lock"), (T("w_st_avg"), "0", "s4", "clock")])
+    hero = web.hero(T("w_title"), T("w_hero"), "🐍", chips=["Python 3", "AST", T("w_chip_timeout")])
+    web.send_page(handler, lang, title=T("w_title"), emoji="🐍", brand="#ca8a04", port=PORT, hero_html=hero,
+                  body=css + st + web.grid(editor, out, min_width=360) + rules,
+                  script="window.SB_SAMPLES=" + json.dumps(SANDBOX_SAMPLES) + ";" + SANDBOX_JS)
 
-print("Fibonacci(12):", fib(12))</textarea>
-    <div class="btn-bar">
-      <div>
-        <button onclick="setSample('math')" style="background:#1f2b48;color:#fff;margin-right:8px">Math Sample</button>
-        <button onclick="setSample('forbidden')" style="background:#1f2b48;color:var(--accent)">Test AST Block</button>
-      </div>
-      <button onclick="runCode()">EXECUTE CODE ⚡</button>
-    </div>
-  </div>
 
-  <div class="card">
-    <div class="card-title"><span>📤 CONSOLE STDOUT / STDERR</span><span id="runBadge"></span></div>
-    <pre id="outputBox">Press "EXECUTE CODE" to view sandboxed output...</pre>
-  </div>
-</div>
+SANDBOX_JS = r"""
+const $=s=>document.querySelector(s);
+$('#out').textContent=pb.t('w_out_empty');
+document.querySelectorAll('.sb-sample').forEach(b=>b.onclick=()=>{$('#code').value=SB_SAMPLES[b.dataset.k]||'';$('#code').focus()});
+$('#code').addEventListener('keydown',e=>{if(e.key==='Tab'){e.preventDefault();const t=e.target,s=t.selectionStart;t.setRangeText('    ',s,t.selectionEnd,'end')}
+  if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();run()}});
+async function stats(){const d=await pb.json('/api/status').catch(()=>null);if(d&&d.stats){const s=d.stats;pb.count($('#s1'),s.total_runs||0);pb.count($('#s2'),s.success_runs||0);pb.count($('#s3'),s.blocked_ast||0);
+  $('#s4').textContent=(+s.avg_time||0).toFixed(2)+' '+pb.t('w_sec')}}
+async function run(){const code=$('#code').value;if(!code.trim())return;const b=$('#run');pb.busy(b,true);const o=$('#out'),g=$('#badge');
+  o.className='sb-out';o.textContent=pb.t('w_running');g.className='sb-badge';g.textContent='…';
+  try{const d=await pb.postJSON('/api/run',{code});const t=(+d.exec_time||0).toFixed(3)+' '+pb.t('w_sec');
+    if(d.success){g.className='sb-badge ok';g.textContent='✓ '+pb.t('w_ok')+' · '+t;o.textContent=d.stdout||pb.t('w_no_output')}
+    else{const blocked=d.status==='AST_BLOCKED',to=d.status==='TIMEOUT';g.className='sb-badge '+(blocked||to?'warn':'bad');
+      g.textContent=(blocked?pb.t('w_blocked'):to?pb.t('w_timeout'):pb.t('w_failed'))+' · '+t;o.className='sb-out err';o.textContent=(d.stdout?d.stdout+'\n':'')+(d.error||d.violation||'')}
+    stats()}
+  catch(err){g.className='sb-badge bad';g.textContent=pb.t('error');o.className='sb-out err';o.textContent=err.message}finally{pb.busy(b,false)}}
+$('#run').onclick=run;stats();
+"""
 
-<script>
-function setSample(t) {{
-  if(t === 'math') {{
-    document.getElementById('codeEditor').value = "import math\nprint('Pi:', math.pi)\nprint('Factorial(8):', math.factorial(8))\nprint('Sine(math.pi/2):', math.sin(math.pi/2))";
-  }} else {{
-    document.getElementById('codeEditor').value = "import os\nprint(os.listdir('.'))";
-  }}
-}}
-
-function runCode() {{
-  const code = document.getElementById('codeEditor').value;
-  const outBox = document.getElementById('outputBox');
-  const badge = document.getElementById('runBadge');
-  outBox.innerText = 'Executing in isolated namespace...';
-  
-  fetch('/api/run?code=' + encodeURIComponent(code))
-    .then(r => r.json())
-    .then(d => {{
-      if(d.success) {{
-        badge.innerHTML = '<span style="color:var(--success)">SUCCESS (' + d.exec_time.toFixed(3) + 's)</span>';
-        outBox.innerText = d.stdout;
-      }} else {{
-        badge.innerHTML = '<span style="color:var(--accent)">' + d.status + ' (' + d.exec_time.toFixed(3) + 's)</span>';
-        outBox.innerText = d.error || d.violation;
-      }}
-    }});
-}}
-</script>
-</body>
-</html>"""
 
 class ThreadedStudioServer(ThreadingHTTPServer):
     allow_reuse_address = True
