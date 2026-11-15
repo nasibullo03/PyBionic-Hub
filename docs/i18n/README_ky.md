@@ -1,6 +1,6 @@
 # 🇰🇬 ⚡ PyBionic Runner — Android түзмөгүндө 24/7 үзгүлтүксүз Python 3.14 чөйрөсү
 
-[![Release](https://img.shields.io/badge/Release-v1.0.0-00E5FF.svg?style=for-the-badge&logo=android&logoColor=black)](https://github.com/nasibullo03/PyBionic-Hub/releases/latest)
+[![Release](https://img.shields.io/badge/Release-v2.1.1-00E5FF.svg?style=for-the-badge&logo=android&logoColor=black)](https://github.com/nasibullo03/PyBionic-Hub/releases/latest)
 [![Python](https://img.shields.io/badge/Python-3.14.10_Bionic-FFD700.svg?style=for-the-badge&logo=python&logoColor=black)](https://python.org)
 [![Platform](https://img.shields.io/badge/Platform-Android_8.0+-3DDC84.svg?style=for-the-badge&logo=android&logoColor=white)](https://android.com)
 [![License](https://img.shields.io/badge/License-AGPL_v3-blue.svg?style=for-the-badge)](../../LICENSE)
@@ -18,7 +18,7 @@
 
 <p align="center">
   <a href="https://github.com/nasibullo03/PyBionic-Hub/releases/latest">
-    <img src="https://img.shields.io/badge/🚀_PYBIONIC_APK_ЖҮКТӨП_АЛУУ-v1.0.0-00E5FF?style=for-the-badge&logo=android&logoColor=black" alt="Download APK" height="50">
+    <img src="https://img.shields.io/badge/🚀_PYBIONIC_APK_ЖҮКТӨП_АЛУУ-v2.1.1-00E5FF?style=for-the-badge&logo=android&logoColor=black" alt="Download APK" height="50">
   </a>
 </p>
 
@@ -49,7 +49,7 @@
 ## 🚀 Ыкчам баштоо
 
 1. **APK файлын жүктөп алыңыз:** Акыркы нускасын [GitHub Releases](https://github.com/nasibullo03/PyBionic-Hub/releases/latest) баракчасынан алыңыз.
-2. **Орнотуңуз:** `PyBionic-Runner-v1.0.0-arm64.apk` файлын Android 8.0+ (ARM64) түзмөгүңүзгө орнотуңуз.
+2. **Орнотуңуз:** `PyBionic-Runner-v2.1.1-arm64.apk` файлын Android 8.0+ (ARM64) түзмөгүңүзгө орнотуңуз.
 3. **Уруксаттарды бериңиз:** Билдирмелерге уруксат берип, 24/7 үзгүлтүксүз иштөө үчүн батареяны оптималдаштырууну өчүрүңүз.
 4. **Алгачкы ботту иштетиңиз:** **BotHub** өтмөгүнө өтүп, калыпты тандаңыз, токениңизди киргизип, **▶ Баштоо** баскычын басыңыз.
 5. **Компьютерден башкарыңыз:** **Жөндөөлөр** ➔ **Web Dashboard** бөлүмүнө кирип, көрсөтүлгөн IP-ни компьютерде ачыңыз жана PIN киргизиңиз.

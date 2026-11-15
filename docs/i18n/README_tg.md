@@ -1,6 +1,6 @@
 # 🇹🇯 ⚡ PyBionic Runner — Иҷрои мустақили Python 3.14 дар Android 24/7
 
-[![Release](https://img.shields.io/badge/Release-v1.0.0-00E5FF.svg?style=for-the-badge&logo=android&logoColor=black)](https://github.com/nasibullo03/PyBionic-Hub/releases/latest)
+[![Release](https://img.shields.io/badge/Release-v2.1.1-00E5FF.svg?style=for-the-badge&logo=android&logoColor=black)](https://github.com/nasibullo03/PyBionic-Hub/releases/latest)
 [![Python](https://img.shields.io/badge/Python-3.14.10_Bionic-FFD700.svg?style=for-the-badge&logo=python&logoColor=black)](https://python.org)
 [![Platform](https://img.shields.io/badge/Platform-Android_8.0+-3DDC84.svg?style=for-the-badge&logo=android&logoColor=white)](https://android.com)
 [![License](https://img.shields.io/badge/License-AGPL_v3-blue.svg?style=for-the-badge)](../../LICENSE)
@@ -18,7 +18,7 @@
 
 <p align="center">
   <a href="https://github.com/nasibullo03/PyBionic-Hub/releases/latest">
-    <img src="https://img.shields.io/badge/🚀_ФАРОБАРДОРИИ_PYBIONIC_APK-v1.0.0-00E5FF?style=for-the-badge&logo=android&logoColor=black" alt="Download APK" height="50">
+    <img src="https://img.shields.io/badge/🚀_ФАРОБАРДОРИИ_PYBIONIC_APK-v2.1.1-00E5FF?style=for-the-badge&logo=android&logoColor=black" alt="Download APK" height="50">
   </a>
 </p>
 
@@ -49,7 +49,7 @@
 ## 🚀 Оғози сареъ
 
 1. **APK-ро боргирӣ кунед:** Версияи навро аз бахши [Релизҳои GitHub](https://github.com/nasibullo03/PyBionic-Hub/releases/latest) дастрас намоед.
-2. **Насб кунед:** Файли `PyBionic-Runner-v1.0.0-arm64.apk`-ро дар дастгоҳи Android 8.0+ (ARM64) насб кунед.
+2. **Насб кунед:** Файли `PyBionic-Runner-v2.1.1-arm64.apk`-ро дар дастгоҳи Android 8.0+ (ARM64) насб кунед.
 3. **Иҷозатҳо:** Иҷозати огоҳиномаҳоро диҳед ва хомӯш кардани маҳдудияти батареяро (Doze Mode) барои кори устувори 24/7 тасдиқ кунед.
 4. **Оғози боти аввал:** Ба бахши **BotHub** гузаред, қолабро интихоб кунед (масалан, `Telebot` ё `FastAPI`), токени худро ворид кунед ва тугмаи **▶ Оғоз**-ро пахш намоед.
 5. **Идора аз компютер:** Ба **Танзимот** ➔ **Web Dashboard** равед, суроғаи IP-ро дар компютер кушоед ва PIN-кодро ворид созед.

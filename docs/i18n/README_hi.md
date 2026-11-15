@@ -1,6 +1,6 @@
 # 🇮🇳 ⚡ PyBionic Runner — एंड्रॉइड पर 24/7 निरंतर Python 3.14 रनटाइम
 
-[![Release](https://img.shields.io/badge/Release-v1.0.0-00E5FF.svg?style=for-the-badge&logo=android&logoColor=black)](https://github.com/nasibullo03/PyBionic-Hub/releases/latest)
+[![Release](https://img.shields.io/badge/Release-v2.1.1-00E5FF.svg?style=for-the-badge&logo=android&logoColor=black)](https://github.com/nasibullo03/PyBionic-Hub/releases/latest)
 [![Python](https://img.shields.io/badge/Python-3.14.10_Bionic-FFD700.svg?style=for-the-badge&logo=python&logoColor=black)](https://python.org)
 [![Platform](https://img.shields.io/badge/Platform-Android_8.0+-3DDC84.svg?style=for-the-badge&logo=android&logoColor=white)](https://android.com)
 [![License](https://img.shields.io/badge/License-AGPL_v3-blue.svg?style=for-the-badge)](../../LICENSE)
@@ -18,7 +18,7 @@
 
 <p align="center">
   <a href="https://github.com/nasibullo03/PyBionic-Hub/releases/latest">
-    <img src="https://img.shields.io/badge/🚀_PYBIONIC_APK_डाउनलोड_करें-v1.0.0-00E5FF?style=for-the-badge&logo=android&logoColor=black" alt="Download APK" height="50">
+    <img src="https://img.shields.io/badge/🚀_PYBIONIC_APK_डाउनलोड_करें-v2.1.1-00E5FF?style=for-the-badge&logo=android&logoColor=black" alt="Download APK" height="50">
   </a>
 </p>
 
@@ -49,7 +49,7 @@
 ## 🚀 त्वरित शुरुआत
 
 1. **APK डाउनलोड करें:** [GitHub Releases](https://github.com/nasibullo03/PyBionic-Hub/releases/latest) से नवीनतम संस्करण प्राप्त करें।
-2. **इंस्टॉल करें:** अपने Android 8.0+ (ARM64) डिवाइस पर `PyBionic-Runner-v1.0.0-arm64.apk` इंस्टॉल करें।
+2. **इंस्टॉल करें:** अपने Android 8.0+ (ARM64) डिवाइस पर `PyBionic-Runner-v2.1.1-arm64.apk` इंस्टॉल करें।
 3. **अनुमतियां दें:** 24/7 संचालन के लिए सूचनाओं की अनुमति दें और बैटरी अनुकूलन को अक्षम करें।
 4. **पहला बॉट चलाएं:** **BotHub** टैब पर जाएं, एक टेम्प्लेट चुनें, टोकन दर्ज करें और **▶ रन** दबाएं।
 5. **कंप्यूटर से नियंत्रण:** **सेटिंग्स** ➔ **Web Dashboard** पर जाएं, ब्राउज़र में IP खोलें और पिन दर्ज करें।

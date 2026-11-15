@@ -1,6 +1,6 @@
 # 🇮🇷 ⚡ PyBionic Runner — اجرای ۲۴ ساعته پایتون ۳.۱۴ در اندروید به صورت مستقل
 
-[![Release](https://img.shields.io/badge/Release-v1.0.0-00E5FF.svg?style=for-the-badge&logo=android&logoColor=black)](https://github.com/nasibullo03/PyBionic-Hub/releases/latest)
+[![Release](https://img.shields.io/badge/Release-v2.1.1-00E5FF.svg?style=for-the-badge&logo=android&logoColor=black)](https://github.com/nasibullo03/PyBionic-Hub/releases/latest)
 [![Python](https://img.shields.io/badge/Python-3.14.10_Bionic-FFD700.svg?style=for-the-badge&logo=python&logoColor=black)](https://python.org)
 [![Platform](https://img.shields.io/badge/Platform-Android_8.0+-3DDC84.svg?style=for-the-badge&logo=android&logoColor=white)](https://android.com)
 [![License](https://img.shields.io/badge/License-AGPL_v3-blue.svg?style=for-the-badge)](../../LICENSE)
@@ -18,7 +18,7 @@
 
 <p align="center">
   <a href="https://github.com/nasibullo03/PyBionic-Hub/releases/latest">
-    <img src="https://img.shields.io/badge/🚀_دانلود_فایل_نصبی_PYBIONIC_APK-v1.0.0-00E5FF?style=for-the-badge&logo=android&logoColor=black" alt="Download APK" height="50">
+    <img src="https://img.shields.io/badge/🚀_دانلود_فایل_نصبی_PYBIONIC_APK-v2.1.1-00E5FF?style=for-the-badge&logo=android&logoColor=black" alt="Download APK" height="50">
   </a>
 </p>
 
@@ -49,7 +49,7 @@
 ## 🚀 راه‌اندازی سریع
 
 1. **دانلود APK:** آخرین نسخه را از صفحه [انتشارهای GitHub](https://github.com/nasibullo03/PyBionic-Hub/releases/latest) دانلود کنید.
-2. **نصب برنامه:** فایل `PyBionic-Runner-v1.0.0-arm64.apk` را روی دستگاه اندروید ۸.۰ یا بالاتر نصب نمایید.
+2. **نصب برنامه:** فایل `PyBionic-Runner-v2.1.1-arm64.apk` را روی دستگاه اندروید ۸.۰ یا بالاتر نصب نمایید.
 3. **مجوزها:** دسترسی اعلان‌ها را تایید کرده و بهینه‌سازی باتری را غیرفعال کنید تا برنامه متوقف نشود.
 4. **اجرای اولین ربات:** به زبانه **BotHub** بروید، قالبی را انتخاب کرده، توکن خود را وارد کنید و دکمه **▶ اجرا** را بزنید.
 5. **مدیریت از رایانه:** به **تنظیمات** ➔ **Web Dashboard** بروید، آدرس IP را در مرورگر کامپیوتر باز کرده و پین کد را وارد نمایید.

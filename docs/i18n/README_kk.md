@@ -1,6 +1,6 @@
 # 🇰🇿 ⚡ PyBionic Runner — Android жүйесінде тәулік бойы (24/7) жұмыс істейтін Python 3.14 ортасы
 
-[![Release](https://img.shields.io/badge/Release-v1.0.0-00E5FF.svg?style=for-the-badge&logo=android&logoColor=black)](https://github.com/nasibullo03/PyBionic-Hub/releases/latest)
+[![Release](https://img.shields.io/badge/Release-v2.1.1-00E5FF.svg?style=for-the-badge&logo=android&logoColor=black)](https://github.com/nasibullo03/PyBionic-Hub/releases/latest)
 [![Python](https://img.shields.io/badge/Python-3.14.10_Bionic-FFD700.svg?style=for-the-badge&logo=python&logoColor=black)](https://python.org)
 [![Platform](https://img.shields.io/badge/Platform-Android_8.0+-3DDC84.svg?style=for-the-badge&logo=android&logoColor=white)](https://android.com)
 [![License](https://img.shields.io/badge/License-AGPL_v3-blue.svg?style=for-the-badge)](../../LICENSE)
@@ -18,7 +18,7 @@
 
 <p align="center">
   <a href="https://github.com/nasibullo03/PyBionic-Hub/releases/latest">
-    <img src="https://img.shields.io/badge/🚀_PYBIONIC_APK_ЖҮКТЕП_АЛУ-v1.0.0-00E5FF?style=for-the-badge&logo=android&logoColor=black" alt="Download APK" height="50">
+    <img src="https://img.shields.io/badge/🚀_PYBIONIC_APK_ЖҮКТЕП_АЛУ-v2.1.1-00E5FF?style=for-the-badge&logo=android&logoColor=black" alt="Download APK" height="50">
   </a>
 </p>
 
@@ -49,7 +49,7 @@
 ## 🚀 Жылдам бастау
 
 1. **APK файлын жүктеп алыңыз:** Соңғы нұсқаны [GitHub Releases](https://github.com/nasibullo03/PyBionic-Hub/releases/latest) бетінен алыңыз.
-2. **Орнатыңыз:** `PyBionic-Runner-v1.0.0-arm64.apk` файлын Android 8.0+ (ARM64) құрылғыңызға орнатыңыз.
+2. **Орнатыңыз:** `PyBionic-Runner-v2.1.1-arm64.apk` файлын Android 8.0+ (ARM64) құрылғыңызға орнатыңыз.
 3. **Рұқсаттар беріңіз:** Хабарландыруларға рұқсат беріп, 24/7 жұмыс істеуі үшін батареяны оңтайландыруды өшіріңіз.
 4. **Алғашқы ботты іске қосыңыз:** **BotHub** қойындысына өтіп, үлгіні таңдаңыз, токеніңізді енгізіп, **▶ Іске қосу** батырмасын басыңыз.
 5. **Компьютерден басқарыңыз:** **Параметрлер** ➔ **Web Dashboard** бөліміне өтіп, көрсетілген IP-ді компьютерде ашыңыз және PIN енгізіңіз.

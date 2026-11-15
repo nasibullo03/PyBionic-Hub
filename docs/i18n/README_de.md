@@ -1,6 +1,6 @@
 # 🇩🇪 ⚡ PyBionic Runner — 24/7 Python 3.14 Laufzeitumgebung auf Android
 
-[![Release](https://img.shields.io/badge/Release-v1.0.0-00E5FF.svg?style=for-the-badge&logo=android&logoColor=black)](https://github.com/nasibullo03/PyBionic-Hub/releases/latest)
+[![Release](https://img.shields.io/badge/Release-v2.1.1-00E5FF.svg?style=for-the-badge&logo=android&logoColor=black)](https://github.com/nasibullo03/PyBionic-Hub/releases/latest)
 [![Python](https://img.shields.io/badge/Python-3.14.10_Bionic-FFD700.svg?style=for-the-badge&logo=python&logoColor=black)](https://python.org)
 [![Platform](https://img.shields.io/badge/Platform-Android_8.0+-3DDC84.svg?style=for-the-badge&logo=android&logoColor=white)](https://android.com)
 [![License](https://img.shields.io/badge/License-AGPL_v3-blue.svg?style=for-the-badge)](../../LICENSE)
@@ -18,7 +18,7 @@
 
 <p align="center">
   <a href="https://github.com/nasibullo03/PyBionic-Hub/releases/latest">
-    <img src="https://img.shields.io/badge/🚀_PYBIONIC_APK_HERUNTERLADEN-v1.0.0-00E5FF?style=for-the-badge&logo=android&logoColor=black" alt="Download APK" height="50">
+    <img src="https://img.shields.io/badge/🚀_PYBIONIC_APK_HERUNTERLADEN-v2.1.1-00E5FF?style=for-the-badge&logo=android&logoColor=black" alt="Download APK" height="50">
   </a>
 </p>
 
@@ -49,7 +49,7 @@ Im Gegensatz zu schweren Linux-Emulatoren (Termux, PRoot, UserLAnd) ist PyBionic
 ## 🚀 Schnellstart
 
 1. **APK herunterladen:** Laden Sie die neueste Version aus den [GitHub Releases](https://github.com/nasibullo03/PyBionic-Hub/releases/latest) herunter.
-2. **Installieren:** Installieren Sie `PyBionic-Runner-v1.0.0-arm64.apk` auf Ihrem Android 8.0+ (ARM64) Gerät.
+2. **Installieren:** Installieren Sie `PyBionic-Runner-v2.1.1-arm64.apk` auf Ihrem Android 8.0+ (ARM64) Gerät.
 3. **Berechtigungen erteilen:** Benachrichtigungen erlauben und die Akku-Optimierung deaktivieren.
 4. **Ersten Bot starten:** Wechseln Sie zu **BotHub**, wählen Sie eine Vorlage, geben Sie den Token ein und tippen Sie auf **▶ Starten**.
 5. **Vom PC steuern:** Öffnen Sie **Einstellungen** ➔ **Web Dashboard**, rufen Sie die IP im Browser auf und geben Sie die PIN ein.

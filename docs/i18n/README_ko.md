@@ -1,6 +1,6 @@
 # 🇰🇷 ⚡ PyBionic Runner — 안드로이드 기반 24/7 무중단 네이티브 Python 3.14 환경
 
-[![Release](https://img.shields.io/badge/Release-v1.0.0-00E5FF.svg?style=for-the-badge&logo=android&logoColor=black)](https://github.com/nasibullo03/PyBionic-Hub/releases/latest)
+[![Release](https://img.shields.io/badge/Release-v2.1.1-00E5FF.svg?style=for-the-badge&logo=android&logoColor=black)](https://github.com/nasibullo03/PyBionic-Hub/releases/latest)
 [![Python](https://img.shields.io/badge/Python-3.14.10_Bionic-FFD700.svg?style=for-the-badge&logo=python&logoColor=black)](https://python.org)
 [![Platform](https://img.shields.io/badge/Platform-Android_8.0+-3DDC84.svg?style=for-the-badge&logo=android&logoColor=white)](https://android.com)
 [![License](https://img.shields.io/badge/License-AGPL_v3-blue.svg?style=for-the-badge)](../../LICENSE)
@@ -18,7 +18,7 @@
 
 <p align="center">
   <a href="https://github.com/nasibullo03/PyBionic-Hub/releases/latest">
-    <img src="https://img.shields.io/badge/🚀_PYBIONIC_APK_다운로드-v1.0.0-00E5FF?style=for-the-badge&logo=android&logoColor=black" alt="Download APK" height="50">
+    <img src="https://img.shields.io/badge/🚀_PYBIONIC_APK_다운로드-v2.1.1-00E5FF?style=for-the-badge&logo=android&logoColor=black" alt="Download APK" height="50">
   </a>
 </p>
 
@@ -49,7 +49,7 @@
 ## 🚀 빠른 시작
 
 1. **APK 다운로드:** [GitHub Releases](https://github.com/nasibullo03/PyBionic-Hub/releases/latest)에서 최신 APK를 다운로드합니다.
-2. **설치:** Android 8.0 이상(ARM64) 기기에 `PyBionic-Runner-v1.0.0-arm64.apk`를 설치합니다.
+2. **설치:** Android 8.0 이상(ARM64) 기기에 `PyBionic-Runner-v2.1.1-arm64.apk`를 설치합니다.
 3. **권한 설정:** 알림 권한을 허용하고 24/7 상시 작동을 위해 배터리 최적화를 비활성화합니다.
 4. **첫 봇 실행:** 하단 **BotHub** 탭에서 템플릿을 선택하고 토큰을 입력한 후 **▶ 실행**을 누릅니다.
 5. **PC에서 제어:** **설정** ➔ **Web Dashboard**로 이동하여 PC 브라우저에 표시된 IP를 입력하고 PIN 코드를 입력합니다.

@@ -1,6 +1,6 @@
 # 🇵🇱 ⚡ PyBionic Runner — Autonomiczne środowisko uruchomieniowe Python 3.14 na Androida 24/7
 
-[![Release](https://img.shields.io/badge/Release-v1.0.0-00E5FF.svg?style=for-the-badge&logo=android&logoColor=black)](https://github.com/nasibullo03/PyBionic-Hub/releases/latest)
+[![Release](https://img.shields.io/badge/Release-v2.1.1-00E5FF.svg?style=for-the-badge&logo=android&logoColor=black)](https://github.com/nasibullo03/PyBionic-Hub/releases/latest)
 [![Python](https://img.shields.io/badge/Python-3.14.10_Bionic-FFD700.svg?style=for-the-badge&logo=python&logoColor=black)](https://python.org)
 [![Platform](https://img.shields.io/badge/Platform-Android_8.0+-3DDC84.svg?style=for-the-badge&logo=android&logoColor=white)](https://android.com)
 [![License](https://img.shields.io/badge/License-AGPL_v3-blue.svg?style=for-the-badge)](../../LICENSE)
@@ -18,7 +18,7 @@
 
 <p align="center">
   <a href="https://github.com/nasibullo03/PyBionic-Hub/releases/latest">
-    <img src="https://img.shields.io/badge/🚀_POBIERZ_PYBIONIC_APK-v1.0.0-00E5FF?style=for-the-badge&logo=android&logoColor=black" alt="Download APK" height="50">
+    <img src="https://img.shields.io/badge/🚀_POBIERZ_PYBIONIC_APK-v2.1.1-00E5FF?style=for-the-badge&logo=android&logoColor=black" alt="Download APK" height="50">
   </a>
 </p>
 
@@ -49,7 +49,7 @@ W przeciwieństwie do ciężkich emulatorów Linuksa (Termux, PRoot, UserLAnd), 
 ## 🚀 Szybki start
 
 1. **Pobierz APK:** Pobierz najnowszą wersję z [GitHub Releases](https://github.com/nasibullo03/PyBionic-Hub/releases/latest).
-2. **Zainstaluj:** Zainstaluj `PyBionic-Runner-v1.0.0-arm64.apk` na urządzeniu z Androidem 8.0+ (ARM64).
+2. **Zainstaluj:** Zainstaluj `PyBionic-Runner-v2.1.1-arm64.apk` na urządzeniu z Androidem 8.0+ (ARM64).
 3. **Uprawnienia:** Zezwól na powiadomienia i wyłącz optymalizację baterii dla stabilnej pracy 24/7.
 4. **Uruchom pierwszego bota:** Otwórz zakładkę **BotHub**, wybierz szablon, wpisz token i kliknij **▶ Uruchom**.
 5. **Sterowanie z PC:** Przejdź do **Ustawienia** ➔ **Web Dashboard**, otwórz adres IP w przeglądarce komputera i wpisz kod PIN.

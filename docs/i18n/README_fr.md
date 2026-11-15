@@ -1,6 +1,6 @@
 # 🇫🇷 ⚡ PyBionic Runner — Exécution autonome de Python 3.14 sur Android 24/7
 
-[![Release](https://img.shields.io/badge/Release-v1.0.0-00E5FF.svg?style=for-the-badge&logo=android&logoColor=black)](https://github.com/nasibullo03/PyBionic-Hub/releases/latest)
+[![Release](https://img.shields.io/badge/Release-v2.1.1-00E5FF.svg?style=for-the-badge&logo=android&logoColor=black)](https://github.com/nasibullo03/PyBionic-Hub/releases/latest)
 [![Python](https://img.shields.io/badge/Python-3.14.10_Bionic-FFD700.svg?style=for-the-badge&logo=python&logoColor=black)](https://python.org)
 [![Platform](https://img.shields.io/badge/Platform-Android_8.0+-3DDC84.svg?style=for-the-badge&logo=android&logoColor=white)](https://android.com)
 [![License](https://img.shields.io/badge/License-AGPL_v3-blue.svg?style=for-the-badge)](../../LICENSE)
@@ -18,7 +18,7 @@
 
 <p align="center">
   <a href="https://github.com/nasibullo03/PyBionic-Hub/releases/latest">
-    <img src="https://img.shields.io/badge/🚀_TÉLÉCHARGER_L'APK_PYBIONIC-v1.0.0-00E5FF?style=for-the-badge&logo=android&logoColor=black" alt="Download APK" height="50">
+    <img src="https://img.shields.io/badge/🚀_TÉLÉCHARGER_L'APK_PYBIONIC-v2.1.1-00E5FF?style=for-the-badge&logo=android&logoColor=black" alt="Download APK" height="50">
   </a>
 </p>
 
@@ -49,7 +49,7 @@ Contrairement aux émulateurs Linux lourds (Termux, PRoot, UserLAnd), PyBionic e
 ## 🚀 Démarrage rapide
 
 1. **Téléchargez l'APK :** Obtenez la dernière version sur [GitHub Releases](https://github.com/nasibullo03/PyBionic-Hub/releases/latest).
-2. **Installez :** Installez `PyBionic-Runner-v1.0.0-arm64.apk` sur votre appareil Android 8.0+ (ARM64).
+2. **Installez :** Installez `PyBionic-Runner-v2.1.1-arm64.apk` sur votre appareil Android 8.0+ (ARM64).
 3. **Autorisations :** Autorisez les notifications et désactivez les optimisations de batterie pour un fonctionnement 24/7.
 4. **Lancez un premier bot :** Allez dans l'onglet **BotHub**, choisissez un modèle, renseignez votre token et appuyez sur **▶ Démarrer**.
 5. **Pilotez depuis votre PC :** Allez dans **Paramètres** ➔ **Web Dashboard**, ouvrez l'adresse IP dans votre navigateur et entrez le code PIN.

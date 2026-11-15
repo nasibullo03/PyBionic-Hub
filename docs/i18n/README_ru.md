@@ -1,6 +1,6 @@
 # ⚡ PyBionic Runner — Автономный запуск Python 3.14 на Android 24/7
 
-[![Релиз](https://img.shields.io/badge/Релиз-v1.0.0-00E5FF.svg?style=for-the-badge&logo=android&logoColor=black)](https://github.com/nasibullo03/PyBionic-Hub/releases/latest)
+[![Релиз](https://img.shields.io/badge/Релиз-v2.1.1-00E5FF.svg?style=for-the-badge&logo=android&logoColor=black)](https://github.com/nasibullo03/PyBionic-Hub/releases/latest)
 [![Python](https://img.shields.io/badge/Python-3.14.10_Bionic-FFD700.svg?style=for-the-badge&logo=python&logoColor=black)](https://python.org)
 [![Платформа](https://img.shields.io/badge/Платформа-Android_8.0+-3DDC84.svg?style=for-the-badge&logo=android&logoColor=white)](https://android.com)
 [![Лицензия](https://img.shields.io/badge/Лицензия-AGPL_v3-blue.svg?style=for-the-badge)](../../LICENSE)
@@ -18,7 +18,7 @@
 
 <p align="center">
   <a href="https://github.com/nasibullo03/PyBionic-Hub/releases/latest">
-    <img src="https://img.shields.io/badge/🚀_СКАЧАТЬ_PYBIONIC_APK-v1.0.0-00E5FF?style=for-the-badge&logo=android&logoColor=black" alt="Скачать APK" height="50">
+    <img src="https://img.shields.io/badge/🚀_СКАЧАТЬ_PYBIONIC_APK-v2.1.1-00E5FF?style=for-the-badge&logo=android&logoColor=black" alt="Скачать APK" height="50">
   </a>
 </p>
 
@@ -49,7 +49,7 @@
 ## 🚀 Быстрый старт
 
 1. **Скачайте APK:** Загрузите свежую версию из раздела [Релизы GitHub](https://github.com/nasibullo03/PyBionic-Hub/releases/latest).
-2. **Установите:** Установите `PyBionic-Runner-v1.0.0-arm64.apk` на Android 8.0+ (ARM64).
+2. **Установите:** Установите `PyBionic-Runner-v2.1.1-arm64.apk` на Android 8.0+ (ARM64).
 3. **Разрешения:** Разрешите показ уведомлений и подтвердите отключение оптимизации батареи для стабильной работы 24/7.
 4. **Запуск первого бота:**
    - Перейдите во вкладку **BotHub**.

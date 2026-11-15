@@ -1,6 +1,6 @@
 # 🇦🇿 ⚡ PyBionic Runner — Android-də 24/7 fasiləsiz Python 3.14 mühiti
 
-[![Release](https://img.shields.io/badge/Release-v1.0.0-00E5FF.svg?style=for-the-badge&logo=android&logoColor=black)](https://github.com/nasibullo03/PyBionic-Hub/releases/latest)
+[![Release](https://img.shields.io/badge/Release-v2.1.1-00E5FF.svg?style=for-the-badge&logo=android&logoColor=black)](https://github.com/nasibullo03/PyBionic-Hub/releases/latest)
 [![Python](https://img.shields.io/badge/Python-3.14.10_Bionic-FFD700.svg?style=for-the-badge&logo=python&logoColor=black)](https://python.org)
 [![Platform](https://img.shields.io/badge/Platform-Android_8.0+-3DDC84.svg?style=for-the-badge&logo=android&logoColor=white)](https://android.com)
 [![License](https://img.shields.io/badge/License-AGPL_v3-blue.svg?style=for-the-badge)](../../LICENSE)
@@ -18,7 +18,7 @@
 
 <p align="center">
   <a href="https://github.com/nasibullo03/PyBionic-Hub/releases/latest">
-    <img src="https://img.shields.io/badge/🚀_PYBIONIC_APK_YÜKLƏ-v1.0.0-00E5FF?style=for-the-badge&logo=android&logoColor=black" alt="Download APK" height="50">
+    <img src="https://img.shields.io/badge/🚀_PYBIONIC_APK_YÜKLƏ-v2.1.1-00E5FF?style=for-the-badge&logo=android&logoColor=black" alt="Download APK" height="50">
   </a>
 </p>
 
@@ -49,7 +49,7 @@ Ağır Linux emulyatorlarından (Termux, PRoot, UserLAnd) fərqli olaraq, PyBion
 ## 🚀 Tez başlama
 
 1. **APK yükləyin:** Ən son buraxılışı [GitHub Releases](https://github.com/nasibullo03/PyBionic-Hub/releases/latest) səhifəsindən əldə edin.
-2. **Quraşdırın:** `PyBionic-Runner-v1.0.0-arm64.apk` faylını Android 8.0+ (ARM64) cihazınıza quraşdırın.
+2. **Quraşdırın:** `PyBionic-Runner-v2.1.1-arm64.apk` faylını Android 8.0+ (ARM64) cihazınıza quraşdırın.
 3. **İcazələr verin:** Bildirişlərə icazə verin və 24/7 işləməsi üçün batareya optimallaşdırmasını söndürün.
 4. **İlk botu işə salın:** **BotHub** bölməsinə keçin, şablon seçin, tokeninizi daxil edin və **▶ Başla** düyməsinə vurun.
 5. **Kompüterdən idarə edin:** **Parametrlər** ➔ **Web Dashboard** menyusuna daxil olun, göstərilən IP-ni kompüterdə açın və PIN daxil edin.
