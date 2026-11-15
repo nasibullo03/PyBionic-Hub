@@ -13,6 +13,7 @@ Features:
 
 from __future__ import annotations
 
+import pybionic_core as core
 import html
 import io
 import json
@@ -378,6 +379,8 @@ def setup_bot() -> telebot.TeleBot | None:
         return None
 
     bot = telebot.TeleBot(BOT_TOKEN, parse_mode="Markdown")
+    core.guard_bot(bot)
+    core.start_janitor([core.get_data_dir() / "pages"])
 
     def check_access(message: Any) -> bool:
         if not ALLOWED_USERS:
@@ -433,8 +436,7 @@ def setup_bot() -> telebot.TeleBot | None:
 
         def process_page():
             try:
-                file_info = bot.get_file(file_id)
-                downloaded = bot.download_file(file_info.file_path)
+                downloaded = core.download_tg_file(bot, file_id)
                 raw_img = Image.open(io.BytesIO(downloaded))
                 proc_img = apply_filter(raw_img, st["filter_mode"])
 
@@ -915,7 +917,7 @@ def main():
     if bot:
         logger.info("Starting Telegram bot polling for Doc Scanner Lens...")
         try:
-            bot.infinity_polling(skip_pending=True)
+            core.start_polling(bot, skip_pending=True)
         except Exception as e:
             logger.error("Bot polling error: %s", e)
     else:

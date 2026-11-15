@@ -12,6 +12,7 @@ Features:
 
 from __future__ import annotations
 
+import pybionic_core as core
 import html
 import io
 import json
@@ -396,7 +397,7 @@ def compress_media(
             f"{a_kbps}k",
             out_p,
         ]
-        res = subprocess.run(cmd, capture_output=True, text=True)
+        res = core.run_media(cmd, capture_output=True, text=True)
         if res.returncode != 0:
             raise RuntimeError(f"FFmpeg audio encoding failed: {res.stderr[-300:]}")
         final_sz = os.path.getsize(out_p) if os.path.exists(out_p) else 0
@@ -447,7 +448,7 @@ def compress_media(
                 "+faststart",
                 out_p,
             ]
-            res = subprocess.run(cmd, capture_output=True, text=True)
+            res = core.run_media(cmd, capture_output=True, text=True)
             if res.returncode != 0:
                 raise RuntimeError(f"FFmpeg 1-pass failed: {res.stderr[-300:]}")
         else:
@@ -472,7 +473,7 @@ def compress_media(
                 "mp4",
                 null_dev,
             ]
-            res1 = subprocess.run(cmd_p1, capture_output=True, text=True)
+            res1 = core.run_media(cmd_p1, capture_output=True, text=True)
             if res1.returncode != 0:
                 raise RuntimeError(f"FFmpeg pass 1 failed: {res1.stderr[-300:]}")
 
@@ -499,7 +500,7 @@ def compress_media(
                 "+faststart",
                 out_p,
             ]
-            res2 = subprocess.run(cmd_p2, capture_output=True, text=True)
+            res2 = core.run_media(cmd_p2, capture_output=True, text=True)
             if res2.returncode != 0:
                 raise RuntimeError(f"FFmpeg pass 2 failed: {res2.stderr[-300:]}")
 
@@ -694,8 +695,7 @@ def setup_bot(bot: Any) -> None:
             tmp_in = None
             tmp_out = None
             try:
-                finfo = bot.get_file(file_obj.file_id)
-                data = bot.download_file(finfo.file_path)
+                data = core.download_tg_file(bot, file_obj.file_id)
 
                 with tempfile.NamedTemporaryFile(suffix=ext, delete=False) as tf:
                     tf.write(data)
@@ -1567,11 +1567,13 @@ def main() -> None:
             return
 
     bot = telebot.TeleBot(BOT_TOKEN)
+    core.guard_bot(bot)
+    core.start_janitor([core.get_data_dir() / "outputs"])
     setup_bot(bot)
     logger.info("Telegram bot listener initiated.")
 
     try:
-        bot.infinity_polling(timeout=20, long_polling_timeout=10)
+        core.start_polling(bot, timeout=20, long_polling_timeout=10)
     except Exception as e:
         logger.exception(f"Bot polling exception: {e}")
     finally:

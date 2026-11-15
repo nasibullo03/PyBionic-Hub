@@ -1,3 +1,4 @@
+import pybionic_core as core
 import os
 import sys
 if hasattr(sys.stdout, "reconfigure"):
@@ -465,7 +466,7 @@ def start_bot():
         bot.send_message(cid, i18n.t("welcome", lang), reply_markup=make_main_keyboard(lang), parse_mode="HTML")
 
     print("[Forum CRM Dispatcher] Telegram bot polling started.")
-    bot.infinity_polling()
+    core.start_polling(bot)
 
 def main():
     print(f"[Forum CRM Dispatcher] Starting on port {PORT}...")

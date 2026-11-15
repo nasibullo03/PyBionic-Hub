@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 
+import pybionic_core as core
 import html
 import http.server
 import json
@@ -432,27 +433,29 @@ def run_telegram_bot(token: str) -> None:
 
     init_db()
     bot = telebot.TeleBot(token, parse_mode="HTML")
+    core.guard_bot(bot)
+    core.start_janitor([core.get_data_dir() / "downloads"])
 
     def build_main_reply_kb(uid: int) -> types.ReplyKeyboardMarkup:
         kb = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=False)
         kb.row(
-            types.KeyboardButton("🎬 MP4 (Видео)"),
-            types.KeyboardButton("🎵 MP3 (Аудио)"),
+            types.KeyboardButton(core.btn("kb_mp4", uid)),
+            types.KeyboardButton(core.btn("kb_mp3", uid)),
         )
         kb.row(
-            types.KeyboardButton("🌐 Выбрать язык"),
-            types.KeyboardButton("ℹ️ Инструкция"),
+            types.KeyboardButton(core.btn("btn_lang", uid)),
+            types.KeyboardButton(core.btn("btn_help", uid)),
         )
         return kb
 
-    def build_format_picker_kb() -> types.ReplyKeyboardMarkup:
+    def build_format_picker_kb(uid: int | None = None) -> types.ReplyKeyboardMarkup:
         kb = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=False)
         kb.row(
-            types.KeyboardButton("🎬 MP4 (Видео)"),
-            types.KeyboardButton("🎵 MP3 (Аудио)"),
+            types.KeyboardButton(core.btn("kb_mp4", uid)),
+            types.KeyboardButton(core.btn("kb_mp3", uid)),
         )
         kb.row(
-            types.KeyboardButton("❌ Отмена"),
+            types.KeyboardButton(core.btn("btn_cancel", uid)),
         )
         return kb
 
@@ -480,7 +483,7 @@ def run_telegram_bot(token: str) -> None:
         bot.reply_to(
             msg,
             t("tg_lang_title", user_id=uid),
-            reply_markup=build_reply_language_keyboard(user_id=uid, back_text="◀ Главное меню"),
+            reply_markup=build_reply_language_keyboard(user_id=uid, back_text=core.btn("btn_menu", uid)),
         )
 
     @bot.message_handler(func=lambda m: bool(m.text and parse_lang_choice(m.text)))
@@ -495,27 +498,27 @@ def run_telegram_bot(token: str) -> None:
                 reply_markup=build_main_reply_kb(uid),
             )
 
-    @bot.message_handler(func=lambda m: m.text in ("◀ Главное меню", "❌ Отмена", "◀ Назад"))
+    @bot.message_handler(func=lambda m: core.is_btn(m.text, "btn_menu", "btn_cancel"))
     def on_cancel_or_back(msg: Any) -> None:
         uid = msg.from_user.id
         clear_user_pending_url(uid)
         bot.reply_to(msg, "Главное меню:", reply_markup=build_main_reply_kb(uid))
 
-    @bot.message_handler(func=lambda m: m.text in ("🌐 Выбрать язык", "🌐 Язык"))
+    @bot.message_handler(func=lambda m: core.is_btn(m.text, "btn_lang"))
     def on_lang_button(msg: Any) -> None:
         uid = msg.from_user.id
         bot.reply_to(
             msg,
             t("tg_lang_title", user_id=uid),
-            reply_markup=build_reply_language_keyboard(user_id=uid, back_text="◀ Главное меню"),
+            reply_markup=build_reply_language_keyboard(user_id=uid, back_text=core.btn("btn_menu", uid)),
         )
 
-    @bot.message_handler(func=lambda m: m.text in ("ℹ️ Инструкция", "ℹ️ Помощь"))
+    @bot.message_handler(func=lambda m: core.is_btn(m.text, "btn_help"))
     def on_help_button(msg: Any) -> None:
         on_help(msg)
 
     # Handling format buttons from bottom keyboard
-    @bot.message_handler(func=lambda m: m.text in ("🎬 MP4 (Видео)", "🎵 MP3 (Аудио)", "🎬 Скачать MP4", "🎵 Скачать MP3"))
+    @bot.message_handler(func=lambda m: core.is_btn(m.text, "kb_mp4", "kb_mp3"))
     def on_format_button(msg: Any) -> None:
         uid = msg.from_user.id
         pending_url = get_user_pending_url(uid)
@@ -591,11 +594,11 @@ def run_telegram_bot(token: str) -> None:
         bot.reply_to(
             msg,
             f"🔗 <b>Ссылка получена!</b>\n\nВыберите формат на клавиатуре внизу:",
-            reply_markup=build_format_picker_kb(),
+            reply_markup=build_format_picker_kb(uid),
         )
 
     log("log_started")
-    bot.infinity_polling(timeout=30, long_polling_timeout=25)
+    core.start_polling(bot, timeout=30, long_polling_timeout=25)
 
 
 def main() -> int:

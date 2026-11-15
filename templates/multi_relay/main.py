@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 
+import pybionic_core as core
 import html
 import http.server
 import json
@@ -517,16 +518,16 @@ def run_telegram_bot(token: str) -> None:
     def build_main_reply_kb(uid: int) -> types.ReplyKeyboardMarkup:
         kb = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=False)
         kb.row(
-            types.KeyboardButton("🔄 Проверить обновления"),
-            types.KeyboardButton("📢 Тестовая рассылка"),
+            types.KeyboardButton(core.btn("kb_check_updates", uid)),
+            types.KeyboardButton(core.btn("kb_test_broadcast", uid)),
         )
         kb.row(
-            types.KeyboardButton("📋 Мои источники"),
-            types.KeyboardButton("➕ Добавить источник"),
+            types.KeyboardButton(core.btn("kb_my_sources", uid)),
+            types.KeyboardButton(core.btn("kb_add_source", uid)),
         )
         kb.row(
-            types.KeyboardButton("🌐 Выбрать язык"),
-            types.KeyboardButton("ℹ️ Инструкция"),
+            types.KeyboardButton(core.btn("btn_lang", uid)),
+            types.KeyboardButton(core.btn("btn_help", uid)),
         )
         return kb
 
@@ -547,7 +548,7 @@ def run_telegram_bot(token: str) -> None:
         bot.reply_to(
             msg,
             t("tg_lang_title", user_id=uid),
-            reply_markup=build_reply_language_keyboard(user_id=uid, back_text="◀ Главное меню"),
+            reply_markup=build_reply_language_keyboard(user_id=uid, back_text=core.btn("btn_menu", uid)),
         )
 
     @bot.message_handler(func=lambda m: bool(m.text and parse_lang_choice(m.text)))
@@ -558,17 +559,17 @@ def run_telegram_bot(token: str) -> None:
             set_user_lang(uid, code)
             bot.reply_to(msg, t("tg_lang_changed", user_id=uid), reply_markup=build_main_reply_kb(uid))
 
-    @bot.message_handler(func=lambda m: m.text in ("◀ Главное меню", "❌ Отмена", "◀ Назад"))
+    @bot.message_handler(func=lambda m: core.is_btn(m.text, "btn_menu", "btn_cancel"))
     def on_back(msg: Any) -> None:
         uid = msg.from_user.id
         clear_user_state(uid)
         bot.reply_to(msg, "Главное меню:", reply_markup=build_main_reply_kb(uid))
 
-    @bot.message_handler(func=lambda m: m.text in ("🌐 Выбрать язык", "🌐 Язык"))
+    @bot.message_handler(func=lambda m: core.is_btn(m.text, "btn_lang"))
     def on_lang_btn(msg: Any) -> None:
         on_lang_cmd(msg)
 
-    @bot.message_handler(func=lambda m: m.text in ("ℹ️ Инструкция", "ℹ️ Помощь"))
+    @bot.message_handler(func=lambda m: core.is_btn(m.text, "btn_help"))
     def on_help_btn(msg: Any) -> None:
         on_help(msg)
 
@@ -589,7 +590,7 @@ def run_telegram_bot(token: str) -> None:
             lines.append(f"• <b>[{r['kind'].upper()}]</b> {html.escape(r['label'] or r['target'])}")
         bot.reply_to(msg, "\n".join(lines), reply_markup=build_main_reply_kb(uid))
 
-    @bot.message_handler(func=lambda m: m.text == "📋 Мои источники")
+    @bot.message_handler(func=lambda m: core.is_btn(m.text, "kb_my_sources"))
     def on_sources_btn(msg: Any) -> None:
         on_sources(msg)
 
@@ -604,7 +605,7 @@ def run_telegram_bot(token: str) -> None:
 
         threading.Thread(target=do_poll, daemon=True).start()
 
-    @bot.message_handler(func=lambda m: m.text == "🔄 Проверить обновления")
+    @bot.message_handler(func=lambda m: core.is_btn(m.text, "kb_check_updates"))
     def on_poll_btn(msg: Any) -> None:
         on_poll_cmd(msg)
 
@@ -620,7 +621,7 @@ def run_telegram_bot(token: str) -> None:
 
         threading.Thread(target=do_test, daemon=True).start()
 
-    @bot.message_handler(func=lambda m: m.text == "📢 Тестовая рассылка")
+    @bot.message_handler(func=lambda m: core.is_btn(m.text, "kb_test_broadcast"))
     def on_test_btn(msg: Any) -> None:
         on_test_cmd(msg)
 
@@ -639,14 +640,14 @@ def run_telegram_bot(token: str) -> None:
         else:
             set_user_state(uid, "WAITING_FEED_URL")
             kb = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=False)
-            kb.row(types.KeyboardButton("◀ Главное меню"))
+            kb.row(types.KeyboardButton(core.btn("btn_menu", uid)))
             bot.reply_to(
                 msg,
                 "✏️ <b>Отправьте URL или репозиторий:</b>\n\n• RSS URL: <code>https://example.com/feed.xml</code>\n• GitHub: <code>owner/repo</code>\n• YouTube: <code>UC...</code>",
                 reply_markup=kb,
             )
 
-    @bot.message_handler(func=lambda m: m.text == "➕ Добавить источник")
+    @bot.message_handler(func=lambda m: core.is_btn(m.text, "kb_add_source"))
     def on_add_btn(msg: Any) -> None:
         on_add(msg)
 
@@ -669,7 +670,7 @@ def run_telegram_bot(token: str) -> None:
         bot.reply_to(msg, "Главное меню:", reply_markup=build_main_reply_kb(uid))
 
     log("log_started")
-    bot.infinity_polling(timeout=30, long_polling_timeout=25)
+    core.start_polling(bot, timeout=30, long_polling_timeout=25)
 
 
 def main() -> int:

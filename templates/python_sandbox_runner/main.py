@@ -1,3 +1,4 @@
+import pybionic_core as core
 import os
 import sys
 if hasattr(sys.stdout, "reconfigure"):
@@ -295,12 +296,7 @@ def start_bot():
     from telebot import types
 
     bot = telebot.TeleBot(BOT_TOKEN)
-
-    _allowed_ids = {int(x) for x in os.environ.get("ALLOWED_USER_IDS", "").replace(" ", "").split(",") if x.isdigit()}
-
-    @bot.message_handler(func=lambda m: not m.from_user or m.from_user.id not in _allowed_ids)
-    def _deny_access(m):
-        bot.reply_to(m, "⛔ Access denied / Доступ закрыт")
+    core.guard_bot(bot, closed_if_empty=True)
 
     user_state = {}
 
@@ -445,7 +441,7 @@ def start_bot():
         threading.Thread(target=run_async, daemon=True).start()
 
     print("[Python Sandbox Runner] Telegram bot polling started.")
-    bot.infinity_polling()
+    core.start_polling(bot)
 
 def main():
     print(f"[Python Sandbox Runner] Starting on port {PORT}...")

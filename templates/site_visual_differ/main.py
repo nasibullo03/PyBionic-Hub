@@ -13,6 +13,7 @@ Features:
 
 from __future__ import annotations
 
+import pybionic_core as core
 import html
 import io
 import json
@@ -322,6 +323,7 @@ def setup_bot() -> telebot.TeleBot | None:
         return None
 
     bot = telebot.TeleBot(BOT_TOKEN, parse_mode="Markdown")
+    core.guard_bot(bot)
 
     def check_access(message: Any) -> bool:
         if not ALLOWED_USERS:
@@ -379,8 +381,7 @@ def setup_bot() -> telebot.TeleBot | None:
 
         def process_upload():
             try:
-                file_info = bot.get_file(file_id)
-                downloaded = bot.download_file(file_info.file_path)
+                downloaded = core.download_tg_file(bot, file_id)
                 img = Image.open(io.BytesIO(downloaded)).convert("RGB")
 
                 u_dir = get_user_dir(uid)
@@ -981,7 +982,7 @@ def main():
     if bot:
         logger.info("Starting Telegram bot polling for Site Visual Differ...")
         try:
-            bot.infinity_polling(skip_pending=True)
+            core.start_polling(bot, skip_pending=True)
         except Exception as e:
             logger.error("Bot polling error: %s", e)
     else:

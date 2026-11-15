@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 
+import pybionic_core as core
 import base64
 import gzip
 import html
@@ -160,7 +161,7 @@ def convert_single_bytes(raw_bytes: bytes, kind: str, target_fmt: str, stem: str
         else:
             cmd = [ff, "-y", "-i", str(src_path), str(out_path)]
         try:
-            res = subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=False)
+            res = core.run_media(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=False)
             if res.returncode == 0 and out_path.is_file() and out_path.stat().st_size > 0:
                 return out_path
         except Exception:
@@ -467,6 +468,10 @@ async function convertFiles() {{
 
             out_dir = get_data_dir() / "web_converted"
             out_dir.mkdir(parents=True, exist_ok=True)
+            _edge = time.time() - 24 * 3600
+            for _old in out_dir.glob("*"):
+                if _old.is_file() and _old.stat().st_mtime < _edge:
+                    _old.unlink(missing_ok=True)
             res_files = []
             converted_paths = []
 
@@ -572,32 +577,32 @@ def run_bot(token: str) -> None:
     def build_main_reply_kb(uid: int) -> types.ReplyKeyboardMarkup:
         kb = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=False)
         kb.row(
-            types.KeyboardButton("🌐 Выбрать язык"),
-            types.KeyboardButton("ℹ️ Инструкция"),
+            types.KeyboardButton(core.btn("btn_lang", uid)),
+            types.KeyboardButton(core.btn("btn_help", uid)),
         )
         return kb
 
-    def build_single_sticker_kb(kind: str, has_pack: bool) -> types.ReplyKeyboardMarkup:
+    def build_single_sticker_kb(kind: str, has_pack: bool, uid: int | None = None) -> types.ReplyKeyboardMarkup:
         kb = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=False)
         if kind == "webp":
-            kb.row(types.KeyboardButton("🖼 Конвертировать в PNG"), types.KeyboardButton("🌐 Сохранить как WebP"))
+            kb.row(types.KeyboardButton(core.btn("kb_to_png", uid)), types.KeyboardButton(core.btn("kb_to_webp", uid)))
         elif kind == "webm":
-            kb.row(types.KeyboardButton("🎞 Конвертировать в GIF"), types.KeyboardButton("🎥 Конвертировать в MP4"))
-            kb.row(types.KeyboardButton("🖼 Первый кадр в PNG"))
+            kb.row(types.KeyboardButton(core.btn("kb_to_gif", uid)), types.KeyboardButton(core.btn("kb_to_mp4", uid)))
+            kb.row(types.KeyboardButton(core.btn("kb_first_frame", uid)))
         else:
-            kb.row(types.KeyboardButton("⚡ Lottie JSON"), types.KeyboardButton("📦 Исходный файл .TGS"))
+            kb.row(types.KeyboardButton(core.btn("kb_lottie", uid)), types.KeyboardButton(core.btn("kb_tgs", uid)))
 
         if has_pack:
-            kb.row(types.KeyboardButton("📦 Скачать весь набор (PNG ZIP)"))
-            kb.row(types.KeyboardButton("📦 Скачать весь набор (GIF ZIP)"))
-        kb.row(types.KeyboardButton("◀ Главное меню"))
+            kb.row(types.KeyboardButton(core.btn("kb_pack_png", uid)))
+            kb.row(types.KeyboardButton(core.btn("kb_pack_gif", uid)))
+        kb.row(types.KeyboardButton(core.btn("btn_menu", uid)))
         return kb
 
-    def build_pack_kb() -> types.ReplyKeyboardMarkup:
+    def build_pack_kb(uid: int | None = None) -> types.ReplyKeyboardMarkup:
         kb = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=False)
-        kb.row(types.KeyboardButton("📦 Скачать ZIP (PNG)"), types.KeyboardButton("📦 Скачать ZIP (GIF)"))
-        kb.row(types.KeyboardButton("📦 Скачать ZIP (WebP)"), types.KeyboardButton("📦 Скачать ZIP (MP4)"))
-        kb.row(types.KeyboardButton("◀ Главное меню"))
+        kb.row(types.KeyboardButton(core.btn("kb_zip_png", uid)), types.KeyboardButton(core.btn("kb_zip_gif", uid)))
+        kb.row(types.KeyboardButton(core.btn("kb_zip_webp", uid)), types.KeyboardButton(core.btn("kb_zip_mp4", uid)))
+        kb.row(types.KeyboardButton(core.btn("btn_menu", uid)))
         return kb
 
     @bot.message_handler(commands=["start"])
@@ -616,7 +621,7 @@ def run_bot(token: str) -> None:
         bot.reply_to(
             msg,
             t("tg_lang_title", user_id=uid),
-            reply_markup=build_reply_language_keyboard(user_id=uid, back_text="◀ Главное меню"),
+            reply_markup=build_reply_language_keyboard(user_id=uid, back_text=core.btn("btn_menu", uid)),
         )
 
     @bot.message_handler(func=lambda m: bool(m.text and parse_lang_choice(m.text)))
@@ -627,17 +632,17 @@ def run_bot(token: str) -> None:
             set_user_lang(uid, code)
             bot.reply_to(msg, t("tg_lang_changed", user_id=uid), reply_markup=build_main_reply_kb(uid))
 
-    @bot.message_handler(func=lambda m: m.text in ("◀ Главное меню", "❌ Отмена", "◀ Назад"))
+    @bot.message_handler(func=lambda m: core.is_btn(m.text, "btn_menu", "btn_cancel"))
     def on_back(msg: Any) -> None:
         uid = msg.from_user.id
         clear_user_pending_job(uid)
         bot.reply_to(msg, "Главное меню:", reply_markup=build_main_reply_kb(uid))
 
-    @bot.message_handler(func=lambda m: m.text in ("🌐 Выбрать язык", "🌐 Язык"))
+    @bot.message_handler(func=lambda m: core.is_btn(m.text, "btn_lang"))
     def on_lang_btn(msg: Any) -> None:
         on_lang_cmd(msg)
 
-    @bot.message_handler(func=lambda m: m.text in ("ℹ️ Инструкция", "ℹ️ Помощь"))
+    @bot.message_handler(func=lambda m: core.is_btn(m.text, "btn_help"))
     def on_help_btn(msg: Any) -> None:
         on_help(msg)
 
@@ -651,7 +656,7 @@ def run_bot(token: str) -> None:
         bot.reply_to(
             msg,
             f"🎨 <b>Стикер получен ({kind.upper()})!</b>\n\nВыберите формат конвертации на клавиатуре внизу:",
-            reply_markup=build_single_sticker_kb(kind, bool(st.set_name)),
+            reply_markup=build_single_sticker_kb(kind, bool(st.set_name), uid),
         )
 
     # Pack link handler
@@ -666,12 +671,12 @@ def run_bot(token: str) -> None:
         bot.reply_to(
             msg,
             f"📦 <b>Стикерпак:</b> <code>{pack_name}</code>\n\nВыберите формат для архива на клавиатуре внизу:",
-            reply_markup=build_pack_kb(),
+            reply_markup=build_pack_kb(uid),
         )
 
     # Format action buttons from bottom keyboard
     @bot.message_handler(func=lambda m: any(kw in (m.text or "") for kw in (
-        "PNG", "WebP", "GIF", "MP4", "JSON", "TGS", "весь набор"
+        "PNG", "WebP", "GIF", "MP4", "JSON", "TGS"
     )))
     def on_format_action(msg: Any) -> None:
         uid = msg.from_user.id
@@ -693,7 +698,7 @@ def run_bot(token: str) -> None:
         elif "TGS" in txt:
             fmt = "tgs"
 
-        is_pack_action = "весь набор" in txt or job.get("job_type") == "pack"
+        is_pack_action = core.is_btn(txt, "kb_pack_png", "kb_pack_gif") or job.get("job_type") == "pack"
 
         if is_pack_action:
             set_name = job.get("set_name")
@@ -718,8 +723,7 @@ def run_bot(token: str) -> None:
                         out_files = []
                         for idx, st in enumerate(stickers, 1):
                             kind = detect_sticker_kind(st)
-                            finfo = bot.get_file(st.file_id)
-                            raw = bot.download_file(finfo.file_path)
+                            raw = core.download_tg_file(bot, st.file_id)
                             stem = f"{idx:03d}_{set_name}"
                             out_f = convert_single_bytes(raw, kind, fmt, stem, tmp_dir)
                             out_files.append(out_f)
@@ -761,11 +765,11 @@ def run_bot(token: str) -> None:
 
             def run_single():
                 try:
-                    finfo = bot.get_file(file_id)
-                    if (getattr(finfo, "file_size", 0) or 0) > 20 * 1024 * 1024:
+                    try:
+                        raw = core.download_tg_file(bot, file_id)
+                    except core.FileTooBig:
                         bot.reply_to(msg, "⚠️ Файл слишком большой (> 20 МБ). Telegram Bot API не позволяет скачивать файлы более 20 МБ.")
                         return
-                    raw = bot.download_file(finfo.file_path)
                     with tempfile.TemporaryDirectory() as tmp:
                         out_file = convert_single_bytes(raw, kind, fmt, "sticker", Path(tmp))
                         with out_file.open("rb") as fh:
@@ -786,7 +790,7 @@ def run_bot(token: str) -> None:
             threading.Thread(target=run_single, daemon=True).start()
 
     log("log_started")
-    bot.infinity_polling(timeout=30, long_polling_timeout=25)
+    core.start_polling(bot, timeout=30, long_polling_timeout=25)
 
 
 def main() -> int:

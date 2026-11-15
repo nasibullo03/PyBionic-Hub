@@ -1,0 +1,161 @@
+{
+  "strings": {
+    "err_missing_token": {
+      "ru": "BOT_TOKEN не задан. Откройте «Секреты» проекта и вставьте токен от @BotFather.",
+      "en": "BOT_TOKEN is empty. Open the project's Secrets and paste the token from @BotFather.",
+      "tg": "BOT_TOKEN холӣ аст. «Сирҳо»-и лоиҳаро кушоед ва токенро аз @BotFather гузоред.",
+      "uz": "BOT_TOKEN boʻsh. Loyiha «Sirlar» boʻlimini oching va @BotFather tokenini qoʻying."
+    },
+    "log_error": {
+      "ru": "Ошибка: {err}",
+      "en": "Error: {err}",
+      "tg": "Хато: {err}",
+      "uz": "Xato: {err}"
+    },
+    "tg_lang_title": {
+      "ru": "🌐 Выберите язык:",
+      "en": "🌐 Choose your language:",
+      "tg": "🌐 Забонро интихоб кунед:",
+      "uz": "🌐 Tilni tanlang:"
+    },
+    "tg_lang_changed": {
+      "ru": "✅ Язык изменён.",
+      "en": "✅ Language changed.",
+      "tg": "✅ Забон иваз шуд.",
+      "uz": "✅ Til oʻzgartirildi."
+    },
+    "log_started_tg": {
+      "ru": "ИИ-помощник запущен: {provider} / {model}",
+      "en": "AI assistant started: {provider} / {model}",
+      "tg": "Ёрдамчии ЗИ оғоз шуд: {provider} / {model}",
+      "uz": "SI yordamchi ishga tushdi: {provider} / {model}"
+    },
+    "btn_mode_chat": {
+      "ru": "💬 Чат",
+      "en": "💬 Chat",
+      "tg": "💬 Сӯҳбат",
+      "uz": "💬 Suhbat"
+    },
+    "btn_mode_translate": {
+      "ru": "🌍 Перевод",
+      "en": "🌍 Translate",
+      "tg": "🌍 Тарҷума",
+      "uz": "🌍 Tarjima"
+    },
+    "btn_mode_summary": {
+      "ru": "📝 Пересказ",
+      "en": "📝 Summary",
+      "tg": "📝 Хулоса",
+      "uz": "📝 Qisqacha"
+    },
+    "btn_mode_fix": {
+      "ru": "✍️ Исправить текст",
+      "en": "✍️ Fix text",
+      "tg": "✍️ Ислоҳи матн",
+      "uz": "✍️ Matnni tuzatish"
+    },
+    "btn_new_chat": {
+      "ru": "🧹 Новый чат",
+      "en": "🧹 New chat",
+      "tg": "🧹 Сӯҳбати нав",
+      "uz": "🧹 Yangi suhbat"
+    },
+    "ai_welcome": {
+      "ru": "🤖 Привет! Я ИИ-помощник.\n\nПишите вопрос, отправляйте голосовое или фото — отвечу.\nКнопки внизу переключают режим: чат, перевод, пересказ, исправление текста.",
+      "en": "🤖 Hi! I'm an AI assistant.\n\nSend a question, a voice message or a photo — I'll answer.\nButtons below switch the mode: chat, translate, summary, fix text.",
+      "tg": "🤖 Салом! Ман ёрдамчии зеҳни сунъӣ ҳастам.\n\nСавол нависед, овоз ё акс фиристед — ҷавоб медиҳам.\nТугмаҳои поён реҷаро иваз мекунанд: сӯҳбат, тарҷума, хулоса, ислоҳи матн.",
+      "uz": "🤖 Salom! Men sun'iy intellekt yordamchisiman.\n\nSavol yozing, ovozli xabar yoki rasm yuboring — javob beraman.\nPastdagi tugmalar rejimni almashtiradi: suhbat, tarjima, qisqacha, matnni tuzatish."
+    },
+    "ai_key_ok": {
+      "ru": "✅ ИИ подключён.",
+      "en": "✅ AI is connected.",
+      "tg": "✅ ЗИ пайваст аст.",
+      "uz": "✅ SI ulangan."
+    },
+    "ai_key_missing": {
+      "ru": "⚠️ Ключ ИИ не задан. Получите бесплатный ключ на aistudio.google.com → Get API key и вставьте его в секрет AI_API_KEY.",
+      "en": "⚠️ AI key is missing. Get a free key at aistudio.google.com → Get API key and put it into the AI_API_KEY secret.",
+      "tg": "⚠️ Калиди ЗИ нест. Калиди ройгонро дар aistudio.google.com → Get API key гиред ва ба сирри AI_API_KEY гузоред.",
+      "uz": "⚠️ SI kaliti yoʻq. aistudio.google.com → Get API key orqali bepul kalit oling va AI_API_KEY siriga qoʻying."
+    },
+    "ai_help": {
+      "ru": "ℹ️ Как пользоваться\n\n• Просто пишите — бот помнит последние сообщения.\n• 🎤 Голосовое — расшифрую и отвечу.\n• 🖼 Фото — опишу или прочитаю текст. Вопрос пишите в подписи.\n• 🌍 Перевод: «на таджикский: текст».\n• 🧹 Новый чат или /new — забыть историю.\n• В группе: упомяните бота или ответьте на его сообщение.\n\nЛимит: {n} запросов в день. Модель: {model}",
+      "en": "ℹ️ How to use\n\n• Just write — the bot remembers recent messages.\n• 🎤 Voice — I'll transcribe and answer.\n• 🖼 Photo — I'll describe it or read the text. Put your question in the caption.\n• 🌍 Translate: \"to Spanish: text\".\n• 🧹 New chat or /new — forget history.\n• In groups: mention the bot or reply to its message.\n\nLimit: {n} requests per day. Model: {model}",
+      "tg": "ℹ️ Тарзи истифода\n\n• Танҳо нависед — бот паёмҳои охиринро дар ёд дорад.\n• 🎤 Овоз — матн карда ҷавоб медиҳам.\n• 🖼 Акс — тасвир мекунам ё матнро мехонам. Саволро дар тавсиф нависед.\n• 🌍 Тарҷума: «ба русӣ: матн».\n• 🧹 Сӯҳбати нав ё /new — таърихро фаромӯш кардан.\n• Дар гурӯҳ: ботро қайд кунед ё ба паёмаш ҷавоб диҳед.\n\nМаҳдудият: {n} дархост дар як рӯз. Модел: {model}",
+      "uz": "ℹ️ Qanday foydalanish\n\n• Shunchaki yozing — bot oxirgi xabarlarni eslab qoladi.\n• 🎤 Ovozli xabar — matnga aylantirib javob beraman.\n• 🖼 Rasm — tasvirlayman yoki matnni oʻqiyman. Savolni izohga yozing.\n• 🌍 Tarjima: «ruschaga: matn».\n• 🧹 Yangi suhbat yoki /new — tarixni unutish.\n• Guruhda: botni belgilang yoki uning xabariga javob bering.\n\nLimit: kuniga {n} ta soʻrov. Model: {model}"
+    },
+    "ai_new_chat": {
+      "ru": "🧹 История очищена. Начинаем заново!",
+      "en": "🧹 History cleared. Starting fresh!",
+      "tg": "🧹 Таърих тоза шуд. Аз нав сар мекунем!",
+      "uz": "🧹 Tarix tozalandi. Yangidan boshlaymiz!"
+    },
+    "ai_menu": {
+      "ru": "Главное меню.",
+      "en": "Main menu.",
+      "tg": "Менюи асосӣ.",
+      "uz": "Bosh menyu."
+    },
+    "ai_mode_chat": {
+      "ru": "💬 Режим чата. Пишите что угодно.",
+      "en": "💬 Chat mode. Write anything.",
+      "tg": "💬 Реҷаи сӯҳбат. Ҳар чӣ хоҳед нависед.",
+      "uz": "💬 Suhbat rejimi. Istalgan narsani yozing."
+    },
+    "ai_mode_translate": {
+      "ru": "🌍 Режим перевода. Пришлите текст. Нужен другой язык — начните с «на английский:».",
+      "en": "🌍 Translate mode. Send text. Need another language — start with \"to German:\".",
+      "tg": "🌍 Реҷаи тарҷума. Матн фиристед. Забони дигар лозим бошад — бо «ба англисӣ:» сар кунед.",
+      "uz": "🌍 Tarjima rejimi. Matn yuboring. Boshqa til kerak boʻlsa — «inglizchaga:» deb boshlang."
+    },
+    "ai_mode_summary": {
+      "ru": "📝 Режим пересказа. Пришлите длинный текст.",
+      "en": "📝 Summary mode. Send a long text.",
+      "tg": "📝 Реҷаи хулоса. Матни дароз фиристед.",
+      "uz": "📝 Qisqacha rejimi. Uzun matn yuboring."
+    },
+    "ai_mode_fix": {
+      "ru": "✍️ Режим исправления. Пришлите текст с ошибками.",
+      "en": "✍️ Fix mode. Send text with mistakes.",
+      "tg": "✍️ Реҷаи ислоҳ. Матни хатодорро фиристед.",
+      "uz": "✍️ Tuzatish rejimi. Xatoli matnni yuboring."
+    },
+    "ai_limit": {
+      "ru": "⏳ На сегодня лимит {n} запросов исчерпан. Приходите завтра!",
+      "en": "⏳ Today's limit of {n} requests is used up. Come back tomorrow!",
+      "tg": "⏳ Маҳдудияти имрӯза ({n} дархост) тамом шуд. Фардо биёед!",
+      "uz": "⏳ Bugungi {n} ta soʻrov limiti tugadi. Ertaga keling!"
+    },
+    "ai_error": {
+      "ru": "⚠️ ИИ не ответил: {err}",
+      "en": "⚠️ AI did not answer: {err}",
+      "tg": "⚠️ ЗИ ҷавоб надод: {err}",
+      "uz": "⚠️ SI javob bermadi: {err}"
+    },
+    "ai_media_gemini_only": {
+      "ru": "🎤🖼 Голос и фото работают только с Gemini (AI_PROVIDER=gemini).",
+      "en": "🎤🖼 Voice and photos work only with Gemini (AI_PROVIDER=gemini).",
+      "tg": "🎤🖼 Овоз ва акс танҳо бо Gemini кор мекунанд (AI_PROVIDER=gemini).",
+      "uz": "🎤🖼 Ovoz va rasm faqat Gemini bilan ishlaydi (AI_PROVIDER=gemini)."
+    },
+    "ai_voice_prompt": {
+      "ru": "Расшифруй это голосовое сообщение и ответь на него. Сначала дай расшифровку, потом ответ.",
+      "en": "Transcribe this voice message and answer it. First the transcript, then the answer.",
+      "tg": "Ин паёми овозиро ба матн гардон ва ба он ҷавоб деҳ. Аввал матн, баъд ҷавоб.",
+      "uz": "Bu ovozli xabarni matnga aylantir va javob ber. Avval matn, keyin javob."
+    },
+    "ai_photo_prompt": {
+      "ru": "Опиши, что на фото. Если есть текст — перепиши его.",
+      "en": "Describe what is in the photo. If there is text, transcribe it.",
+      "tg": "Бигӯ, ки дар акс чист. Агар матн бошад — онро нависед.",
+      "uz": "Rasmda nima borligini tasvirla. Matn boʻlsa — uni yozib ber."
+    },
+    "ai_unknown_cmd": {
+      "ru": "Не знаю такую команду. /help — подсказка.",
+      "en": "Unknown command. /help — tips.",
+      "tg": "Чунин фармон нест. /help — маслиҳат.",
+      "uz": "Bunday buyruq yoʻq. /help — yordam."
+    }
+  },
+  "lists": {}
+}

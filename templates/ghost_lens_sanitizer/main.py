@@ -14,6 +14,7 @@ Features:
 
 from __future__ import annotations
 
+import pybionic_core as core
 import html
 import io
 import json
@@ -470,7 +471,7 @@ def sanitize_image(
             "-map_metadata", "-1",
             str(out_p),
         ]
-        subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        core.run_media(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 
 def sanitize_video(input_path: str | Path, output_path: str | Path) -> None:
@@ -487,7 +488,7 @@ def sanitize_video(input_path: str | Path, output_path: str | Path) -> None:
         "-c", "copy",
         str(output_path),
     ]
-    res = subprocess.run(cmd, capture_output=True, text=True)
+    res = core.run_media(cmd, capture_output=True, text=True)
     if res.returncode != 0:
         raise RuntimeError(f"FFmpeg video sanitize failed: {res.stderr[-300:]}")
 
@@ -542,6 +543,8 @@ def build_settings_keyboard(user_id: int | str) -> Any:
 bot: Any = None
 if telebot and BOT_TOKEN:
     bot = telebot.TeleBot(BOT_TOKEN, parse_mode="HTML")
+    core.guard_bot(bot)
+    core.start_janitor([core.get_data_dir() / "outputs"])
 
 
 def setup_telegram_handlers() -> None:
@@ -693,8 +696,7 @@ def setup_telegram_handlers() -> None:
     ) -> None:
         try:
             status_msg = bot.send_message(chat_id, i18n.t("tg_analyzing", user_id=uid))
-            file_info = bot.get_file(file_id)
-            downloaded = bot.download_file(file_info.file_path)
+            downloaded = core.download_tg_file(bot, file_id)
 
             suffix = Path(original_name).suffix.lower() or (".mp4" if is_video else ".jpg")
             with tempfile.NamedTemporaryFile("wb", suffix=suffix, delete=False) as tf_in:
@@ -1376,7 +1378,7 @@ def main() -> None:
     if bot:
         setup_telegram_handlers()
         logger.info("Starting Telegram bot polling...")
-        bot.infinity_polling(skip_pending=True)
+        core.start_polling(bot, skip_pending=True)
     else:
         logger.info("BOT_TOKEN not provided, running in Web Studio mode on port %d", WEB_PORT)
         web_t.join()

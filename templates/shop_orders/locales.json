@@ -1,0 +1,347 @@
+{
+  "strings": {
+    "err_missing_token": {
+      "ru": "BOT_TOKEN не задан. Откройте «Секреты» проекта и вставьте токен от @BotFather.",
+      "en": "BOT_TOKEN is empty. Open the project's Secrets and paste the token from @BotFather.",
+      "tg": "BOT_TOKEN холӣ аст. «Сирҳо»-и лоиҳаро кушоед ва токенро аз @BotFather гузоред.",
+      "uz": "BOT_TOKEN boʻsh. Loyiha «Sirlar» boʻlimini oching va @BotFather tokenini qoʻying."
+    },
+    "log_error": {
+      "ru": "Ошибка: {err}",
+      "en": "Error: {err}",
+      "tg": "Хато: {err}",
+      "uz": "Xato: {err}"
+    },
+    "tg_lang_title": {
+      "ru": "🌐 Выберите язык:",
+      "en": "🌐 Choose your language:",
+      "tg": "🌐 Забонро интихоб кунед:",
+      "uz": "🌐 Tilni tanlang:"
+    },
+    "tg_lang_changed": {
+      "ru": "✅ Язык изменён.",
+      "en": "✅ Language changed.",
+      "tg": "✅ Забон иваз шуд.",
+      "uz": "✅ Til oʻzgartirildi."
+    },
+    "log_started_tg": {
+      "ru": "Магазин «{shop}» запущен, владельцев: {admins}",
+      "en": "Shop \"{shop}\" started, owners: {admins}",
+      "tg": "Мағозаи «{shop}» оғоз шуд, соҳибон: {admins}",
+      "uz": "«{shop}» doʻkoni ishga tushdi, egalar: {admins}"
+    },
+    "shop_no_admins": {
+      "ru": "ВНИМАНИЕ: ADMIN_IDS пуст — заказы некому получать. Впишите свой Telegram ID (команда /myid).",
+      "en": "WARNING: ADMIN_IDS is empty — nobody receives orders. Put your Telegram ID (command /myid).",
+      "tg": "ДИҚҚАТ: ADMIN_IDS холӣ аст — фармоишҳоро касе намегирад. ID-и Telegram-ро нависед (/myid).",
+      "uz": "DIQQAT: ADMIN_IDS boʻsh — buyurtmalarni hech kim olmaydi. Telegram ID ni yozing (/myid)."
+    },
+    "btn_catalog": {
+      "ru": "🛍 Каталог",
+      "en": "🛍 Catalog",
+      "tg": "🛍 Феҳрист",
+      "uz": "🛍 Katalog"
+    },
+    "btn_cart": {
+      "ru": "🧺 Корзина",
+      "en": "🧺 Cart",
+      "tg": "🧺 Сабад",
+      "uz": "🧺 Savat"
+    },
+    "btn_my_orders": {
+      "ru": "📦 Мои заказы",
+      "en": "📦 My orders",
+      "tg": "📦 Фармоишҳои ман",
+      "uz": "📦 Buyurtmalarim"
+    },
+    "btn_add_product": {
+      "ru": "➕ Товар",
+      "en": "➕ Product",
+      "tg": "➕ Мол",
+      "uz": "➕ Mahsulot"
+    },
+    "btn_products": {
+      "ru": "🗂 Товары",
+      "en": "🗂 Products",
+      "tg": "🗂 Молҳо",
+      "uz": "🗂 Mahsulotlar"
+    },
+    "btn_orders": {
+      "ru": "📥 Заказы",
+      "en": "📥 Orders",
+      "tg": "📥 Фармоишҳо",
+      "uz": "📥 Buyurtmalar"
+    },
+    "btn_skip": {
+      "ru": "⏭ Пропустить",
+      "en": "⏭ Skip",
+      "tg": "⏭ Гузаштан",
+      "uz": "⏭ Oʻtkazib yuborish"
+    },
+    "shop_welcome": {
+      "ru": "🛍 Добро пожаловать в <b>{shop}</b>!\n\nОткройте каталог, добавьте товары в корзину и оформите заказ — мы свяжемся с вами.",
+      "en": "🛍 Welcome to <b>{shop}</b>!\n\nOpen the catalog, add items to the cart and place an order — we'll contact you.",
+      "tg": "🛍 Ба <b>{shop}</b> хуш омадед!\n\nФеҳристро кушоед, молҳоро ба сабад гузоред ва фармоиш диҳед — мо бо шумо тамос мегирем.",
+      "uz": "🛍 <b>{shop}</b> ga xush kelibsiz!\n\nKatalogni oching, mahsulotlarni savatga qoʻshing va buyurtma bering — siz bilan bogʻlanamiz."
+    },
+    "shop_admin_hint": {
+      "ru": "👑 Вы владелец. Кнопки ниже: добавить товар, список товаров, активные заказы.\nБыстро: /add Название | цена | описание",
+      "en": "👑 You are the owner. Buttons below: add product, product list, active orders.\nQuick: /add Name | price | description",
+      "tg": "👑 Шумо соҳиб ҳастед. Тугмаҳои поён: илова кардани мол, рӯйхати молҳо, фармоишҳои фаъол.\nЗуд: /add Ном | нарх | тавсиф",
+      "uz": "👑 Siz egasiz. Pastdagi tugmalar: mahsulot qoʻshish, roʻyxat, faol buyurtmalar.\nTez: /add Nomi | narx | tavsif"
+    },
+    "shop_catalog_title": {
+      "ru": "🛍 <b>{shop}</b> — выберите товар:",
+      "en": "🛍 <b>{shop}</b> — choose a product:",
+      "tg": "🛍 <b>{shop}</b> — молро интихоб кунед:",
+      "uz": "🛍 <b>{shop}</b> — mahsulotni tanlang:"
+    },
+    "shop_catalog_empty": {
+      "ru": "Каталог пока пуст.",
+      "en": "The catalog is empty for now.",
+      "tg": "Феҳрист ҳоло холӣ аст.",
+      "uz": "Katalog hozircha boʻsh."
+    },
+    "shop_product_gone": {
+      "ru": "Этого товара уже нет.",
+      "en": "This product is no longer available.",
+      "tg": "Ин мол дигар нест.",
+      "uz": "Bu mahsulot endi yoʻq."
+    },
+    "shop_add_to_cart": {
+      "ru": "➕ В корзину",
+      "en": "➕ Add to cart",
+      "tg": "➕ Ба сабад",
+      "uz": "➕ Savatga"
+    },
+    "shop_open_cart": {
+      "ru": "🧺 Корзина",
+      "en": "🧺 Cart",
+      "tg": "🧺 Сабад",
+      "uz": "🧺 Savat"
+    },
+    "shop_back_catalog": {
+      "ru": "◀ Каталог",
+      "en": "◀ Catalog",
+      "tg": "◀ Феҳрист",
+      "uz": "◀ Katalog"
+    },
+    "shop_added": {
+      "ru": "Добавлено в корзину",
+      "en": "Added to cart",
+      "tg": "Ба сабад илова шуд",
+      "uz": "Savatga qoʻshildi"
+    },
+    "shop_cart_title": {
+      "ru": "🧺 <b>Корзина</b>",
+      "en": "🧺 <b>Cart</b>",
+      "tg": "🧺 <b>Сабад</b>",
+      "uz": "🧺 <b>Savat</b>"
+    },
+    "shop_cart_empty": {
+      "ru": "Корзина пуста.",
+      "en": "The cart is empty.",
+      "tg": "Сабад холӣ аст.",
+      "uz": "Savat boʻsh."
+    },
+    "shop_total": {
+      "ru": "<b>Итого: {total}</b>",
+      "en": "<b>Total: {total}</b>",
+      "tg": "<b>Ҳамагӣ: {total}</b>",
+      "uz": "<b>Jami: {total}</b>"
+    },
+    "shop_checkout": {
+      "ru": "✅ Оформить заказ",
+      "en": "✅ Checkout",
+      "tg": "✅ Фармоиш додан",
+      "uz": "✅ Buyurtma berish"
+    },
+    "shop_clear_cart": {
+      "ru": "🧹 Очистить",
+      "en": "🧹 Clear",
+      "tg": "🧹 Тоза кардан",
+      "uz": "🧹 Tozalash"
+    },
+    "shop_min_order": {
+      "ru": "Минимальная сумма заказа — {min}",
+      "en": "Minimum order is {min}",
+      "tg": "Ҳадди ақали фармоиш — {min}",
+      "uz": "Minimal buyurtma — {min}"
+    },
+    "shop_ask_name": {
+      "ru": "Как вас зовут?",
+      "en": "What is your name?",
+      "tg": "Номатон чист?",
+      "uz": "Ismingiz nima?"
+    },
+    "shop_ask_phone": {
+      "ru": "Ваш телефон? Нажмите кнопку ниже или напишите номер.",
+      "en": "Your phone? Tap the button below or type the number.",
+      "tg": "Телефони шумо? Тугмаи поёнро пахш кунед ё рақамро нависед.",
+      "uz": "Telefoningiz? Pastdagi tugmani bosing yoki raqamni yozing."
+    },
+    "shop_share_phone": {
+      "ru": "📱 Отправить мой номер",
+      "en": "📱 Share my number",
+      "tg": "📱 Фиристодани рақам",
+      "uz": "📱 Raqamimni yuborish"
+    },
+    "shop_bad_phone": {
+      "ru": "Похоже, это не номер телефона. Попробуйте ещё раз.",
+      "en": "That doesn't look like a phone number. Try again.",
+      "tg": "Ин ба рақами телефон монанд нест. Боз кӯшиш кунед.",
+      "uz": "Bu telefon raqamiga oʻxshamaydi. Qayta urinib koʻring."
+    },
+    "shop_ask_address": {
+      "ru": "Адрес доставки (или «самовывоз»):",
+      "en": "Delivery address (or \"pickup\"):",
+      "tg": "Суроғаи расонидан (ё «худам мебарам»):",
+      "uz": "Yetkazish manzili (yoki «oʻzim olib ketaman»):"
+    },
+    "shop_ask_comment": {
+      "ru": "Комментарий к заказу? (или «Пропустить»)",
+      "en": "Any comment? (or \"Skip\")",
+      "tg": "Шарҳ ба фармоиш? (ё «Гузаштан»)",
+      "uz": "Izoh bormi? (yoki «Oʻtkazib yuborish»)"
+    },
+    "shop_confirm_title": {
+      "ru": "📝 <b>Проверьте заказ:</b>",
+      "en": "📝 <b>Check your order:</b>",
+      "tg": "📝 <b>Фармоишро санҷед:</b>",
+      "uz": "📝 <b>Buyurtmani tekshiring:</b>"
+    },
+    "shop_confirm_btn": {
+      "ru": "✅ Подтвердить",
+      "en": "✅ Confirm",
+      "tg": "✅ Тасдиқ",
+      "uz": "✅ Tasdiqlash"
+    },
+    "shop_cancel_order_btn": {
+      "ru": "❌ Отмена",
+      "en": "❌ Cancel",
+      "tg": "❌ Бекор",
+      "uz": "❌ Bekor"
+    },
+    "shop_order_placed": {
+      "ru": "🎉 Заказ №{id} принят! Мы скоро свяжемся с вами. Статус придёт сюда.",
+      "en": "🎉 Order #{id} placed! We'll contact you soon. Status updates will come here.",
+      "tg": "🎉 Фармоиши №{id} қабул шуд! Ба зудӣ бо шумо тамос мегирем. Ҳолат ба ин ҷо меояд.",
+      "uz": "🎉 №{id} buyurtma qabul qilindi! Tez orada bogʻlanamiz. Holati shu yerga keladi."
+    },
+    "shop_new_order": {
+      "ru": "🔔 <b>Новый заказ!</b>",
+      "en": "🔔 <b>New order!</b>",
+      "tg": "🔔 <b>Фармоиши нав!</b>",
+      "uz": "🔔 <b>Yangi buyurtma!</b>"
+    },
+    "shop_order_head": {
+      "ru": "{icon} <b>Заказ №{id}</b> — {status}",
+      "en": "{icon} <b>Order #{id}</b> — {status}",
+      "tg": "{icon} <b>Фармоиши №{id}</b> — {status}",
+      "uz": "{icon} <b>№{id} buyurtma</b> — {status}"
+    },
+    "shop_status_changed": {
+      "ru": "{icon} Заказ №{id}: {status}",
+      "en": "{icon} Order #{id}: {status}",
+      "tg": "{icon} Фармоиши №{id}: {status}",
+      "uz": "{icon} №{id} buyurtma: {status}"
+    },
+    "shop_st_new": {
+      "ru": "новый",
+      "en": "new",
+      "tg": "нав",
+      "uz": "yangi"
+    },
+    "shop_st_accepted": {
+      "ru": "принят",
+      "en": "accepted",
+      "tg": "қабул шуд",
+      "uz": "qabul qilindi"
+    },
+    "shop_st_delivering": {
+      "ru": "в пути",
+      "en": "on the way",
+      "tg": "дар роҳ",
+      "uz": "yoʻlda"
+    },
+    "shop_st_done": {
+      "ru": "выполнен",
+      "en": "completed",
+      "tg": "иҷро шуд",
+      "uz": "bajarildi"
+    },
+    "shop_st_cancelled": {
+      "ru": "отменён",
+      "en": "cancelled",
+      "tg": "бекор шуд",
+      "uz": "bekor qilindi"
+    },
+    "shop_no_orders": {
+      "ru": "У вас пока нет заказов.",
+      "en": "You have no orders yet.",
+      "tg": "Шумо ҳоло фармоиш надоред.",
+      "uz": "Sizda hali buyurtma yoʻq."
+    },
+    "shop_no_active_orders": {
+      "ru": "Активных заказов нет.",
+      "en": "No active orders.",
+      "tg": "Фармоиши фаъол нест.",
+      "uz": "Faol buyurtmalar yoʻq."
+    },
+    "shop_ask_p_name": {
+      "ru": "Название товара:",
+      "en": "Product name:",
+      "tg": "Номи мол:",
+      "uz": "Mahsulot nomi:"
+    },
+    "shop_ask_p_price": {
+      "ru": "Цена (число):",
+      "en": "Price (number):",
+      "tg": "Нарх (рақам):",
+      "uz": "Narx (raqam):"
+    },
+    "shop_bad_price": {
+      "ru": "Нужно число, например 25 или 12.5",
+      "en": "A number is needed, e.g. 25 or 12.5",
+      "tg": "Рақам лозим, масалан 25 ё 12.5",
+      "uz": "Raqam kerak, masalan 25 yoki 12.5"
+    },
+    "shop_ask_p_descr": {
+      "ru": "Описание (или «Пропустить»):",
+      "en": "Description (or \"Skip\"):",
+      "tg": "Тавсиф (ё «Гузаштан»):",
+      "uz": "Tavsif (yoki «Oʻtkazib yuborish»):"
+    },
+    "shop_ask_p_photo": {
+      "ru": "Пришлите фото товара (или «Пропустить»):",
+      "en": "Send a product photo (or \"Skip\"):",
+      "tg": "Акси молро фиристед (ё «Гузаштан»):",
+      "uz": "Mahsulot rasmini yuboring (yoki «Oʻtkazib yuborish»):"
+    },
+    "shop_product_saved": {
+      "ru": "✅ Товар №{id} «{name}» добавлен в каталог.",
+      "en": "✅ Product #{id} \"{name}\" added to the catalog.",
+      "tg": "✅ Моли №{id} «{name}» ба феҳрист илова шуд.",
+      "uz": "✅ №{id} «{name}» mahsuloti katalogga qoʻshildi."
+    },
+    "shop_products_admin": {
+      "ru": "🗂 <b>Товары</b>\n💲 — цена, 🙈/👁 — скрыть/показать, 🗑 — удалить",
+      "en": "🗂 <b>Products</b>\n💲 — price, 🙈/👁 — hide/show, 🗑 — delete",
+      "tg": "🗂 <b>Молҳо</b>\n💲 — нарх, 🙈/👁 — пинҳон/нишон, 🗑 — нест кардан",
+      "uz": "🗂 <b>Mahsulotlar</b>\n💲 — narx, 🙈/👁 — yashirish/koʻrsatish, 🗑 — oʻchirish"
+    },
+    "shop_step_hint": {
+      "ru": "Ответьте на вопрос выше или нажмите «❌ Отмена».",
+      "en": "Answer the question above or tap \"❌ Cancel\".",
+      "tg": "Ба саволи боло ҷавоб диҳед ё «❌ Бекор кардан»-ро пахш кунед.",
+      "uz": "Yuqoridagi savolga javob bering yoki «❌ Bekor qilish» ni bosing."
+    },
+    "shop_almost_done": {
+      "ru": "Почти готово — проверьте заказ ниже.",
+      "en": "Almost done — check your order below.",
+      "tg": "Қариб тайёр — фармоишро дар поён санҷед.",
+      "uz": "Deyarli tayyor — buyurtmani pastda tekshiring."
+    }
+  },
+  "lists": {}
+}
