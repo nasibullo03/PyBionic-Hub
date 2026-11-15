@@ -857,6 +857,82 @@
       "id": "❌ Batal",
       "vi": "❌ Hủy",
       "th": "❌ ยกเลิก"
+    },
+    "kb_mp4": {
+      "ru": "🎬 MP4 (Видео)",
+      "en": "🎬 MP4 (Video)",
+      "tg": "🎬 MP4 (Видео)",
+      "uz": "🎬 MP4 (Video)",
+      "tr": "🎬 MP4 (Video)",
+      "es": "🎬 MP4 (Vídeo)",
+      "de": "🎬 MP4 (Video)",
+      "fr": "🎬 MP4 (Vidéo)",
+      "it": "🎬 MP4 (Video)",
+      "pt": "🎬 MP4 (Vídeo)",
+      "pl": "🎬 MP4 (Wideo)",
+      "uk": "🎬 MP4 (Відео)",
+      "kk": "🎬 MP4 (Бейне)",
+      "ky": "🎬 MP4 (Видео)",
+      "az": "🎬 MP4 (Video)",
+      "ar": "🎬 MP4 (فيديو)",
+      "fa": "🎬 MP4 (ویدیو)",
+      "hi": "🎬 MP4 (वीडियो)",
+      "zh-cn": "🎬 MP4（视频）",
+      "ja": "🎬 MP4（動画）",
+      "ko": "🎬 MP4 (동영상)",
+      "id": "🎬 MP4 (Video)",
+      "vi": "🎬 MP4 (Video)",
+      "th": "🎬 MP4 (วิดีโอ)"
+    },
+    "kb_mp3": {
+      "ru": "🎵 MP3 (Аудио)",
+      "en": "🎵 MP3 (Audio)",
+      "tg": "🎵 MP3 (Аудио)",
+      "uz": "🎵 MP3 (Audio)",
+      "tr": "🎵 MP3 (Ses)",
+      "es": "🎵 MP3 (Audio)",
+      "de": "🎵 MP3 (Audio)",
+      "fr": "🎵 MP3 (Audio)",
+      "it": "🎵 MP3 (Audio)",
+      "pt": "🎵 MP3 (Áudio)",
+      "pl": "🎵 MP3 (Audio)",
+      "uk": "🎵 MP3 (Аудіо)",
+      "kk": "🎵 MP3 (Аудио)",
+      "ky": "🎵 MP3 (Аудио)",
+      "az": "🎵 MP3 (Audio)",
+      "ar": "🎵 MP3 (صوت)",
+      "fa": "🎵 MP3 (صوتی)",
+      "hi": "🎵 MP3 (ऑडियो)",
+      "zh-cn": "🎵 MP3（音频）",
+      "ja": "🎵 MP3（音声）",
+      "ko": "🎵 MP3 (오디오)",
+      "id": "🎵 MP3 (Audio)",
+      "vi": "🎵 MP3 (Âm thanh)",
+      "th": "🎵 MP3 (เสียง)"
+    },
+    "log_web_only": {
+      "ru": "BOT_TOKEN не задан — работает только веб-интерфейс на порту {port}.",
+      "en": "BOT_TOKEN is empty — only the web interface is running on port {port}.",
+      "tg": "BOT_TOKEN холӣ аст — танҳо интерфейси веб дар порти {port} кор мекунад.",
+      "uz": "BOT_TOKEN boʻsh — faqat {port}-portdagi veb-interfeys ishlayapti."
+    },
+    "log_started": {
+      "ru": "Telegram-бот запущен.",
+      "en": "Telegram bot started.",
+      "tg": "Боти Telegram оғоз шуд.",
+      "uz": "Telegram bot ishga tushdi."
+    },
+    "log_download_done": {
+      "ru": "Скачано: {fmt} — {title}",
+      "en": "Downloaded: {fmt} — {title}",
+      "tg": "Боргирӣ шуд: {fmt} — {title}",
+      "uz": "Yuklab olindi: {fmt} — {title}"
+    },
+    "err_access_denied": {
+      "ru": "⛔ Доступ закрыт.",
+      "en": "⛔ Access denied.",
+      "tg": "⛔ Дастрасӣ маҳдуд аст.",
+      "uz": "⛔ Kirish taqiqlangan."
     }
   },
   "lists": {}

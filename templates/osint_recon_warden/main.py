@@ -1,3 +1,4 @@
+import pybionic_core as core
 import os
 import sys
 if hasattr(sys.stdout, "reconfigure"):
@@ -6,6 +7,7 @@ if hasattr(sys.stderr, "reconfigure"):
     sys.stderr.reconfigure(line_buffering=True)
 import html
 import json
+from html import escape as html_escape
 import time
 import threading
 import urllib.parse
@@ -119,10 +121,14 @@ class StudioHandler(BaseHTTPRequestHandler):
         score = last.get("security_score", 0)
         badge = html.escape(str(last.get("score_badge", "N/A"))) + f" ({score}/100)"
 
-        ips_str = html.escape(", ".join(dns.get("ipv4", [])) or "None")
-        issuer = html.escape(str(ssl_info.get("issuer", "N/A")))
-        expires = html.escape(str(ssl_info.get("expires", "N/A")))
-        cipher = html.escape(str(ssl_info.get("cipher", "N/A")))
+        ips_str = ", ".join(dns.get("ipv4", [])) or "None"
+        issuer = ssl_info.get("issuer", "N/A")
+        expires = ssl_info.get("expires", "N/A")
+        cipher = ssl_info.get("cipher", "N/A")
+        # всё, что пришло от пользователя или чужого сервера, экранируем перед вставкой в HTML
+        target, badge, ips_str, issuer, expires, cipher = (
+            html_escape(str(v), quote=True) for v in (target, badge, ips_str, issuer, expires, cipher)
+        )
 
         return f"""<!DOCTYPE html>
 <html lang="en">
@@ -330,6 +336,8 @@ def start_bot():
     from telebot import types
 
     bot = telebot.TeleBot(BOT_TOKEN)
+    core.guard_bot(bot)
+
     user_state = {}
 
     ALLOWED = {int(x) for x in os.environ.get("ALLOWED_USER_IDS", "").replace(" ", "").split(",") if x.isdigit()}
@@ -517,7 +525,7 @@ def start_bot():
             bot.send_message(cid, i18n.t("welcome", lang), reply_markup=make_main_keyboard(lang), parse_mode="HTML")
 
     print("[OSINT Recon Warden] Telegram bot polling started.")
-    bot.infinity_polling()
+    core.start_polling(bot)
 
 def main():
     print(f"[OSINT Recon Warden] Starting on port {PORT}...")

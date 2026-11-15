@@ -14,6 +14,7 @@ Features:
 
 from __future__ import annotations
 
+import pybionic_core as core
 import html
 import io
 import json
@@ -40,7 +41,7 @@ class ThreadedStudioServer(ThreadingHTTPServer):
 from pathlib import Path
 from typing import Any
 import urllib.parse
-from urllib.parse import parse_qs, urlparse, urlencode
+from urllib.parse import parse_qs, urlencode, urlparse
 
 try:
     import telebot
@@ -293,6 +294,7 @@ def setup_bot() -> telebot.TeleBot | None:
         return None
 
     bot = telebot.TeleBot(BOT_TOKEN, parse_mode="Markdown")
+    core.guard_bot(bot)
 
     def check_access(message: Any) -> bool:
         if not ALLOWED_USERS:
@@ -664,7 +666,7 @@ class WebStudioHandler(BaseHTTPRequestHandler):
                 if "application/json" in self.headers.get("Content-Type", ""):
                     try:
                         j = json.loads(body)
-                        q = urllib.parse.urlencode({k: str(v) for k, v in j.items()})
+                        q = urlencode({k: str(v) for k, v in j.items()})
                         self.path = f"{self.path}?{q}"
                     except Exception:
                         pass
@@ -732,7 +734,7 @@ def main():
     if bot:
         logger.info("Starting Telegram bot polling for DEX Whale Radar...")
         try:
-            bot.infinity_polling(skip_pending=True)
+            core.start_polling(bot, skip_pending=True)
         except Exception as e:
             logger.error("Bot polling error: %s", e)
     else:

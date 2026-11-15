@@ -1,0 +1,173 @@
+{
+  "strings": {
+    "err_missing_token": {
+      "ru": "BOT_TOKEN не задан. Откройте «Секреты» проекта и вставьте токен от @BotFather.",
+      "en": "BOT_TOKEN is empty. Open the project's Secrets and paste the token from @BotFather.",
+      "tg": "BOT_TOKEN холӣ аст. «Сирҳо»-и лоиҳаро кушоед ва токенро аз @BotFather гузоред.",
+      "uz": "BOT_TOKEN boʻsh. Loyiha «Sirlar» boʻlimini oching va @BotFather tokenini qoʻying."
+    },
+    "log_error": {
+      "ru": "Ошибка: {err}",
+      "en": "Error: {err}",
+      "tg": "Хато: {err}",
+      "uz": "Xato: {err}"
+    },
+    "tg_lang_title": {
+      "ru": "🌐 Выберите язык:",
+      "en": "🌐 Choose your language:",
+      "tg": "🌐 Забонро интихоб кунед:",
+      "uz": "🌐 Tilni tanlang:"
+    },
+    "tg_lang_changed": {
+      "ru": "✅ Язык изменён.",
+      "en": "✅ Language changed.",
+      "tg": "✅ Забон иваз шуд.",
+      "uz": "✅ Til oʻzgartirildi."
+    },
+    "log_started_tg": {
+      "ru": "Бюджет-бот запущен, валюта {cur}",
+      "en": "Budget bot started, currency {cur}",
+      "tg": "Боти буҷет оғоз шуд, асъор {cur}",
+      "uz": "Byudjet boti ishga tushdi, valyuta {cur}"
+    },
+    "btn_rates": {
+      "ru": "💱 Курсы",
+      "en": "💱 Rates",
+      "tg": "💱 Қурбҳо",
+      "uz": "💱 Kurslar"
+    },
+    "btn_report": {
+      "ru": "📊 Отчёт за месяц",
+      "en": "📊 Monthly report",
+      "tg": "📊 Ҳисоботи моҳ",
+      "uz": "📊 Oylik hisobot"
+    },
+    "btn_undo": {
+      "ru": "↩️ Отменить последнее",
+      "en": "↩️ Undo last",
+      "tg": "↩️ Бекор кардани охирин",
+      "uz": "↩️ Oxirgisini bekor qilish"
+    },
+    "btn_alerts": {
+      "ru": "🔔 Уведомления о курсе",
+      "en": "🔔 Rate alerts",
+      "tg": "🔔 Огоҳиҳои қурб",
+      "uz": "🔔 Kurs xabarnomalari"
+    },
+    "fin_welcome": {
+      "ru": "💰 Курсы валют и семейный бюджет.\n\n<b>Конвертер:</b> 100 usd rub · 50$ · 1000 руб\n<b>Расход:</b> 120 такси  ·  -45 кофе\n<b>Доход:</b> +5000 зарплата\n<b>Уведомление:</b> /alert USD RUB &gt; 95\n\nПервое слово — категория. Валюта бюджета: {cur}.\nДобавьте бота в семейную группу — бюджет станет общим.",
+      "en": "💰 Exchange rates and family budget.\n\n<b>Converter:</b> 100 usd eur · 50$ · 1000 rub\n<b>Expense:</b> 120 taxi  ·  -45 coffee\n<b>Income:</b> +5000 salary\n<b>Alert:</b> /alert USD EUR &lt; 0.9\n\nThe first word is the category. Budget currency: {cur}.\nAdd the bot to a family group to share the budget.",
+      "tg": "💰 Қурби асъор ва буҷети оилавӣ.\n\n<b>Табдил:</b> 100 usd rub · 50$ · 1000 руб\n<b>Харҷ:</b> 120 такси  ·  -45 қаҳва\n<b>Даромад:</b> +5000 маош\n<b>Огоҳӣ:</b> /alert USD TJS &gt; 11\n\nКалимаи аввал — категория. Асъори буҷет: {cur}.\nБотро ба гурӯҳи оилавӣ илова кунед — буҷет умумӣ мешавад.",
+      "uz": "💰 Valyuta kurslari va oilaviy byudjet.\n\n<b>Konvertor:</b> 100 usd rub · 50$ · 1000 rubl\n<b>Xarajat:</b> 120 taksi  ·  -45 qahva\n<b>Daromad:</b> +5000 maosh\n<b>Xabarnoma:</b> /alert USD UZS &gt; 13000\n\nBirinchi soʻz — toifa. Byudjet valyutasi: {cur}.\nBotni oilaviy guruhga qoʻshing — byudjet umumiy boʻladi."
+    },
+    "fin_rates_title": {
+      "ru": "💱 <b>Курсы к {cur}</b>",
+      "en": "💱 <b>Rates to {cur}</b>",
+      "tg": "💱 <b>Қурб нисбат ба {cur}</b>",
+      "uz": "💱 <b>{cur} ga nisbatan kurslar</b>"
+    },
+    "fin_no_rates": {
+      "ru": "Не удалось получить курсы. Проверьте интернет и попробуйте позже.",
+      "en": "Couldn't get rates. Check the internet and try later.",
+      "tg": "Қурбҳоро гирифта нашуд. Интернетро санҷед ва баъдтар кӯшиш кунед.",
+      "uz": "Kurslarni olib boʻlmadi. Internetni tekshirib, keyinroq urinib koʻring."
+    },
+    "fin_unknown_currency": {
+      "ru": "Неизвестная валюта. Используйте коды: USD, EUR, RUB, TJS, UZS, KZT…",
+      "en": "Unknown currency. Use codes: USD, EUR, RUB, TJS, UZS, KZT…",
+      "tg": "Асъори номаълум. Рамзҳо: USD, EUR, RUB, TJS, UZS, KZT…",
+      "uz": "Nomaʼlum valyuta. Kodlar: USD, EUR, RUB, TJS, UZS, KZT…"
+    },
+    "fin_expense_saved": {
+      "ru": "➖ {amount} {cur} — <b>{cat}</b>\nРасходы за месяц: {month} {cur}",
+      "en": "➖ {amount} {cur} — <b>{cat}</b>\nSpent this month: {month} {cur}",
+      "tg": "➖ {amount} {cur} — <b>{cat}</b>\nХарҷи моҳ: {month} {cur}",
+      "uz": "➖ {amount} {cur} — <b>{cat}</b>\nOylik xarajat: {month} {cur}"
+    },
+    "fin_income_saved": {
+      "ru": "➕ {amount} {cur} — <b>{cat}</b>",
+      "en": "➕ {amount} {cur} — <b>{cat}</b>",
+      "tg": "➕ {amount} {cur} — <b>{cat}</b>",
+      "uz": "➕ {amount} {cur} — <b>{cat}</b>"
+    },
+    "fin_not_understood": {
+      "ru": "🤔 Не понял. Примеры: «120 такси», «+5000 зарплата», «100 usd rub».",
+      "en": "🤔 Didn't get it. Examples: \"120 taxi\", \"+5000 salary\", \"100 usd eur\".",
+      "tg": "🤔 Нафаҳмидам. Намуна: «120 такси», «+5000 маош», «100 usd rub».",
+      "uz": "🤔 Tushunmadim. Misol: «120 taksi», «+5000 maosh», «100 usd rub»."
+    },
+    "fin_report_title": {
+      "ru": "📊 <b>Отчёт за {month}</b>",
+      "en": "📊 <b>Report for {month}</b>",
+      "tg": "📊 <b>Ҳисобот барои {month}</b>",
+      "uz": "📊 <b>{month} hisoboti</b>"
+    },
+    "fin_report_sums": {
+      "ru": "Доходы: <b>{inc}</b> {cur}\nРасходы: <b>{exp}</b> {cur}\nОстаток: <b>{bal}</b> {cur}",
+      "en": "Income: <b>{inc}</b> {cur}\nExpenses: <b>{exp}</b> {cur}\nBalance: <b>{bal}</b> {cur}",
+      "tg": "Даромад: <b>{inc}</b> {cur}\nХарҷ: <b>{exp}</b> {cur}\nБақия: <b>{bal}</b> {cur}",
+      "uz": "Daromad: <b>{inc}</b> {cur}\nXarajat: <b>{exp}</b> {cur}\nQoldiq: <b>{bal}</b> {cur}"
+    },
+    "fin_report_cats": {
+      "ru": "\n<b>На что ушли деньги:</b>",
+      "en": "\n<b>Where the money went:</b>",
+      "tg": "\n<b>Пул ба куҷо рафт:</b>",
+      "uz": "\n<b>Pul nimaga ketdi:</b>"
+    },
+    "fin_report_empty": {
+      "ru": "\nЗаписей нет.",
+      "en": "\nNo entries.",
+      "tg": "\nСабт нест.",
+      "uz": "\nYozuvlar yoʻq."
+    },
+    "fin_nothing_to_undo": {
+      "ru": "Нечего отменять.",
+      "en": "Nothing to undo.",
+      "tg": "Чизе барои бекор кардан нест.",
+      "uz": "Bekor qiladigan narsa yoʻq."
+    },
+    "fin_undone": {
+      "ru": "↩️ Удалено: {amount} — {note}",
+      "en": "↩️ Removed: {amount} — {note}",
+      "tg": "↩️ Нест шуд: {amount} — {note}",
+      "uz": "↩️ Oʻchirildi: {amount} — {note}"
+    },
+    "fin_deleted": {
+      "ru": "Удалено",
+      "en": "Deleted",
+      "tg": "Нест карда шуд",
+      "uz": "Oʻchirildi"
+    },
+    "fin_alerts_title": {
+      "ru": "🔔 <b>Уведомления о курсе</b>\nДобавить: /alert USD RUB &gt; 95",
+      "en": "🔔 <b>Rate alerts</b>\nAdd: /alert USD EUR &lt; 0.9",
+      "tg": "🔔 <b>Огоҳиҳои қурб</b>\nИлова: /alert USD TJS &gt; 11",
+      "uz": "🔔 <b>Kurs xabarnomalari</b>\nQoʻshish: /alert USD UZS &gt; 13000"
+    },
+    "fin_alerts_empty": {
+      "ru": "Пока нет.",
+      "en": "None yet.",
+      "tg": "Ҳоло нест.",
+      "uz": "Hozircha yoʻq."
+    },
+    "fin_alert_usage": {
+      "ru": "Формат: /alert USD RUB &gt; 95  или  /alert EUR TJS &lt; 11",
+      "en": "Format: /alert USD EUR &lt; 0.9  or  /alert USD RUB &gt; 95",
+      "tg": "Шакл: /alert USD TJS &gt; 11  ё  /alert USD RUB &lt; 80",
+      "uz": "Format: /alert USD UZS &gt; 13000  yoki  /alert USD RUB &lt; 80"
+    },
+    "fin_alert_saved": {
+      "ru": "🔔 Сообщу, когда {pair} станет {op} {value}. Сейчас: {now}",
+      "en": "🔔 I'll tell you when {pair} goes {op} {value}. Now: {now}",
+      "tg": "🔔 Вақте {pair} {op} {value} шавад, хабар медиҳам. Ҳоло: {now}",
+      "uz": "🔔 {pair} {op} {value} boʻlganda xabar beraman. Hozir: {now}"
+    },
+    "fin_alert_fired": {
+      "ru": "🔔 <b>{pair}</b> сейчас {now} ({op} {value})",
+      "en": "🔔 <b>{pair}</b> is now {now} ({op} {value})",
+      "tg": "🔔 <b>{pair}</b> ҳоло {now} ({op} {value})",
+      "uz": "🔔 <b>{pair}</b> hozir {now} ({op} {value})"
+    }
+  },
+  "lists": {}
+}

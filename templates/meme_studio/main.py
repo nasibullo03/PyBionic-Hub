@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 
+import pybionic_core as core
 import base64
 import html
 import http.server
@@ -563,8 +564,8 @@ def run_telegram_bot(token: str) -> None:
             types.KeyboardButton(btn_txt("blur", "🌫 Размытие")),
         )
         kb.row(
-            types.KeyboardButton("🌐 Выбрать язык"),
-            types.KeyboardButton("ℹ️ Инструкция"),
+            types.KeyboardButton(core.btn("btn_lang", uid)),
+            types.KeyboardButton(core.btn("btn_help", uid)),
         )
         return kb
 
@@ -584,7 +585,7 @@ def run_telegram_bot(token: str) -> None:
         bot.reply_to(
             msg,
             t("tg_lang_title", user_id=uid),
-            reply_markup=build_reply_language_keyboard(user_id=uid, back_text="◀ Главное меню"),
+            reply_markup=build_reply_language_keyboard(user_id=uid, back_text=core.btn("btn_menu", uid)),
         )
 
     @bot.message_handler(func=lambda m: bool(m.text and parse_lang_choice(m.text)))
@@ -595,16 +596,16 @@ def run_telegram_bot(token: str) -> None:
             set_user_lang(uid, code)
             bot.reply_to(msg, t("tg_lang_changed", user_id=uid), reply_markup=build_main_reply_kb(uid))
 
-    @bot.message_handler(func=lambda m: m.text in ("◀ Главное меню", "❌ Отмена", "◀ Назад"))
+    @bot.message_handler(func=lambda m: core.is_btn(m.text, "btn_menu", "btn_cancel"))
     def on_back(msg: Any) -> None:
         uid = msg.from_user.id
         bot.reply_to(msg, "Главное меню:", reply_markup=build_main_reply_kb(uid))
 
-    @bot.message_handler(func=lambda m: m.text in ("🌐 Выбрать язык", "🌐 Язык"))
+    @bot.message_handler(func=lambda m: core.is_btn(m.text, "btn_lang"))
     def on_lang_btn(msg: Any) -> None:
         on_lang_cmd(msg)
 
-    @bot.message_handler(func=lambda m: m.text in ("ℹ️ Инструкция", "ℹ️ Помощь"))
+    @bot.message_handler(func=lambda m: core.is_btn(m.text, "btn_help"))
     def on_help_btn(msg: Any) -> None:
         on_help(msg)
 
@@ -652,8 +653,7 @@ def run_telegram_bot(token: str) -> None:
 
         def run_render():
             try:
-                finfo = bot.get_file(msg.photo[-1].file_id)
-                img_bytes = bot.download_file(finfo.file_path)
+                img_bytes = core.download_tg_file(bot, msg.photo[-1].file_id)
                 rendered = render_meme(img_bytes, top, bottom, style)
                 bot.send_photo(
                     msg.chat.id,
@@ -669,7 +669,7 @@ def run_telegram_bot(token: str) -> None:
         threading.Thread(target=run_render, daemon=True).start()
 
     log("log_started_tg")
-    bot.infinity_polling(timeout=30, long_polling_timeout=25)
+    core.start_polling(bot, timeout=30, long_polling_timeout=25)
 
 
 def main() -> int:

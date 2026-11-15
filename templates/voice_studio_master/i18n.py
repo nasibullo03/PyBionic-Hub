@@ -213,9 +213,20 @@ def _candidate_langs(tag: str) -> list[str]:
     return candidates
 
 
+_LOCALES_CACHE: dict[str, Any] = {"mtime": None, "data": {}}
+
+
 def get_locales_dict() -> dict[str, Any]:
+    """locales.json с кэшем: файл перечитывается, только если изменился."""
     loc_file = Path(__file__).resolve().parent / "locales.json"
-    return _load_locales(str(loc_file))
+    try:
+        mtime = loc_file.stat().st_mtime_ns
+    except OSError:
+        return {}
+    if _LOCALES_CACHE["mtime"] != mtime:
+        _LOCALES_CACHE["data"] = _load_locales(str(loc_file))
+        _LOCALES_CACHE["mtime"] = mtime
+    return _LOCALES_CACHE["data"]
 
 
 def t(key: str, lang_override: str | None = None, user_id: int | str | None = None, **kwargs: Any) -> str:

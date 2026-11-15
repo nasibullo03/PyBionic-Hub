@@ -68,7 +68,7 @@ def audit_ast(code_str: str) -> Tuple[bool, Optional[str]]:
                 if node.func.id in FORBIDDEN_NAMES:
                     return False, f"Forbidden function call: '{node.func.id}()'"
         
-        # Disallow access to private and dunder attributes (blocks _sys, __class__, etc.)
+        # Disallow access to private and dunder attributes (collections._sys, random._inst ...)
         elif isinstance(node, ast.Attribute):
             if node.attr.startswith("_"):
                 return False, f"Forbidden private attribute: '{node.attr}'"
@@ -117,7 +117,21 @@ safe_builtins = {
     "sorted": sorted, "str": str, "sum": sum, "tuple": tuple, "type": type,
     "zip": zip, "True": True, "False": False, "None": None
 }
-import math, random, time, json, re, collections, itertools, functools
+import math, random, time, json, re, collections, itertools, functools, statistics, datetime, string, decimal, fractions
+_ALLOWED_IMPORTS = {"math", "random", "time", "json", "re", "collections", "itertools", "functools",
+                    "statistics", "datetime", "string", "decimal", "fractions"}
+_real_import = __import__
+
+def _safe_import(name, globals=None, locals=None, fromlist=(), level=0):
+    # import разрешён только для модулей из белого списка (остальное режет и проверка AST)
+    if level != 0 or name.split(".")[0] not in _ALLOWED_IMPORTS:
+        raise ImportError("Module not allowed in sandbox: " + str(name))
+    return _real_import(name, globals, locals, fromlist, level)
+
+safe_builtins["__import__"] = _safe_import
+safe_builtins["Exception"] = Exception
+safe_builtins["ValueError"] = ValueError
+safe_builtins["ZeroDivisionError"] = ZeroDivisionError
 env_globals = {
     "__builtins__": safe_builtins,
     "math": math, "random": random, "time": time, "json": json,
@@ -127,7 +141,7 @@ with open(sys.argv[1], "r", encoding="utf-8") as f:
     user_code = f.read()
 
 compiled = compile(user_code, "<sandbox>", "exec")
-exec(compiled, env_globals, {})
+exec(compiled, env_globals)  # один словарь: функции видят друг друга, рекурсия работает
 """
 
     tmp_user = None
@@ -155,7 +169,7 @@ exec(compiled, env_globals, {})
             cwd=sandbox_cwd,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            text=True
+            text=True,
         )
         try:
             stdout_txt, stderr_txt = proc.communicate(timeout=timeout_sec)

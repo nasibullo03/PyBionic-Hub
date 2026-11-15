@@ -13,6 +13,7 @@ Features:
 
 from __future__ import annotations
 
+import pybionic_core as core
 import hashlib
 import html
 import io
@@ -449,6 +450,7 @@ def build_main_keyboard(user_id: int | str) -> Any:
 bot: Any = None
 if telebot and BOT_TOKEN:
     bot = telebot.TeleBot(BOT_TOKEN, parse_mode="HTML")
+    core.guard_bot(bot)
 
 
 def setup_telegram_handlers() -> None:
@@ -593,8 +595,7 @@ def setup_telegram_handlers() -> None:
         st = get_user_settings(uid)
         doc = message.document
 
-        file_info = bot.get_file(doc.file_id)
-        downloaded = bot.download_file(file_info.file_path)
+        downloaded = core.download_tg_file(bot, doc.file_id)
         doc_name = doc.file_name or "file.bin"
 
         # Check if user sent a ZIP containing shards or a single shard
@@ -1228,7 +1229,7 @@ def main() -> None:
     if bot:
         setup_telegram_handlers()
         logger.info("Starting Telegram bot polling...")
-        bot.infinity_polling(skip_pending=True)
+        core.start_polling(bot, skip_pending=True)
     else:
         logger.info("BOT_TOKEN not provided, running in Web Studio mode on port %d", WEB_PORT)
         web_t.join()

@@ -12,6 +12,7 @@ Features:
 
 from __future__ import annotations
 
+import pybionic_core as core
 import html
 import http.server
 import json
@@ -346,7 +347,6 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 # Karaoke Video Rendering Pipeline
 # ---------------------------------------------------------------------------
 
-FFMPEG_SLOTS = threading.BoundedSemaphore(1)
 
 def render_karaoke_video(
     media_path: Path,
@@ -406,8 +406,7 @@ def render_karaoke_video(
 
     log("log_processing", filename=media_path.name, style=style, bg=background)
     try:
-        with FFMPEG_SLOTS:
-            res = subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, check=False, timeout=180)
+        res = core.run_media(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, check=False, timeout=180)
         if res.returncode == 0 and out_video_path.is_file() and out_video_path.stat().st_size > 0:
             size_kb = out_video_path.stat().st_size / 1024.0
             log("log_done", out_path=out_video_path.name, size_kb=size_kb)
@@ -854,6 +853,9 @@ def run_bot(token: str) -> None:
 
     init_db()
     bot = telebot.TeleBot(token, parse_mode="HTML")
+    core.guard_bot(bot)
+    core.start_janitor([core.get_data_dir() / "karaoke_cache"])
+
     cache_dir = get_cache_dir()
 
     ALLOWED = {int(x) for x in os.environ.get("ALLOWED_USER_IDS", "").replace(" ", "").split(",") if x.isdigit()}
@@ -1007,11 +1009,11 @@ def run_bot(token: str) -> None:
         def worker() -> None:
             try:
                 bot.send_chat_action(msg.chat.id, "upload_document")
-                f_info = bot.get_file(file_id)
-                if (getattr(f_info, "file_size", 0) or 0) > 20 * 1024 * 1024:
+                try:
+                    f_bytes = core.download_tg_file(bot, file_id)
+                except core.FileTooBig:
                     bot.reply_to(msg, "⚠️ Файл слишком большой (> 20 МБ). Telegram Bot API разрешает ботам загружать файлы размером не более 20 МБ.", reply_markup=build_main_reply_kb(uid))
                     return
-                f_bytes = bot.download_file(f_info.file_path)
 
                 ext = ".mp4" if is_video else ".mp3"
                 src_path = cache_dir / f"in_karaoke_{uid}_{int(time.time())}{ext}"
@@ -1056,8 +1058,7 @@ def run_bot(token: str) -> None:
         fname = (getattr(doc, "file_name", "") or "").lower()
         if fname.endswith((".lrc", ".srt", ".txt")):
             # It's lyrics or subtitles!
-            f_info = bot.get_file(doc.file_id)
-            f_bytes = bot.download_file(f_info.file_path)
+            f_bytes = core.download_tg_file(bot, doc.file_id)
             lyrics = f_bytes.decode("utf-8", errors="replace")
             update_pending_lyrics(msg.from_user.id, lyrics)
             lines_cnt = len([l for l in lyrics.splitlines() if l.strip()])
@@ -1158,7 +1159,7 @@ def run_bot(token: str) -> None:
 
     log("log_started", port=8095)
     try:
-        bot.infinity_polling(timeout=20, long_polling_timeout=20)
+        core.start_polling(bot, timeout=20, long_polling_timeout=20)
     except Exception as exc:
         log("log_error", err=f"Karaoke bot polling exception: {exc}")
 

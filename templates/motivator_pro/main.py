@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 
+import pybionic_core as core
 import datetime
 import html
 import http.server
@@ -522,16 +523,16 @@ def run_bot(token: str) -> None:
     def build_main_reply_kb(uid: int) -> types.ReplyKeyboardMarkup:
         kb = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=False)
         kb.row(
-            types.KeyboardButton("✅ Отметить привычки"),
-            types.KeyboardButton("🖼 Карточка прогресса"),
+            types.KeyboardButton(core.btn("kb_habits", uid)),
+            types.KeyboardButton(core.btn("kb_card", uid)),
         )
         kb.row(
-            types.KeyboardButton("✨ Цитата дня"),
-            types.KeyboardButton("➕ Добавить привычку"),
+            types.KeyboardButton(core.btn("kb_quote", uid)),
+            types.KeyboardButton(core.btn("kb_add_habit", uid)),
         )
         kb.row(
-            types.KeyboardButton("🌐 Выбрать язык"),
-            types.KeyboardButton("ℹ️ Инструкция"),
+            types.KeyboardButton(core.btn("btn_lang", uid)),
+            types.KeyboardButton(core.btn("btn_help", uid)),
         )
         return kb
 
@@ -544,7 +545,7 @@ def run_bot(token: str) -> None:
             mark = "✅" if r["last_done_date"] == today_iso else "⬜"
             btn_txt = f"{mark} {r['title']} ({r['streak']}d)"
             kb.row(types.KeyboardButton(btn_txt))
-        kb.row(types.KeyboardButton("◀ Главное меню"))
+        kb.row(types.KeyboardButton(core.btn("btn_menu", uid)))
         return kb
 
     @bot.message_handler(commands=["start"])
@@ -564,7 +565,7 @@ def run_bot(token: str) -> None:
         bot.reply_to(
             msg,
             t("tg_lang_title", user_id=uid),
-            reply_markup=build_reply_language_keyboard(user_id=uid, back_text="◀ Главное меню"),
+            reply_markup=build_reply_language_keyboard(user_id=uid, back_text=core.btn("btn_menu", uid)),
         )
 
     @bot.message_handler(func=lambda m: bool(m.text and parse_lang_choice(m.text)))
@@ -575,17 +576,17 @@ def run_bot(token: str) -> None:
             set_user_lang(uid, code)
             bot.reply_to(msg, t("tg_lang_changed", user_id=uid), reply_markup=build_main_reply_kb(uid))
 
-    @bot.message_handler(func=lambda m: m.text in ("◀ Главное меню", "❌ Отмена", "◀ Назад"))
+    @bot.message_handler(func=lambda m: core.is_btn(m.text, "btn_menu", "btn_cancel"))
     def on_back(msg: Any) -> None:
         uid = msg.from_user.id
         clear_user_state(uid)
         bot.reply_to(msg, "Главное меню:", reply_markup=build_main_reply_kb(uid))
 
-    @bot.message_handler(func=lambda m: m.text in ("🌐 Выбрать язык", "🌐 Язык"))
+    @bot.message_handler(func=lambda m: core.is_btn(m.text, "btn_lang"))
     def on_lang_btn(msg: Any) -> None:
         on_lang_cmd(msg)
 
-    @bot.message_handler(func=lambda m: m.text in ("ℹ️ Инструкция", "ℹ️ Помощь"))
+    @bot.message_handler(func=lambda m: core.is_btn(m.text, "btn_help"))
     def on_help_btn(msg: Any) -> None:
         on_help(msg)
 
@@ -596,7 +597,7 @@ def run_bot(token: str) -> None:
         bot.reply_to(msg, f"✨ <i>{q}</i>", reply_markup=build_main_reply_kb(uid))
         log("log_quote_sent", user=uid)
 
-    @bot.message_handler(func=lambda m: m.text == "✨ Цитата дня")
+    @bot.message_handler(func=lambda m: core.is_btn(m.text, "kb_quote"))
     def on_quote_btn(msg: Any) -> None:
         on_quote(msg)
 
@@ -616,7 +617,7 @@ def run_bot(token: str) -> None:
 
         threading.Thread(target=send_card, daemon=True).start()
 
-    @bot.message_handler(func=lambda m: m.text in ("🖼 Карточка прогресса", "🖼 Скачать карточку"))
+    @bot.message_handler(func=lambda m: core.is_btn(m.text, "kb_card"))
     def on_card_btn(msg: Any) -> None:
         on_card(msg)
 
@@ -638,7 +639,7 @@ def run_bot(token: str) -> None:
             reply_markup=build_habits_checkin_kb(uid),
         )
 
-    @bot.message_handler(func=lambda m: m.text == "✅ Отметить привычки")
+    @bot.message_handler(func=lambda m: core.is_btn(m.text, "kb_habits"))
     def on_done_btn(msg: Any) -> None:
         on_done(msg)
 
@@ -654,15 +655,17 @@ def run_bot(token: str) -> None:
         else:
             set_user_state(uid, "WAITING_HABIT_NAME")
             kb = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=False)
-            kb.row(types.KeyboardButton("◀ Главное меню"))
+            kb.row(types.KeyboardButton(core.btn("btn_menu", uid)))
             bot.reply_to(
                 msg,
                 "✏️ <b>Введите название привычки:</b>\n\n(Например: <i>Чтение 20 мин</i> или <i>Утренняя пробежка</i>)",
                 reply_markup=kb,
             )
 
-    @bot.message_handler(func=lambda m: m.text == "➕ Добавить привычку")
+    @bot.message_handler(func=lambda m: core.is_btn(m.text, "kb_add_habit"))
     def on_add_btn(msg: Any) -> None:
+        # текст кнопки не должен стать названием привычки — спрашиваем название
+        msg.text = "/add"
         on_add(msg)
 
     # Habit checkin button handler (detects '[✅/⬜] Title (Xd)')
@@ -736,7 +739,7 @@ def run_bot(token: str) -> None:
 
     threading.Thread(target=reminder_loop, daemon=True).start()
     log("log_started")
-    bot.infinity_polling(timeout=30, long_polling_timeout=25)
+    core.start_polling(bot, timeout=30, long_polling_timeout=25)
 
 
 def main() -> int:

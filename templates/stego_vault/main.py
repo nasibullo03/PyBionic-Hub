@@ -13,6 +13,7 @@ Features:
 
 from __future__ import annotations
 
+import pybionic_core as core
 import hashlib
 import hmac
 import html
@@ -464,6 +465,7 @@ def build_main_keyboard(user_id: int | str) -> Any:
 bot: Any = None
 if telebot and BOT_TOKEN:
     bot = telebot.TeleBot(BOT_TOKEN, parse_mode="HTML")
+    core.guard_bot(bot)
 
 
 def setup_telegram_handlers() -> None:
@@ -626,8 +628,7 @@ def setup_telegram_handlers() -> None:
         # Download document
         doc = message.document
         file_id = doc.file_id if doc else message.photo[-1].file_id
-        file_info = bot.get_file(file_id)
-        downloaded = bot.download_file(file_info.file_path)
+        downloaded = core.download_tg_file(bot, file_id)
 
         with tempfile.NamedTemporaryFile("wb", suffix=".png", delete=False) as tf:
             tf.write(downloaded)
@@ -1178,7 +1179,7 @@ def main() -> None:
     if bot:
         setup_telegram_handlers()
         logger.info("Starting Telegram bot polling...")
-        bot.infinity_polling(skip_pending=True)
+        core.start_polling(bot, skip_pending=True)
     else:
         logger.info("BOT_TOKEN not provided, running in Web Studio mode on port %d", WEB_PORT)
         web_t.join()

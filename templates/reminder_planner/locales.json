@@ -1,0 +1,173 @@
+{
+  "strings": {
+    "err_missing_token": {
+      "ru": "BOT_TOKEN не задан. Откройте «Секреты» проекта и вставьте токен от @BotFather.",
+      "en": "BOT_TOKEN is empty. Open the project's Secrets and paste the token from @BotFather.",
+      "tg": "BOT_TOKEN холӣ аст. «Сирҳо»-и лоиҳаро кушоед ва токенро аз @BotFather гузоред.",
+      "uz": "BOT_TOKEN boʻsh. Loyiha «Sirlar» boʻlimini oching va @BotFather tokenini qoʻying."
+    },
+    "log_error": {
+      "ru": "Ошибка: {err}",
+      "en": "Error: {err}",
+      "tg": "Хато: {err}",
+      "uz": "Xato: {err}"
+    },
+    "tg_lang_title": {
+      "ru": "🌐 Выберите язык:",
+      "en": "🌐 Choose your language:",
+      "tg": "🌐 Забонро интихоб кунед:",
+      "uz": "🌐 Tilni tanlang:"
+    },
+    "tg_lang_changed": {
+      "ru": "✅ Язык изменён.",
+      "en": "✅ Language changed.",
+      "tg": "✅ Забон иваз шуд.",
+      "uz": "✅ Til oʻzgartirildi."
+    },
+    "log_started_tg": {
+      "ru": "Напоминалка запущена (UTC{tz:+g})",
+      "en": "Reminder bot started (UTC{tz:+g})",
+      "tg": "Ботӣ ёдрас оғоз шуд (UTC{tz:+g})",
+      "uz": "Eslatma boti ishga tushdi (UTC{tz:+g})"
+    },
+    "btn_new_reminder": {
+      "ru": "⏰ Напоминание",
+      "en": "⏰ Reminder",
+      "tg": "⏰ Ёдрас",
+      "uz": "⏰ Eslatma"
+    },
+    "btn_my_reminders": {
+      "ru": "📋 Мои напоминания",
+      "en": "📋 My reminders",
+      "tg": "📋 Ёдрасҳои ман",
+      "uz": "📋 Eslatmalarim"
+    },
+    "btn_add_todo": {
+      "ru": "➕ Задача",
+      "en": "➕ Task",
+      "tg": "➕ Вазифа",
+      "uz": "➕ Vazifa"
+    },
+    "btn_todos": {
+      "ru": "✅ Список дел",
+      "en": "✅ To-do list",
+      "tg": "✅ Рӯйхати корҳо",
+      "uz": "✅ Vazifalar roʻyxati"
+    },
+    "rem_done_btn": {
+      "ru": "✅ Готово",
+      "en": "✅ Done",
+      "tg": "✅ Тайёр",
+      "uz": "✅ Bajarildi"
+    },
+    "rem_cancel_btn": {
+      "ru": "❌ Отменить",
+      "en": "❌ Cancel",
+      "tg": "❌ Бекор кардан",
+      "uz": "❌ Bekor qilish"
+    },
+    "rem_welcome": {
+      "ru": "⏰ Напоминалка и список дел.\n\nПросто напишите, когда напомнить:\n• через 10 мин позвонить маме\n• завтра в 9:00 врач\n• в 18:30 спорт\n• 25.12 10:00 поздравить\n• каждый день в 8:00 таблетки\n• 2h купить хлеб\n\nЧасовой пояс: {tz}. Утренняя сводка: {digest} (/digest — вкл/выкл).",
+      "en": "⏰ Reminders and to-do list.\n\nJust write when to remind you:\n• in 10 min call mom\n• tomorrow 9:00 doctor\n• at 18:30 gym\n• 25.12 10:00 congratulate\n• every day 8:00 pills\n• 2h buy bread\n\nTime zone: {tz}. Morning digest: {digest} (/digest — on/off).",
+      "tg": "⏰ Ёдрас ва рӯйхати корҳо.\n\nТанҳо нависед, кай ёдрас кунам:\n• баъди 10 дақиқа ба модар занг задан\n• пагоҳ 9:00 духтур\n• соати 18:30 варзиш\n• 25.12 10:00 табрик\n• ҳар рӯз 8:00 дору\n• 2h нон харидан\n\nМинтақаи вақт: {tz}. Хулосаи саҳарӣ: {digest} (/digest — фаъол/хомӯш).",
+      "uz": "⏰ Eslatmalar va vazifalar roʻyxati.\n\nQachon eslatishni yozing:\n• 10 daqiqadan keyin onamga qoʻngʻiroq\n• ertaga 9:00 shifokor\n• soat 18:30 sport\n• 25.12 10:00 tabriklash\n• har kuni 8:00 dori\n• 2h non olish\n\nVaqt mintaqasi: {tz}. Ertalabki xulosa: {digest} (/digest — yoqish/oʻchirish)."
+    },
+    "rem_ask": {
+      "ru": "Напишите, когда и о чём напомнить:\n• через 10 мин позвонить маме\n• завтра в 9:00 врач\n• в 18:30 спорт\n• 25.12 10:00 поздравить\n• каждый день в 8:00 таблетки\n• 2h купить хлеб",
+      "en": "Write when and what to remind:\n• in 10 min call mom\n• tomorrow 9:00 doctor\n• at 18:30 gym\n• 25.12 10:00 congratulate\n• every day 8:00 pills\n• 2h buy bread",
+      "tg": "Нависед, кай ва дар бораи чӣ ёдрас кунам:\n• баъди 10 дақиқа ба модар занг задан\n• пагоҳ 9:00 духтур\n• соати 18:30 варзиш\n• 25.12 10:00 табрик\n• ҳар рӯз 8:00 дору\n• 2h нон харидан",
+      "uz": "Qachon va nima haqida eslatishni yozing:\n• 10 daqiqadan keyin onamga qoʻngʻiroq\n• ertaga 9:00 shifokor\n• soat 18:30 sport\n• 25.12 10:00 tabriklash\n• har kuni 8:00 dori\n• 2h non olish"
+    },
+    "rem_not_understood": {
+      "ru": "🤔 Не понял время. Примеры:\n• через 10 мин позвонить маме\n• завтра в 9:00 врач\n• в 18:30 спорт\n• 25.12 10:00 поздравить\n• каждый день в 8:00 таблетки\n• 2h купить хлеб",
+      "en": "🤔 I didn't get the time. Examples:\n• in 10 min call mom\n• tomorrow 9:00 doctor\n• at 18:30 gym\n• 25.12 10:00 congratulate\n• every day 8:00 pills\n• 2h buy bread",
+      "tg": "🤔 Вақтро нафаҳмидам. Намунаҳо:\n• баъди 10 дақиқа ба модар занг задан\n• пагоҳ 9:00 духтур\n• соати 18:30 варзиш\n• 25.12 10:00 табрик\n• ҳар рӯз 8:00 дору\n• 2h нон харидан",
+      "uz": "🤔 Vaqtni tushunmadim. Misollar:\n• 10 daqiqadan keyin onamga qoʻngʻiroq\n• ertaga 9:00 shifokor\n• soat 18:30 sport\n• 25.12 10:00 tabriklash\n• har kuni 8:00 dori\n• 2h non olish"
+    },
+    "rem_saved": {
+      "ru": "✅ Напомню в <b>{when}</b>:\n{text}",
+      "en": "✅ I'll remind you at <b>{when}</b>:\n{text}",
+      "tg": "✅ Соати <b>{when}</b> ёдрас мекунам:\n{text}",
+      "uz": "✅ <b>{when}</b> da eslataman:\n{text}"
+    },
+    "rem_saved_daily": {
+      "ru": "🔁 Буду напоминать каждый день, первый раз в <b>{when}</b>:\n{text}",
+      "en": "🔁 I'll remind you every day, first at <b>{when}</b>:\n{text}",
+      "tg": "🔁 Ҳар рӯз ёдрас мекунам, бори аввал <b>{when}</b>:\n{text}",
+      "uz": "🔁 Har kuni eslataman, birinchi marta <b>{when}</b> da:\n{text}"
+    },
+    "rem_fire": {
+      "ru": "⏰ <b>Напоминание</b>\n{text}",
+      "en": "⏰ <b>Reminder</b>\n{text}",
+      "tg": "⏰ <b>Ёдрас</b>\n{text}",
+      "uz": "⏰ <b>Eslatma</b>\n{text}"
+    },
+    "rem_snoozed": {
+      "ru": "Отложено до {when}",
+      "en": "Snoozed until {when}",
+      "tg": "То {when} мавқуф шуд",
+      "uz": "{when} gacha qoldirildi"
+    },
+    "rem_deleted": {
+      "ru": "Удалено",
+      "en": "Deleted",
+      "tg": "Нест карда шуд",
+      "uz": "Oʻchirildi"
+    },
+    "rem_empty": {
+      "ru": "Напоминаний нет.",
+      "en": "No reminders.",
+      "tg": "Ёдрас нест.",
+      "uz": "Eslatmalar yoʻq."
+    },
+    "rem_list_title": {
+      "ru": "📋 <b>Напоминания</b> (🗑 — удалить):",
+      "en": "📋 <b>Reminders</b> (🗑 — delete):",
+      "tg": "📋 <b>Ёдрасҳо</b> (🗑 — нест кардан):",
+      "uz": "📋 <b>Eslatmalar</b> (🗑 — oʻchirish):"
+    },
+    "todo_ask": {
+      "ru": "Напишите задачу. Можно несколько — каждую с новой строки.",
+      "en": "Write a task. Several — one per line.",
+      "tg": "Вазифаро нависед. Якчанд — ҳар кадом дар сатри нав.",
+      "uz": "Vazifani yozing. Bir nechta — har biri yangi qatorda."
+    },
+    "todo_title": {
+      "ru": "✅ <b>Список дел</b> (нажмите, чтобы отметить):",
+      "en": "✅ <b>To-do list</b> (tap to check):",
+      "tg": "✅ <b>Рӯйхати корҳо</b> (барои қайд пахш кунед):",
+      "uz": "✅ <b>Vazifalar</b> (belgilash uchun bosing):"
+    },
+    "todo_empty": {
+      "ru": "Список дел пуст. Нажмите «➕ Задача».",
+      "en": "To-do list is empty. Tap \"➕ Task\".",
+      "tg": "Рӯйхат холӣ аст. «➕ Вазифа»-ро пахш кунед.",
+      "uz": "Roʻyxat boʻsh. «➕ Vazifa» ni bosing."
+    },
+    "todo_clear_done": {
+      "ru": "🧹 Убрать выполненные",
+      "en": "🧹 Clear done",
+      "tg": "🧹 Тоза кардани иҷрошудаҳо",
+      "uz": "🧹 Bajarilganlarni tozalash"
+    },
+    "digest_title": {
+      "ru": "☀️ <b>Доброе утро! План на сегодня:</b>",
+      "en": "☀️ <b>Good morning! Today's plan:</b>",
+      "tg": "☀️ <b>Субҳ ба хайр! Нақшаи имрӯз:</b>",
+      "uz": "☀️ <b>Xayrli tong! Bugungi reja:</b>"
+    },
+    "digest_on": {
+      "ru": "☀️ Утренняя сводка включена ({time}).",
+      "en": "☀️ Morning digest is on ({time}).",
+      "tg": "☀️ Хулосаи саҳарӣ фаъол шуд ({time}).",
+      "uz": "☀️ Ertalabki xulosa yoqildi ({time})."
+    },
+    "digest_off": {
+      "ru": "🌙 Утренняя сводка выключена.",
+      "en": "🌙 Morning digest is off.",
+      "tg": "🌙 Хулосаи саҳарӣ хомӯш шуд.",
+      "uz": "🌙 Ertalabki xulosa oʻchirildi."
+    }
+  },
+  "lists": {}
+}

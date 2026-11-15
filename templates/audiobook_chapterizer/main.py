@@ -13,6 +13,7 @@ Features:
 
 from __future__ import annotations
 
+import pybionic_core as core
 import html
 import io
 import json
@@ -258,7 +259,7 @@ def detect_silence_chapters(
         "null",
         "-",
     ]
-    res = subprocess.run(cmd, capture_output=True, text=True)
+    res = core.run_media(cmd, capture_output=True, text=True)
     out_text = res.stderr
 
     # Parse silence intervals
@@ -336,7 +337,7 @@ def create_m4b_audiobook(
             "192k",
             str(output_path),
         ]
-        res = subprocess.run(cmd, capture_output=True, text=True)
+        res = core.run_media(cmd, capture_output=True, text=True)
         if res.returncode != 0:
             raise RuntimeError(f"FFmpeg M4B muxing failed: {res.stderr[-300:]}")
     finally:
@@ -382,7 +383,7 @@ def split_into_zip_tracks(
                 f"track={c_idx}/{len(chapters)}",
                 fpath,
             ]
-            subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            core.run_media(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             generated_tracks.append((fpath, fname))
 
         with zipfile.ZipFile(output_zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
@@ -411,7 +412,7 @@ def speedup_audio(
         "192k",
         str(output_path),
     ]
-    res = subprocess.run(cmd, capture_output=True, text=True)
+    res = core.run_media(cmd, capture_output=True, text=True)
     if res.returncode != 0:
         raise RuntimeError(f"FFmpeg speedup failed: {res.stderr[-300:]}")
 
@@ -562,8 +563,7 @@ def setup_bot(bot: Any) -> None:
             tmp_in = None
             tmp_out = None
             try:
-                finfo = bot.get_file(file_obj.file_id)
-                data = bot.download_file(finfo.file_path)
+                data = core.download_tg_file(bot, file_obj.file_id)
 
                 with tempfile.NamedTemporaryFile(suffix=".mp3", delete=False) as tf:
                     tf.write(data)
@@ -1206,11 +1206,13 @@ def main() -> None:
             return
 
     bot = telebot.TeleBot(BOT_TOKEN)
+    core.guard_bot(bot)
+    core.start_janitor([core.get_data_dir() / "outputs"])
     setup_bot(bot)
     logger.info("Telegram bot listener initiated.")
 
     try:
-        bot.infinity_polling(timeout=20, long_polling_timeout=10)
+        core.start_polling(bot, timeout=20, long_polling_timeout=10)
     except Exception as e:
         logger.exception(f"Bot polling exception: {e}")
     finally:

@@ -38,6 +38,12 @@
           "secret": false,
           "defaultValue": "",
           "hint": "12345678,87654321"
+        },
+        {
+          "key": "TELEGRAM_PROXY",
+          "required": false,
+          "secret": false,
+          "hint": "socks5h://IP:1080 / http://IP:8080 (если Telegram заблокирован)"
         }
       ],
       "title": {
@@ -53,7 +59,10 @@
         "tg": "Боргирии видео, садо ва мусиқӣ аз YouTube, Instagram Reels ва пайвандҳои мустақим.",
         "uz": "YouTube, Instagram Reels va to'g'ridan-to'g'ri havolalardan video va musiqa yuklash.",
         "tr": "YouTube, Instagram Reels ve direkt bağlantılardan video ve müzik indirme."
-      }
+      },
+      "version": "1.1.0",
+      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/media_downloader-1.1.0.zip",
+      "sha256": "d4d31f36708a453791739a9b7e83033416982281389fba02f85b9c278b791e22"
     },
     {
       "id": "sticker_studio",
@@ -85,6 +94,12 @@
           "secret": false,
           "defaultValue": "8091",
           "hint": "8091"
+        },
+        {
+          "key": "TELEGRAM_PROXY",
+          "required": false,
+          "secret": false,
+          "hint": "socks5h://IP:1080 / http://IP:8080 (если Telegram заблокирован)"
         }
       ],
       "title": {
@@ -100,7 +115,10 @@
         "tg": "Табдилдиҳандаи бастаҳо ва созандаи стикерҳо аз WebP, GIF ва видео бо веб-студия.",
         "uz": "WebP, GIF va videodan stikerlar to'plamini yaratish va konvertatsiya qilish.",
         "tr": "WebP, GIF ve videodan çıkartma paketleri oluşturma ve dönüştürme stüdyosu."
-      }
+      },
+      "version": "1.1.0",
+      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/sticker_studio-1.1.0.zip",
+      "sha256": "2f2c4c9148a1ce36442de2e285bd0a3212b1c3f441d5e01e89192aac76c5790b"
     },
     {
       "id": "meme_studio",
@@ -131,6 +149,12 @@
           "secret": false,
           "defaultValue": "8089",
           "hint": "8089"
+        },
+        {
+          "key": "TELEGRAM_PROXY",
+          "required": false,
+          "secret": false,
+          "hint": "socks5h://IP:1080 / http://IP:8080 (если Telegram заблокирован)"
         }
       ],
       "title": {
@@ -146,7 +170,10 @@
         "tg": "Созандаи демотиваторҳо, мемҳои классикӣ ва расмҳои вирусӣ.",
         "uz": "Demotivatorlar, klassik memlar va virusli rasmlar yaratish.",
         "tr": "Demotivatörler, klasik memeler ve eğlenceli görseller oluşturma aracı."
-      }
+      },
+      "version": "1.1.0",
+      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/meme_studio-1.1.0.zip",
+      "sha256": "fe38a63c4e01d42801533448396080f6bdce6ee5eb003ab52555db025d52821f"
     },
     {
       "id": "motivator_pro",
@@ -178,6 +205,12 @@
           "secret": false,
           "defaultValue": "8092",
           "hint": "8092"
+        },
+        {
+          "key": "TELEGRAM_PROXY",
+          "required": false,
+          "secret": false,
+          "hint": "socks5h://IP:1080 / http://IP:8080 (если Telegram заблокирован)"
         }
       ],
       "title": {
@@ -193,7 +226,10 @@
         "tg": "Пайгирии одатҳо бо SQLite, омори давраҳо, ёдраскуниҳо ва иқтибосҳои ҳавасмандкунанда.",
         "uz": "SQLite asosidagi odatlar trekeri, seriyalar statistikasi va eslatmalar.",
         "tr": "SQLite veritabanlı alışkanlık takipçisi, seri istatistikleri ve hatırlatıcılar."
-      }
+      },
+      "version": "1.1.0",
+      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/motivator_pro-1.1.0.zip",
+      "sha256": "d8a7ab8b2e3c6ee277872aa72f2bce4f77c992d4d979c501a0dd179cad3e7eb2"
     },
     {
       "id": "discord_guardian",
@@ -245,7 +281,10 @@
         "tg": "Discord-бот бо филтри спам, сабти мудирият ва пойгоҳи додаҳои SQLite.",
         "uz": "Spam filtri, moderatsiya jurnallari va SQLite bazasiga ega Discord boti.",
         "tr": "Spam filtresi, denetim kayıtları ve yerel SQLite tabanlı Discord moderasyon botu."
-      }
+      },
+      "version": "1.1.0",
+      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/discord_guardian-1.1.0.zip",
+      "sha256": "b0b8a035b1c195c798b5756a0f4a760c5240455974212dac10ea17931d27bd72"
     },
     {
       "id": "multi_relay",
@@ -300,6 +339,12 @@
           "secret": false,
           "defaultValue": "8090",
           "hint": "8090"
+        },
+        {
+          "key": "TELEGRAM_PROXY",
+          "required": false,
+          "secret": false,
+          "hint": "socks5h://IP:1080 / http://IP:8080 (если Telegram заблокирован)"
         }
       ],
       "title": {
@@ -315,7 +360,10 @@
         "tg": "Интиқоли дуҷонибаи паёмҳо байни Telegram, Discord ва веб-панел.",
         "uz": "Telegram, Discord vebxuklari va veb-panel o'rtasida xabarlarni uzatuvchi tizim.",
         "tr": "Telegram, Discord webhookları ve web kontrol paneli arasında çift yönlü mesaj iletici."
-      }
+      },
+      "version": "1.1.0",
+      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/multi_relay-1.1.0.zip",
+      "sha256": "d18306f4d92639740aae909ce72fbe7888edd556d95667e656d77e6d5b2261b3"
     },
     {
       "id": "round_video_master",
@@ -355,6 +403,12 @@
           "secret": false,
           "defaultValue": "",
           "hint": "12345678,87654321"
+        },
+        {
+          "key": "TELEGRAM_PROXY",
+          "required": false,
+          "secret": false,
+          "hint": "socks5h://IP:1080 / http://IP:8080 (если Telegram заблокирован)"
         }
       ],
       "title": {
@@ -389,7 +443,10 @@
         "tg": "Табдили ҳама гуна видео ба паёми мудаввари Telegram: марказонии 1:1, садои EBU R128, ҳалқаи неонӣ ва суръат то 60с.",
         "uz": "Har qanday videoni Telegram dumaloq xabarlariga aylantirish: 1:1 markazlash, EBU R128 ovoz kuchaytirish, neon hoshiya va 60s gacha moslash.",
         "tr": "Videoları Telegram yuvarlak video mesajına dönüştürün: 1:1 ortalama, EBU R128 ses güçlendirme, neon çerçeve ve 60s sığdırma."
-      }
+      },
+      "version": "1.1.0",
+      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/round_video_master-1.1.0.zip",
+      "sha256": "1a5cd4e634ee954b30e34e3a7fe1bb229762af679c3f92d65e85be0dcdc01fbe"
     },
     {
       "id": "glitch_datamosh_studio",
@@ -429,6 +486,12 @@
           "secret": false,
           "defaultValue": "",
           "hint": "12345678,87654321"
+        },
+        {
+          "key": "TELEGRAM_PROXY",
+          "required": false,
+          "secret": false,
+          "hint": "socks5h://IP:1080 / http://IP:8080 (если Telegram заблокирован)"
         }
       ],
       "title": {
@@ -463,7 +526,10 @@
         "tg": "Генератори датамошинг, RGB Split, лентаи VHS, блокҳои вайроншуда ва биткрашери садо барои видео ва аксҳо.",
         "uz": "Datamoshing, RGB Split, 90-yillar VHS lentasi, pikselli bloklar va audio bitkrasher generatori.",
         "tr": "P-frame datamosh eritme, kromatik RGB Split, VHS kaset tarama çizgileri, piksel makro blokları ve ses bitcrush üretin."
-      }
+      },
+      "version": "1.1.0",
+      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/glitch_datamosh_studio-1.1.0.zip",
+      "sha256": "6c61c70371846294fb49be4a74b4bcb37cf0e43a459a963fc50a8bce3d527823"
     },
     {
       "id": "smart_karaoke_subber",
@@ -503,6 +569,12 @@
           "secret": false,
           "defaultValue": "",
           "hint": "12345678,87654321"
+        },
+        {
+          "key": "TELEGRAM_PROXY",
+          "required": false,
+          "secret": false,
+          "hint": "socks5h://IP:1080 / http://IP:8080 (если Telegram заблокирован)"
         }
       ],
       "title": {
@@ -537,7 +609,10 @@
         "tg": "Генератори караоке-видео бо равшании ҳар як калима, сабкҳои ASS, мавҷи садо ва LRC.",
         "uz": "Har bir so‘zni alohida yorituvchi animatsion karaoke videolari, ASS stillari va audio to‘lqin generatori.",
         "tr": "Müzikle senkronize kelime kelime vurgulanan karaoke video üretici, ASS altyazı stilleri ve ses dalgası görselleştirici."
-      }
+      },
+      "version": "1.1.0",
+      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/smart_karaoke_subber-1.1.0.zip",
+      "sha256": "d642371d0351b62f8f7593d197346417f87e9f1f7a1e5c1bb51a4577e719c504"
     },
     {
       "id": "media_target_compressor",
@@ -577,6 +652,12 @@
           "secret": false,
           "defaultValue": "",
           "hint": "12345678,87654321"
+        },
+        {
+          "key": "TELEGRAM_PROXY",
+          "required": false,
+          "secret": false,
+          "hint": "socks5h://IP:1080 / http://IP:8080 (если Telegram заблокирован)"
         }
       ],
       "title": {
@@ -611,7 +692,10 @@
         "tg": "Фишурдани дақиқи 2-гузариши видео ва аудио мутобиқи лимитҳои Discord, WhatsApp ва Telegram бидуни вайроншавӣ.",
         "uz": "Discord (8/25 MB), WhatsApp (16 MB) va Telegram (50 MB) limitlariga mos 2 bosqichli aniq video/audio siquvchi.",
         "tr": "Discord, WhatsApp ve Telegram sınırlarına tam uyan 2 geçişli hassas video ve ses sıkıştırma stüdyosu."
-      }
+      },
+      "version": "1.1.0",
+      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/media_target_compressor-1.1.0.zip",
+      "sha256": "3798d4eb540927861db300cdf8c7e7b02719b32094628789e2f3afa14b6dab42"
     },
     {
       "id": "voice_studio_master",
@@ -651,6 +735,12 @@
           "secret": false,
           "defaultValue": "",
           "hint": "12345678,87654321"
+        },
+        {
+          "key": "TELEGRAM_PROXY",
+          "required": false,
+          "secret": false,
+          "hint": "socks5h://IP:1080 / http://IP:8080 (если Telegram заблокирован)"
         }
       ],
       "title": {
@@ -685,7 +775,10 @@
         "tg": "Коркарди студиявии овоз: мастеринги подкаст (EBU R128), радио, вокодер, баси чуқур, бурундук, акси садо ва ратсия.",
         "uz": "Professional ovoz studiyasi: podkast masteringi (EBU R128), radio, vokoder, chuqur bas, burunduq, aks-sado va ratsiya effektlari.",
         "tr": "Stüdyo ses işleme ve vokal efektleri: podcast mastering (EBU R128), radyo yayını, robot, derin bas, katedral yankısı ve megafon."
-      }
+      },
+      "version": "1.1.0",
+      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/voice_studio_master-1.1.0.zip",
+      "sha256": "26da7b2939deac81233de969b301b484d046ff0847312d7a83116936b40e70f9"
     },
     {
       "id": "spatial_audio_8d",
@@ -725,6 +818,12 @@
           "secret": false,
           "defaultValue": "",
           "hint": "12345678,87654321"
+        },
+        {
+          "key": "TELEGRAM_PROXY",
+          "required": false,
+          "secret": false,
+          "hint": "socks5h://IP:1080 / http://IP:8080 (если Telegram заблокирован)"
         }
       ],
       "title": {
@@ -759,7 +858,10 @@
         "tg": "Генератори садои 8D-и бинауралӣ бо чархиши 360° дар гирди сар, траекторияҳои Лиссажу ва акси садо.",
         "uz": "Quloqchinlarda bosh atrofida aylanuvchi 360° 8D binaural ovoz, Lissaju trayektoriyalari va akustik zallar.",
         "tr": "Kulaklıkta baş etrafında dönen 360° 8D binaural ses, Lissajous yörüngeleri ve mekan akustiği."
-      }
+      },
+      "version": "1.1.0",
+      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/spatial_audio_8d-1.1.0.zip",
+      "sha256": "e9cb119fad8a3813e8ee06d087949fdba828f1063ebff88c9e90ba953e76dd09"
     },
     {
       "id": "audiobook_chapterizer",
@@ -799,6 +901,12 @@
           "secret": false,
           "defaultValue": "",
           "hint": "12345678,87654321"
+        },
+        {
+          "key": "TELEGRAM_PROXY",
+          "required": false,
+          "secret": false,
+          "hint": "socks5h://IP:1080 / http://IP:8080 (если Telegram заблокирован)"
         }
       ],
       "title": {
@@ -833,7 +941,10 @@
         "tg": "Муайянкунии интеллектуалии таваққуфҳо дар китобҳои савтӣ, воридсозии фаслҳои M4B, тақсим ба трекҳои MP3 дар ZIP ва суръатбахшӣ.",
         "uz": "Audio kitoblar va podkastlarda sukunatni aniqlash, M4B boblarini kiritish, MP3 ZIP ga ajratish va ohangni buzmasdan tezlashtirish.",
         "tr": "Sesli kitap ve podcastlerde sessizlik tespiti ile M4B bölüm atomları ekleme, numaralı MP3 ZIP parçalama ve hızlandırma."
-      }
+      },
+      "version": "1.1.0",
+      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/audiobook_chapterizer-1.1.0.zip",
+      "sha256": "aa5c3db081480a760dad6aabcd3a5426514a6e3c65042c911816488396cd739e"
     },
     {
       "id": "ghost_lens_sanitizer",
@@ -874,6 +985,12 @@
           "secret": false,
           "defaultValue": "",
           "hint": "12345678,87654321"
+        },
+        {
+          "key": "TELEGRAM_PROXY",
+          "required": false,
+          "secret": false,
+          "hint": "socks5h://IP:1080 / http://IP:8080 (если Telegram заблокирован)"
         }
       ],
       "title": {
@@ -908,7 +1025,10 @@
         "tg": "Тозакунии амиқи EXIF, GPS ва миниатюраҳо барои аксҳо ва видеоҳо бо таҳлили стеганографии LSB.",
         "uz": "Rasmlar uchun EXIF, GPS va kesh tozalash hamda MP4/MOV atomlarini tozalash, steganografik tahlil.",
         "tr": "Fotoğraflar için EXIF, GPS ve önbellek temizleme, kayıpsız MP4/MOV atom temizliği ve steganografi kontrolü."
-      }
+      },
+      "version": "1.1.0",
+      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/ghost_lens_sanitizer-1.1.0.zip",
+      "sha256": "6e9d1187daa45f8c3fec471de05c8dfb07c354640c8818e6ce9faf696e53b734"
     },
     {
       "id": "stego_vault",
@@ -949,6 +1069,12 @@
           "secret": false,
           "defaultValue": "",
           "hint": "12345678,87654321"
+        },
+        {
+          "key": "TELEGRAM_PROXY",
+          "required": false,
+          "secret": false,
+          "hint": "socks5h://IP:1080 / http://IP:8080 (если Telegram заблокирован)"
         }
       ],
       "title": {
@@ -983,11 +1109,14 @@
         "tg": "Пинҳон кардан ва кушодани маълумоти махфӣ дар файлҳои PNG, WebP ва WAV бо рамзгузории AES-256-GCM.",
         "uz": "PNG, WebP va WAV fayllarda maxfiy sirlarni AES-256-GCM shifrlash bilan yashirish va chiqarish.",
         "tr": "PNG, WebP ve WAV dosyalarında AES-256-GCM şifreleme ve LSB ile gizli verileri saklama ve çıkarma."
-      }
+      },
+      "version": "1.1.0",
+      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/stego_vault-1.1.0.zip",
+      "sha256": "9c2af4d2c8a272a4f21c69762bcf2f5e558ec8316af6a3fbbbdb6cb6591e6f54"
     },
     {
       "id": "cloud_shard_backup",
-      "category": "MEDIA_STICKERS",
+      "category": "UTILITIES",
       "title": {
         "en": "Cloud Shard Backup (Shamir's Secret Sharing & GF(256) Redundancy)",
         "ru": "Cloud Shard Backup (Схема разделения секрета Шамира и GF(256))",
@@ -1053,12 +1182,21 @@
           "secret": false,
           "defaultValue": "",
           "hint": "12345678,87654321"
+        },
+        {
+          "key": "TELEGRAM_PROXY",
+          "required": false,
+          "secret": false,
+          "hint": "socks5h://IP:1080 / http://IP:8080 (если Telegram заблокирован)"
         }
-      ]
+      ],
+      "version": "1.1.0",
+      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/cloud_shard_backup-1.1.0.zip",
+      "sha256": "260bc8a1f1139f9b7cc74a4cb74350c9a5b58f021b26bc9fb5f517823f3ccc32"
     },
     {
       "id": "doc_scanner_lens",
-      "category": "MEDIA_STICKERS",
+      "category": "UTILITIES",
       "title": {
         "en": "Doc Scanner Lens (Shadow Removal & Multi-Page PDF Compiler)",
         "ru": "Doc Scanner Lens (Устранение теней, отбеливание и сборка PDF)",
@@ -1127,12 +1265,21 @@
           "secret": false,
           "defaultValue": "",
           "hint": "12345678,87654321"
+        },
+        {
+          "key": "TELEGRAM_PROXY",
+          "required": false,
+          "secret": false,
+          "hint": "socks5h://IP:1080 / http://IP:8080 (если Telegram заблокирован)"
         }
-      ]
+      ],
+      "version": "1.1.0",
+      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/doc_scanner_lens-1.1.0.zip",
+      "sha256": "4adff720810c33e2c099aecb25d5b63f5796fddc30572526ef3927c82f8672a8"
     },
     {
       "id": "barcode_matrix_lab",
-      "category": "MEDIA_STICKERS",
+      "category": "UTILITIES",
       "title": {
         "en": "Barcode Matrix Lab (Vector QR, Code128 & Crypto Payment Studio)",
         "ru": "Barcode Matrix Lab (Векторные QR, Code128 и Криптоплатежи)",
@@ -1202,12 +1349,21 @@
           "secret": false,
           "defaultValue": "",
           "hint": "12345678,87654321"
+        },
+        {
+          "key": "TELEGRAM_PROXY",
+          "required": false,
+          "secret": false,
+          "hint": "socks5h://IP:1080 / http://IP:8080 (если Telegram заблокирован)"
         }
-      ]
+      ],
+      "version": "1.1.0",
+      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/barcode_matrix_lab-1.1.0.zip",
+      "sha256": "2026f00be5d113bd8b4b914bd1dc9c865b489ce060135fe0610899910fe8053b"
     },
     {
       "id": "site_visual_differ",
-      "category": "MEDIA_STICKERS",
+      "category": "UTILITIES",
       "title": {
         "en": "Site Visual Differ (Pixel UI Regression & Animated GIF Heatmap)",
         "ru": "Site Visual Differ (Пиксельный анализ UI, Heatmap и GIF сравнение)",
@@ -1276,8 +1432,17 @@
           "secret": false,
           "defaultValue": "",
           "hint": "12345678,87654321"
+        },
+        {
+          "key": "TELEGRAM_PROXY",
+          "required": false,
+          "secret": false,
+          "hint": "socks5h://IP:1080 / http://IP:8080 (если Telegram заблокирован)"
         }
-      ]
+      ],
+      "version": "1.1.0",
+      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/site_visual_differ-1.1.0.zip",
+      "sha256": "cf151dafb3ebb1f9c1c92f766c220238105442fe267ac8b688032a9fa2c79794"
     },
     {
       "id": "dex_whale_radar",
@@ -1347,8 +1512,17 @@
           "secret": false,
           "defaultValue": "",
           "hint": "12345678,87654321"
+        },
+        {
+          "key": "TELEGRAM_PROXY",
+          "required": false,
+          "secret": false,
+          "hint": "socks5h://IP:1080 / http://IP:8080 (если Telegram заблокирован)"
         }
-      ]
+      ],
+      "version": "1.1.0",
+      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/dex_whale_radar-1.1.0.zip",
+      "sha256": "ea1e7a64f7cf08a21ec792c67222c16fb32fc592d68f4cafeb51520504b3bdeb"
     },
     {
       "id": "osint_recon_warden",
@@ -1396,8 +1570,17 @@
           "secret": false,
           "defaultValue": "",
           "hint": "12345678,87654321"
+        },
+        {
+          "key": "TELEGRAM_PROXY",
+          "required": false,
+          "secret": false,
+          "hint": "socks5h://IP:1080 / http://IP:8080 (если Telegram заблокирован)"
         }
-      ]
+      ],
+      "version": "1.1.0",
+      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/osint_recon_warden-1.1.0.zip",
+      "sha256": "a7759ae0102b9743718e3eac96c0712037f4e65d52a50efbb1ec5052c666f154"
     },
     {
       "id": "antiraid_math_shield",
@@ -1438,8 +1621,17 @@
           "secret": false,
           "defaultValue": "8108",
           "hint": "8108"
+        },
+        {
+          "key": "TELEGRAM_PROXY",
+          "required": false,
+          "secret": false,
+          "hint": "socks5h://IP:1080 / http://IP:8080 (если Telegram заблокирован)"
         }
-      ]
+      ],
+      "version": "1.1.0",
+      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/antiraid_math_shield-1.1.0.zip",
+      "sha256": "059a16dbbfdf8aecbb5855ebb4fa28aab393373fd3491530021c2e501a873396"
     },
     {
       "id": "forum_crm_dispatcher",
@@ -1480,8 +1672,17 @@
           "secret": false,
           "defaultValue": "8109",
           "hint": "8109"
+        },
+        {
+          "key": "TELEGRAM_PROXY",
+          "required": false,
+          "secret": false,
+          "hint": "socks5h://IP:1080 / http://IP:8080 (если Telegram заблокирован)"
         }
-      ]
+      ],
+      "version": "1.1.0",
+      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/forum_crm_dispatcher-1.1.0.zip",
+      "sha256": "9916bc05b9c60d8583acce6f846bd4a138cfbf396f60de1e87ddff013b87b836"
     },
     {
       "id": "content_auto_pipeline",
@@ -1529,8 +1730,17 @@
           "secret": false,
           "defaultValue": "",
           "hint": "12345678,87654321"
+        },
+        {
+          "key": "TELEGRAM_PROXY",
+          "required": false,
+          "secret": false,
+          "hint": "socks5h://IP:1080 / http://IP:8080 (если Telegram заблокирован)"
         }
-      ]
+      ],
+      "version": "1.1.0",
+      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/content_auto_pipeline-1.1.0.zip",
+      "sha256": "64cfe88de86a74b460dd32dea561d4528fe399d60d585df0b454617e2cbdc1c6"
     },
     {
       "id": "python_sandbox_runner",
@@ -1578,8 +1788,17 @@
           "secret": false,
           "defaultValue": "",
           "hint": "12345678,87654321"
+        },
+        {
+          "key": "TELEGRAM_PROXY",
+          "required": false,
+          "secret": false,
+          "hint": "socks5h://IP:1080 / http://IP:8080 (если Telegram заблокирован)"
         }
-      ]
+      ],
+      "version": "1.1.0",
+      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/python_sandbox_runner-1.1.0.zip",
+      "sha256": "b682dad2e887bfa5d12ed749104e2c809b10e3b4747395581d8cace62fa7e194"
     },
     {
       "id": "chronos_deep_audit",
@@ -1627,8 +1846,304 @@
           "secret": false,
           "defaultValue": "",
           "hint": "12345678,87654321"
+        },
+        {
+          "key": "TELEGRAM_PROXY",
+          "required": false,
+          "secret": false,
+          "hint": "socks5h://IP:1080 / http://IP:8080 (если Telegram заблокирован)"
         }
-      ]
+      ],
+      "version": "1.1.0",
+      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/chronos_deep_audit-1.1.0.zip",
+      "sha256": "dfb7f90f63be9ad7f598301041cd881fdeabff9d4c661fac224ed78a22958dab"
+    },
+    {
+      "id": "ai_assistant",
+      "category": "AI_ASSISTANTS",
+      "entryFile": "main.py",
+      "platforms": [
+        "Telegram",
+        "SQLite"
+      ],
+      "systemPackages": [],
+      "pipPackages": [
+        "pyTelegramBotAPI"
+      ],
+      "useSystemSitePackages": true,
+      "defaultCron": "",
+      "fields": [
+        {
+          "key": "BOT_TOKEN",
+          "required": true,
+          "secret": true,
+          "hint": "123456:ABC..."
+        },
+        {
+          "key": "AI_API_KEY",
+          "required": true,
+          "secret": true,
+          "hint": "aistudio.google.com → Get API key"
+        },
+        {
+          "key": "AI_PROVIDER",
+          "required": false,
+          "secret": false,
+          "defaultValue": "gemini",
+          "hint": "gemini | openai"
+        },
+        {
+          "key": "AI_MODEL",
+          "required": false,
+          "secret": false,
+          "defaultValue": "gemini-2.5-flash",
+          "hint": "gemini-2.5-flash"
+        },
+        {
+          "key": "AI_BASE_URL",
+          "required": false,
+          "secret": false,
+          "hint": "https://api.groq.com/openai/v1"
+        },
+        {
+          "key": "SYSTEM_PROMPT",
+          "required": false,
+          "secret": false,
+          "hint": "You are a friendly assistant..."
+        },
+        {
+          "key": "DAILY_LIMIT",
+          "required": false,
+          "secret": false,
+          "defaultValue": "100",
+          "hint": "100"
+        },
+        {
+          "key": "ALLOWED_USER_IDS",
+          "required": false,
+          "secret": false,
+          "hint": "123456789,987654321"
+        },
+        {
+          "key": "TELEGRAM_PROXY",
+          "required": false,
+          "secret": false,
+          "hint": "socks5h://IP:1080 / http://IP:8080 (если Telegram заблокирован)"
+        }
+      ],
+      "title": {
+        "ru": "ИИ-помощник (Gemini)",
+        "en": "AI Assistant (Gemini)",
+        "tg": "Ёрдамчии ЗИ (Gemini)",
+        "uz": "SI yordamchi (Gemini)"
+      },
+      "description": {
+        "ru": "Чат с ИИ в Telegram: память диалога, голосовые и фото, перевод, пересказ и исправление текста. Бесплатный ключ Gemini.",
+        "en": "AI chat in Telegram: conversation memory, voice and photos, translation, summaries and text fixing. Free Gemini key.",
+        "tg": "Сӯҳбат бо ЗИ дар Telegram: хотираи гуфтугӯ, овоз ва акс, тарҷума, хулоса ва ислоҳи матн. Калиди ройгони Gemini.",
+        "uz": "Telegramda SI bilan suhbat: suhbat xotirasi, ovoz va rasm, tarjima, qisqacha va matnni tuzatish. Bepul Gemini kaliti."
+      },
+      "version": "1.0.0",
+      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/ai_assistant-1.0.0.zip",
+      "sha256": "058eb08fad01064b669305ea24888d2db03b9c7e719cbd6818945e61e1d3e441"
+    },
+    {
+      "id": "reminder_planner",
+      "category": "PRODUCTIVITY",
+      "entryFile": "main.py",
+      "platforms": [
+        "Telegram",
+        "SQLite"
+      ],
+      "systemPackages": [],
+      "pipPackages": [
+        "pyTelegramBotAPI"
+      ],
+      "useSystemSitePackages": true,
+      "defaultCron": "",
+      "fields": [
+        {
+          "key": "BOT_TOKEN",
+          "required": true,
+          "secret": true,
+          "hint": "123456:ABC..."
+        },
+        {
+          "key": "TZ_OFFSET",
+          "required": false,
+          "secret": false,
+          "defaultValue": "5",
+          "hint": "5 = Душанбе/Ташкент, 3 = Москва"
+        },
+        {
+          "key": "DIGEST_TIME",
+          "required": false,
+          "secret": false,
+          "defaultValue": "08:00",
+          "hint": "08:00"
+        },
+        {
+          "key": "ALLOWED_USER_IDS",
+          "required": false,
+          "secret": false,
+          "hint": "123456789,987654321"
+        },
+        {
+          "key": "TELEGRAM_PROXY",
+          "required": false,
+          "secret": false,
+          "hint": "socks5h://IP:1080 / http://IP:8080 (если Telegram заблокирован)"
+        }
+      ],
+      "title": {
+        "ru": "Напоминалки и планы",
+        "en": "Reminders & Planner",
+        "tg": "Ёдрасҳо ва нақшаҳо",
+        "uz": "Eslatmalar va rejalar"
+      },
+      "description": {
+        "ru": "Напоминания обычным текстом («завтра в 9:00 врач»), повторы каждый день, кнопки «отложить», список дел и утренняя сводка.",
+        "en": "Reminders in plain text (\"tomorrow 9:00 doctor\"), daily repeats, snooze buttons, to-do list and a morning digest.",
+        "tg": "Ёдрас бо матни оддӣ («пагоҳ 9:00 духтур»), такрори ҳаррӯза, тугмаи мавқуф, рӯйхати корҳо ва хулосаи саҳарӣ.",
+        "uz": "Oddiy matn bilan eslatmalar («ertaga 9:00 shifokor»), har kuni takrorlash, kechiktirish tugmalari, vazifalar va ertalabki xulosa."
+      },
+      "version": "1.0.0",
+      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/reminder_planner-1.0.0.zip",
+      "sha256": "ff5cd81baf6b9e6157ca4aea81721fd7a6d4b19fb8666f84d2cd31e7f9cf6820"
+    },
+    {
+      "id": "shop_orders",
+      "category": "BUSINESS",
+      "entryFile": "main.py",
+      "platforms": [
+        "Telegram",
+        "SQLite"
+      ],
+      "systemPackages": [],
+      "pipPackages": [
+        "pyTelegramBotAPI"
+      ],
+      "useSystemSitePackages": true,
+      "defaultCron": "",
+      "fields": [
+        {
+          "key": "BOT_TOKEN",
+          "required": true,
+          "secret": true,
+          "hint": "123456:ABC..."
+        },
+        {
+          "key": "ADMIN_IDS",
+          "required": true,
+          "secret": false,
+          "hint": "123456789 (/myid)"
+        },
+        {
+          "key": "SHOP_NAME",
+          "required": false,
+          "secret": false,
+          "hint": "My Shop"
+        },
+        {
+          "key": "CURRENCY",
+          "required": false,
+          "secret": false,
+          "defaultValue": "сом.",
+          "hint": "сом. / ₽ / $"
+        },
+        {
+          "key": "MIN_ORDER",
+          "required": false,
+          "secret": false,
+          "defaultValue": "0",
+          "hint": "0"
+        },
+        {
+          "key": "TELEGRAM_PROXY",
+          "required": false,
+          "secret": false,
+          "hint": "socks5h://IP:1080 / http://IP:8080 (если Telegram заблокирован)"
+        }
+      ],
+      "title": {
+        "ru": "Магазин и приём заказов",
+        "en": "Shop & Orders",
+        "tg": "Мағоза ва қабули фармоиш",
+        "uz": "Doʻkon va buyurtmalar"
+      },
+      "description": {
+        "ru": "Мини-магазин в Telegram: каталог с фото, корзина, оформление с телефоном и адресом, заказы владельцу со статусами.",
+        "en": "Mini shop in Telegram: photo catalog, cart, checkout with phone and address, orders to the owner with statuses.",
+        "tg": "Мағозаи хурд дар Telegram: феҳрист бо акс, сабад, фармоиш бо телефон ва суроға, фармоишҳо ба соҳиб бо ҳолат.",
+        "uz": "Telegramda mini doʻkon: rasmli katalog, savat, telefon va manzil bilan buyurtma, holatlar bilan egasiga buyurtmalar."
+      },
+      "version": "1.0.0",
+      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/shop_orders-1.0.0.zip",
+      "sha256": "2b23f1f255a5e6e643c98ad16733edb270a5b0949aeab7b511fa9cff118077a7"
+    },
+    {
+      "id": "finance_budget",
+      "category": "BUSINESS",
+      "entryFile": "main.py",
+      "platforms": [
+        "Telegram",
+        "SQLite"
+      ],
+      "systemPackages": [],
+      "pipPackages": [
+        "pyTelegramBotAPI"
+      ],
+      "useSystemSitePackages": true,
+      "defaultCron": "",
+      "fields": [
+        {
+          "key": "BOT_TOKEN",
+          "required": true,
+          "secret": true,
+          "hint": "123456:ABC..."
+        },
+        {
+          "key": "HOME_CURRENCY",
+          "required": false,
+          "secret": false,
+          "defaultValue": "TJS",
+          "hint": "TJS / RUB / UZS / USD"
+        },
+        {
+          "key": "WATCH_CURRENCIES",
+          "required": false,
+          "secret": false,
+          "defaultValue": "USD,EUR,RUB,CNY",
+          "hint": "USD,EUR,RUB,CNY"
+        },
+        {
+          "key": "ALLOWED_USER_IDS",
+          "required": false,
+          "secret": false,
+          "hint": "123456789,987654321"
+        },
+        {
+          "key": "TELEGRAM_PROXY",
+          "required": false,
+          "secret": false,
+          "hint": "socks5h://IP:1080 / http://IP:8080 (если Telegram заблокирован)"
+        }
+      ],
+      "title": {
+        "ru": "Курсы и бюджет",
+        "en": "Rates & Budget",
+        "tg": "Қурб ва буҷет",
+        "uz": "Kurslar va byudjet"
+      },
+      "description": {
+        "ru": "Курсы валют и конвертер («100 usd rub»), уведомления о курсе, семейный бюджет («-120 такси»), отчёт за месяц и CSV.",
+        "en": "Exchange rates and converter (\"100 usd eur\"), rate alerts, family budget (\"-120 taxi\"), monthly report and CSV.",
+        "tg": "Қурби асъор ва табдил («100 usd rub»), огоҳии қурб, буҷети оилавӣ («-120 такси»), ҳисоботи моҳ ва CSV.",
+        "uz": "Valyuta kurslari va konvertor («100 usd rub»), kurs xabarnomalari, oilaviy byudjet («-120 taksi»), oylik hisobot va CSV."
+      },
+      "version": "1.0.0",
+      "zipUrl": "https://raw.githubusercontent.com/nasibullo03/PyBionic-Hub/main/dist/finance_budget-1.0.0.zip",
+      "sha256": "b0fbc03492f8f83c496313fc60eebf850618c9398bca4e1bd8d36d3f61d59335"
     }
   ]
 }

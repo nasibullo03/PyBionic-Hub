@@ -1,3 +1,4 @@
+import pybionic_core as core
 import os
 import sys
 if hasattr(sys.stdout, "reconfigure"):
@@ -282,6 +283,8 @@ def start_bot():
     from telebot import types
 
     bot = telebot.TeleBot(BOT_TOKEN)
+    core.guard_bot(bot)
+
     user_state = {}
 
     ALLOWED = {int(x) for x in os.environ.get("ALLOWED_USER_IDS", "").replace(" ", "").split(",") if x.isdigit()}
@@ -417,7 +420,7 @@ def start_bot():
         bot.send_message(cid, i18n.t("welcome", lang), reply_markup=make_main_keyboard(lang), parse_mode="HTML")
 
     print("[Chronos Deep Audit] Telegram bot polling started.")
-    bot.infinity_polling()
+    core.start_polling(bot)
 
 def main():
     print(f"[Chronos Deep Audit] Starting on port {PORT}...")

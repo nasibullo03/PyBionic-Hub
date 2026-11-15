@@ -12,6 +12,7 @@ Features:
 
 from __future__ import annotations
 
+import pybionic_core as core
 import html
 import io
 import json
@@ -288,7 +289,7 @@ def process_8d_audio(
     else:
         cmd.extend(["-c:a", "libmp3lame", "-b:a", "320k", out_p])
 
-    res = subprocess.run(cmd, capture_output=True, text=True)
+    res = core.run_media(cmd, capture_output=True, text=True)
     if res.returncode != 0:
         raise RuntimeError(f"FFmpeg 8D filter failed: {res.stderr[-300:]}")
 
@@ -467,8 +468,7 @@ def setup_bot(bot: Any) -> None:
             tmp_in = None
             tmp_out = None
             try:
-                finfo = bot.get_file(file_obj.file_id)
-                data = bot.download_file(finfo.file_path)
+                data = core.download_tg_file(bot, file_obj.file_id)
 
                 with tempfile.NamedTemporaryFile(suffix=ext, delete=False) as tf:
                     tf.write(data)
@@ -1197,11 +1197,13 @@ def main() -> None:
             return
 
     bot = telebot.TeleBot(BOT_TOKEN)
+    core.guard_bot(bot)
+    core.start_janitor([core.get_data_dir() / "outputs"])
     setup_bot(bot)
     logger.info("Telegram bot listener initiated.")
 
     try:
-        bot.infinity_polling(timeout=20, long_polling_timeout=10)
+        core.start_polling(bot, timeout=20, long_polling_timeout=10)
     except Exception as e:
         logger.exception(f"Bot polling exception: {e}")
     finally:

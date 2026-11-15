@@ -13,6 +13,7 @@ Features:
 
 from __future__ import annotations
 
+import pybionic_core as core
 import html
 import http.server
 import json
@@ -279,7 +280,6 @@ def mpeg4_datamosh_bytes(avi_bytes: bytes, drop_ratio: float = 0.75) -> bytes:
 
     return pattern.join(out_chunks)
 
-FFMPEG_SLOTS = threading.BoundedSemaphore(1)
 
 def apply_glitch(
     src_path: Path,
@@ -313,7 +313,7 @@ def apply_glitch(
             "-c:v", "libx264", "-preset", "ultrafast",
             str(tmp_clip),
         ]
-        res = subprocess.run(cmd_photo, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=False)
+        res = core.run_media(cmd_photo, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=False)
         if res.returncode == 0 and tmp_clip.is_file():
             working_src = tmp_clip
 
@@ -332,7 +332,7 @@ def apply_glitch(
             "-an",
             str(avi_stage),
         ]
-        subprocess.run(cmd_avi, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=False)
+        core.run_media(cmd_avi, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=False)
 
         if avi_stage.is_file() and avi_stage.stat().st_size > 1024:
             raw_bytes = avi_stage.read_bytes()
@@ -359,7 +359,7 @@ def apply_glitch(
                     str(out_path),
                 ]
 
-            res_final = subprocess.run(cmd_out, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=False)
+            res_final = core.run_media(cmd_out, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=False)
             try:
                 avi_stage.unlink(missing_ok=True)
                 avi_moshed.unlink(missing_ok=True)
@@ -438,8 +438,7 @@ def apply_glitch(
 
     log("log_processing", filename=src_path.name, mode=mode, intensity=intensity)
     try:
-        with FFMPEG_SLOTS:
-            res = subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, check=False, timeout=120)
+        res = core.run_media(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, check=False, timeout=120)
         if res.returncode == 0 and out_path.is_file() and out_path.stat().st_size > 0:
             size_kb = out_path.stat().st_size / 1024.0
             log("log_done", out_path=out_path.name, size_kb=size_kb)
@@ -928,6 +927,9 @@ def run_bot(token: str) -> None:
 
     init_db()
     bot = telebot.TeleBot(token, parse_mode="HTML")
+    core.guard_bot(bot)
+    core.start_janitor([core.get_data_dir() / "glitch_cache"])
+
     cache_dir = get_cache_dir()
 
     ALLOWED = {int(x) for x in os.environ.get("ALLOWED_USER_IDS", "").replace(" ", "").split(",") if x.isdigit()}
@@ -1090,11 +1092,11 @@ def run_bot(token: str) -> None:
         def worker() -> None:
             try:
                 bot.send_chat_action(msg.chat.id, "upload_document")
-                f_info = bot.get_file(file_id)
-                if (getattr(f_info, "file_size", 0) or 0) > 20 * 1024 * 1024:
+                try:
+                    f_bytes = core.download_tg_file(bot, file_id)
+                except core.FileTooBig:
                     bot.reply_to(msg, "⚠️ Файл слишком большой (> 20 МБ). Telegram Bot API разрешает ботам загружать файлы размером не более 20 МБ.", reply_markup=build_main_reply_kb(uid))
                     return
-                f_bytes = bot.download_file(f_info.file_path)
 
                 ext = ".jpg" if is_photo else ".mp4"
                 src_path = cache_dir / f"in_glitch_{uid}_{int(time.time())}{ext}"
@@ -1255,7 +1257,7 @@ def run_bot(token: str) -> None:
 
     log("log_started", port=8094)
     try:
-        bot.infinity_polling(timeout=20, long_polling_timeout=20)
+        core.start_polling(bot, timeout=20, long_polling_timeout=20)
     except Exception as exc:
         log("log_error", err=f"Glitch bot polling exception: {exc}")
 
