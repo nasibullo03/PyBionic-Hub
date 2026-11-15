@@ -5,10 +5,12 @@
 from __future__ import annotations
 
 import pybionic_core as core
+import pybionic_web as web
 import html
 import http.server
 import json
 import os
+import re
 import socketserver
 import sqlite3
 import sys
@@ -252,6 +254,80 @@ def poll_once() -> int:
     return new_count
 
 
+def render_studio(handler: Any, port: int) -> None:
+    lang = web.resolve_lang(handler)
+    T = web.translator(lang)
+    strip = lambda s: re.sub(r"^[^\w(]+", "", s)  # noqa: E731
+    with get_conn() as conn:
+        sources = conn.execute("SELECT * FROM sources ORDER BY id DESC").fetchall()
+        logs = conn.execute("SELECT * FROM broadcast_logs ORDER BY id DESC LIMIT 10").fetchall()
+        total_logs = conn.execute("SELECT COUNT(*) FROM broadcast_logs").fetchone()[0]
+    kinds = {"rss": ("RSS", "#f59e0b", "wave"), "gh": ("GitHub", "#22c55e", "code"), "yt": ("YouTube", "#ef4444", "play")}
+    css = ("<style>.mr-row{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:var(--surface2);margin-bottom:8px}"
+           ".mr-ico{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;flex:none}.mr-main{flex:1;min-width:0}"
+           ".mr-main b{display:block;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}"
+           ".mr-main small{color:var(--muted);display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}"
+           ".mr-tag{font-size:11px;font-weight:700;padding:3px 8px;border-radius:99px}"
+           ".mr-ch{display:flex;flex-wrap:wrap;gap:8px}.mr-chip{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:99px;font-size:13px;border:1px solid var(--line);background:var(--surface2)}"
+           ".mr-chip.on{border-color:#22c55e66;color:#22c55e}.mr-chip.off{color:var(--muted)}"
+           ".mr-log{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}.mr-log:last-child{border:0}"
+           ".mr-log time{font-size:12.5px;color:var(--muted);white-space:nowrap;padding-top:2px}.mr-log a{color:var(--text);font-weight:600;text-decoration:none}"
+           ".mr-log a:hover{color:var(--brand)}.mr-log small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}</style>")
+    src_rows = []
+    for r in sources:
+        name, color, ico = kinds.get(r["kind"], (r["kind"].upper(), "#64748b", "link"))
+        src_rows.append(
+            f'<div class="mr-row"><span class="mr-ico" style="background:{color}22;color:{color}">{web.icon(ico, 18)}</span>'
+            f'<div class="mr-main"><b>{web.esc(r["label"] or r["target"])}</b><small>{web.esc(r["target"])}</small></div>'
+            f'<span class="mr-tag" style="background:{color}22;color:{color}">{web.esc(name)}</span>'
+            + web.button("", cls="pb-btn-sm mr-del", kind="ghost", icon_name="trash", title=T("delete"), **{"data-id": str(r["id"]), "aria-label": T("delete")}) + "</div>")
+    sources_html = "".join(src_rows) or web.empty_state(T("w_no_sources"), "wave")
+    log_rows = []
+    for item in logs:
+        dt = time.strftime("%d.%m %H:%M", time.localtime(item["created_at"]))
+        url = item["url"] if str(item["url"]).startswith(("http://", "https://")) else "#"
+        log_rows.append(f'<div class="mr-log"><time>{dt}</time><div><a href="{web.esc(url)}" target="_blank" rel="noopener">{web.esc(item["title"])}</a>'
+                        f'<small>{web.esc(item["source"])} → {web.esc(item["targets"])}</small></div></div>')
+    logs_html = "".join(log_rows) or web.empty_state(T("no_history"), "clock")
+    channels = [("Telegram", bool(os.environ.get("BOT_TOKEN", "").strip() and os.environ.get("TG_CHAT_ID", "").strip())),
+                ("Discord", bool(os.environ.get("DISCORD_WEBHOOK_URL", "").strip())), ("Webhook", bool(os.environ.get("WEBHOOK_URL", "").strip()))]
+    ch_html = '<div class="mr-ch">' + "".join(
+        f'<span class="mr-chip {"on" if on else "off"}">{web.icon("check" if on else "x", 14)}{name}</span>' for name, on in channels) + "</div>"
+    actions = web.card(T("w_card_actions"),
+        '<div class="pb-row">' + web.button(strip(T("btn_check_now")), "poll", icon_name="refresh")
+        + web.button(strip(T("btn_test_broadcast")), "test", kind="ghost", icon_name="send") + "</div>"
+        + f'<h4 style="margin:18px 0 10px">{web.esc(T("w_channels"))}</h4>' + ch_html
+        + web.note(T("w_channels_note"), "info"), icon_name="zap")
+    add = web.card(T("btn_add_source"),
+        '<form id="add">' + web.field(T("w_kind"), web.segmented("kind", [("rss", "RSS / Atom"), ("gh", "GitHub"), ("yt", "YouTube")], "rss",
+                                     sub={"rss": T("w_rss_sub"), "gh": T("w_gh_sub"), "yt": T("w_yt_sub")}, icons={"rss": "wave", "gh": "code", "yt": "play"}))
+        + web.field(T("w_target"), web.input_("target", "https://example.com/feed.xml", icon_name="link", required=True, autocomplete="off"))
+        + web.field(T("ph_label"), web.input_("label", T("ph_label"), icon_name="list", autocomplete="off"))
+        + web.button(strip(T("btn_add_source")), "addbtn", type="submit", icon_name="plus") + "</form>", icon_name="plus")
+    src_card = web.card(T("web_sources"), f'<div id="sources">{sources_html}</div>', icon_name="wave", aside=f'<span class="mr-tag" style="background:var(--surface2)">{len(sources)}</span>')
+    hist = web.card(T("broadcast_history"), logs_html, icon_name="clock")
+    st = web.stats([(T("w_st_sources"), str(len(sources)), None, "wave"), (T("w_st_sent"), str(total_logs), None, "send"),
+                    (T("w_st_channels"), str(sum(1 for _, on in channels if on)), None, "zap")])
+    hero = web.hero(T("w_title"), T("w_hero"), "📡", chips=["RSS", "GitHub Releases", "YouTube", "Telegram · Discord"])
+    web.send_page(handler, lang, title=T("w_title"), emoji="📡", brand="#06b6d4", port=port, hero_html=hero,
+                  body=css + st + web.grid(actions, add, min_width=330) + web.grid(src_card, hist, min_width=330), script=RELAY_JS)
+
+
+RELAY_JS = r"""
+const $=s=>document.querySelector(s);
+const PH={rss:'https://example.com/feed.xml',gh:'owner/repo',yt:'UCxxxxxxxxxxxxxxxxxxxxxx'};
+$('#kind').addEventListener('change',()=>{$('#target').placeholder=PH[$('#kind').dataset.value]||''});
+const form=(o)=>Object.entries(o).map(([k,v])=>k+'='+encodeURIComponent(v)).join('&');
+async function post(url,body){const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:body||'',redirect:'manual'});return r}
+$('#poll').onclick=async()=>{const b=$('#poll');pb.busy(b,true);try{await post('/poll');pb.toast(pb.t('w_poll_started'));setTimeout(()=>location.reload(),4000)}catch(e){pb.busy(b,false);pb.toast(pb.t('error_conn'),true)}};
+$('#test').onclick=async()=>{const b=$('#test');pb.busy(b,true);try{await post('/test_broadcast');pb.toast(pb.t('w_test_sent'));setTimeout(()=>location.reload(),2500)}catch(e){pb.busy(b,false);pb.toast(pb.t('error_conn'),true)}};
+$('#add').addEventListener('submit',async e=>{e.preventDefault();const t=$('#target').value.trim();if(!t)return;const b=$('#addbtn');pb.busy(b,true);
+  try{await post('/add',form({kind:$('#kind').dataset.value,target:t,label:$('#label').value.trim()}));location.reload()}catch(err){pb.busy(b,false);pb.toast(pb.t('error_conn'),true)}});
+document.querySelectorAll('.mr-del').forEach(b=>b.onclick=async()=>{if(!confirm(pb.t('w_del_confirm')))return;pb.busy(b,true);
+  try{await fetch('/del?id='+b.dataset.id,{redirect:'manual'});b.closest('.mr-row').remove();pb.toast(pb.t('deleted'))}catch(e){pb.busy(b,false);pb.toast(pb.t('error_conn'),true)}});
+"""
+
+
 def start_web_ui(port: int) -> None:
     class Handler(http.server.BaseHTTPRequestHandler):
         def log_message(self, fmt: str, *args: Any) -> None:
@@ -259,192 +335,7 @@ def start_web_ui(port: int) -> None:
 
         def do_GET(self) -> None:
             u = urllib.parse.urlparse(self.path)
-            lang = urllib.parse.parse_qs(u.query).get("lang", [current_lang()])[0]
-            rtl_attr = ' dir="rtl"' if is_rtl(lang) else ""
-
-            lang_options = "\n".join(
-                f'<option value="{code}"{" selected" if code == lang else ""}>{html.escape(label)}</option>'
-                for code, label in SUPPORTED_LANGUAGES
-            )
-
-            with get_conn() as conn:
-                sources = conn.execute("SELECT * FROM sources ORDER BY id DESC").fetchall()
-                logs = conn.execute("SELECT * FROM broadcast_logs ORDER BY id DESC LIMIT 10").fetchall()
-
-            sources_html = ""
-            for r in sources:
-                kind_color = "#00D8FF" if r["kind"] == "rss" else ("#00E676" if r["kind"] == "gh" else "#FF5252")
-                sources_html += f"""
-                <div class="source-row">
-                  <div>
-                    <span class="kind-tag" style="background:{kind_color}22;color:{kind_color}">{html.escape(r['kind'].upper())}</span>
-                    <b style="margin-left:6px">{html.escape(r['label'] or r['target'])}</b>
-                    <div style="font-size:12px;color:var(--text-dim);margin-top:4px">{html.escape(r['target'])}</div>
-                  </div>
-                  <a href="/del?id={r['id']}" onclick="return confirm('Удалить источник?')"><button class="del-btn">✕</button></a>
-                </div>
-                """
-
-            logs_html = ""
-            for l in logs:
-                dt = time.strftime("%H:%M:%S", time.localtime(l["created_at"]))
-                logs_html += f"""
-                <div class="log-row">
-                  <div style="font-size:12px;color:var(--text-dim)">{dt} • <span style="color:var(--accent-cyan)">{html.escape(l['targets'])}</span></div>
-                  <div style="font-weight:600;margin-top:2px"><a href="{html.escape(l['url'])}" target="_blank" style="color:var(--text-main);text-decoration:none">{html.escape(l['title'])}</a></div>
-                </div>
-                """
-
-            html_page = f"""<!doctype html>
-<html lang="{lang}"{rtl_attr}>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>{html.escape(t('web_title', lang_override=lang))}</title>
-<style>
-:root {{
-  --bg-deep: #0A0F1A;
-  --bg-card: #121A2B;
-  --bg-input: #0D1322;
-  --accent-cyan: #00D8FF;
-  --accent-emerald: #00E676;
-  --accent-gold: #FFC107;
-  --text-main: #E6F1FF;
-  --text-dim: #8BA0C6;
-  --border: #1F2D4A;
-}}
-* {{ box-sizing: border-box; margin: 0; padding: 0; }}
-body {{
-  background: var(--bg-deep);
-  color: var(--text-main);
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-  padding: 16px;
-  max-width: 640px;
-  margin: 0 auto;
-}}
-header {{
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  border-bottom: 1px solid var(--border);
-  padding-bottom: 12px;
-}}
-.brand {{ font-size: 20px; font-weight: 800; color: var(--accent-cyan); }}
-.lang-sel {{
-  background: var(--bg-input);
-  color: var(--text-main);
-  border: 1px solid var(--border);
-  padding: 6px 10px;
-  border-radius: 8px;
-  font-size: 13px;
-}}
-.card {{
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 20px;
-  margin-bottom: 20px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-}}
-.source-row, .log-row {{
-  background: var(--bg-input);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 12px;
-  margin-top: 10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}}
-.log-row {{ display: block; }}
-.kind-tag {{
-  padding: 2px 6px;
-  border-radius: 6px;
-  font-size: 11px;
-  font-weight: 700;
-}}
-.del-btn {{
-  background: rgba(255, 82, 82, 0.15);
-  color: #FF5252;
-  border: 1px solid rgba(255, 82, 82, 0.3);
-  padding: 6px 10px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 700;
-}}
-input[type="text"], select, button {{
-  width: 100%;
-  padding: 12px;
-  margin-top: 10px;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: var(--bg-input);
-  color: var(--text-main);
-  font-size: 15px;
-}}
-button.primary {{
-  background: linear-gradient(135deg, #00D8FF, #0088cc);
-  color: #001B2E;
-  font-weight: 700;
-  border: none;
-  cursor: pointer;
-}}
-button.primary:hover {{ opacity: 0.95; }}
-.btn-group {{
-  display: flex;
-  gap: 10px;
-  margin-top: 10px;
-}}
-.btn-group button {{ margin-top: 0; }}
-</style>
-</head>
-<body>
-<header>
-  <div class="brand">📡 Multi-Relay Notifier</div>
-  <select class="lang-sel" onchange="location.href='/?lang='+this.value">
-    {lang_options}
-  </select>
-</header>
-
-<div class="card">
-  <h2>{html.escape(t('web_title', lang_override=lang))}</h2>
-  <div class="btn-group">
-    <form method="POST" action="/poll" style="flex:1"><button style="background:#1F2D4A;color:#00D8FF">{html.escape(t('btn_check_now', lang_override=lang))}</button></form>
-    <form method="POST" action="/test_broadcast" style="flex:1"><button style="background:rgba(0,230,118,0.15);color:var(--accent-emerald)">{html.escape(t('btn_test_broadcast', lang_override=lang))}</button></form>
-  </div>
-</div>
-
-<div class="card">
-  <h3>{html.escape(t('web_sources', lang_override=lang))} ({len(sources)})</h3>
-  {sources_html or '<div style="color:var(--text-dim);margin-top:10px">Нет добавленных источников. Добавьте первый источник ниже!</div>'}
-
-  <form method="POST" action="/add" style="margin-top:16px">
-    <select name="kind">
-      <option value="rss">RSS / Atom XML URL</option>
-      <option value="gh">GitHub Releases (owner/repo)</option>
-      <option value="yt">YouTube Channel ID (UC...)</option>
-    </select>
-    <input type="text" name="target" placeholder="https://... | owner/repo | UC..." required>
-    <input type="text" name="label" placeholder="{html.escape(t('ph_label', lang_override=lang))}">
-    <button type="submit" class="primary">{html.escape(t('btn_add_source', lang_override=lang))}</button>
-  </form>
-</div>
-
-<div class="card">
-  <h3>{html.escape(t('broadcast_history', lang_override=lang))}</h3>
-  {logs_html or f'<div style="color:var(--text-dim);margin-top:10px">{html.escape(t("no_history", lang_override=lang))}</div>'}
-</div>
-
-</body>
-</html>
-"""
-            raw = html_page.encode("utf-8")
-            self.send_response(200)
-            self.send_header("Content-Type", "text/html; charset=utf-8")
-            self.send_header("Content-Length", str(len(raw)))
-            self.end_headers()
-            self.wfile.write(raw)
+            render_studio(self, port)
 
         def do_POST(self) -> None:
             length = int(self.headers.get("Content-Length", "0"))

@@ -1,4 +1,7 @@
 import pybionic_core as core
+import pybionic_web as web
+import sqlite3
+from typing import Any
 import os
 import sys
 if hasattr(sys.stdout, "reconfigure"):
@@ -80,205 +83,58 @@ class StudioHandler(BaseHTTPRequestHandler):
             self.wfile.write(json.dumps(t).encode("utf-8"))
             return
 
-        # Render HTML UI
-        self.send_response(200)
-        self.send_header("Content-Type", "text/html; charset=utf-8")
-        self.end_headers()
-        html = self._render_html()
-        self.wfile.write(html.encode("utf-8"))
+        render_studio(self)
 
-    def _render_html(self):
-        stats = crm_engine.get_crm_stats()
-        tickets = crm_engine.get_user_tickets(1234567) or [
-            {"id": 1, "category": "Billing", "subject": "Payment query", "topic_id": 5567, "status": "PENDING", "created_at": time.time()}
-        ]
 
-        ticket_rows = "".join([
-            f"""<tr>
-                <td>#{t['id']}</td>
-                <td><span class="badge">{t['category']}</span></td>
-                <td>{t['subject']}</td>
-                <td><code>#{t['topic_id']}</code></td>
-                <td><span class="status-{t['status'].lower()}">{t['status']}</span></td>
-            </tr>"""
-            for t in tickets
-        ])
+def render_studio(handler: Any) -> None:
+    lang = web.resolve_lang(handler)
+    T = web.translator(lang)
+    stats = crm_engine.get_crm_stats()
+    conn = sqlite3.connect(crm_engine.DB_PATH)
+    try:
+        rows = conn.execute("SELECT id, username, category, subject, topic_id, status, created_at FROM tickets ORDER BY id DESC LIMIT 30").fetchall()
+    finally:
+        conn.close()
+    css = ("<style>.cr-st{font-size:11.5px;font-weight:700;padding:4px 9px;border-radius:99px;white-space:nowrap}"
+           ".cr-open{background:#3b82f622;color:#3b82f6}.cr-pending{background:#f59e0b22;color:#f59e0b}.cr-resolved{background:#22c55e22;color:#22c55e}"
+           ".cr-cat{font-size:12px;padding:3px 9px;border-radius:8px;background:var(--surface2);border:1px solid var(--line);white-space:nowrap}"
+           ".cr-subj{max-width:420px;word-break:break-word}.cr-meta{color:var(--muted);font-size:12.5px;white-space:nowrap}"
+           ".cr-flow{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}.cr-flow div{padding:14px;border-radius:14px;border:1px solid var(--line);background:var(--surface2);font-size:13.5px}"
+           ".cr-flow b{display:block;font-size:15px;margin-bottom:4px}</style>")
+    st_names = {"OPEN": T("w_s_open"), "PENDING": T("w_s_pending"), "RESOLVED": T("w_s_resolved")}
+    trs = []
+    for r in rows:
+        status = str(r[5] or "OPEN").upper()
+        when = time.strftime("%d.%m %H:%M", time.localtime(r[6] or 0))
+        trs.append([f"#{int(r[0])}", f'<span class="cr-cat">{web.esc(r[2])}</span>', f'<div class="cr-subj">{web.esc(r[3])}</div><span class="cr-meta">{web.esc(r[1] or "")}</span>',
+                    f'<code>#{int(r[4] or 0)}</code>', f'<span class="cr-st cr-{status.lower()}">{web.esc(st_names.get(status, status))}</span>', f'<span class="cr-meta">{when}</span>'])
+    table = web.table(["ID", T("w_cat"), T("w_subject"), T("w_topic"), T("status"), T("time")], trs, T("w_no_tickets"), raw=True)
+    cats = [("Technical", T("w_c_tech")), ("Billing", T("w_c_billing")), ("Partnership", T("w_c_partner")), ("Other", T("w_c_other"))]
+    create = web.card(T("w_card_new"),
+        '<form id="f">' + web.field(T("w_cat"), web.segmented("cat", cats, "Technical", icons={"Technical": "settings", "Billing": "chart", "Partnership": "users", "Other": "sparkles"}))
+        + web.field(T("w_subject"), web.textarea("subj", T("w_subject_ph"), rows=3, maxlength="300"))
+        + web.button(T("w_create"), "go", type="submit", icon_name="plus") + "</form>", icon_name="plus")
+    flow = web.card(T("w_card_flow"), '<div class="cr-flow">' + "".join(
+        f"<div><b>{i}. {web.esc(T('w_f' + str(i) + '_t'))}</b>{web.esc(T('w_f' + str(i)))}</div>" for i in (1, 2, 3)) + "</div>"
+        + web.note(T("w_flow_note"), "info"), icon_name="list")
+    st = web.stats([(T("w_st_total"), str(stats.get("total", 0)), None, "list"), (T("w_s_open"), str(stats.get("open", 0)), None, "send"),
+                    (T("w_s_pending"), str(stats.get("pending", 0)), None, "clock"), (T("w_s_resolved"), str(stats.get("resolved", 0)), None, "check")])
+    tickets = web.card(T("w_card_tickets"), table, icon_name="folder", aside=web.button(T("refresh"), "rf", kind="ghost", cls="pb-btn-sm", icon_name="refresh"))
+    hero = web.hero(T("w_title"), T("w_hero"), "🗂", chips=[T("w_chip_tickets"), T("w_chip_topics"), T("w_chip_statuses")])
+    web.send_page(handler, lang, title=T("w_title"), emoji="🗂", brand="#6366f1", port=PORT, hero_html=hero,
+                  body=css + st + web.grid(create, flow, min_width=330) + tickets, script=CRM_JS)
 
-        return f"""<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Forum CRM Dispatcher Studio</title>
-<style>
-  :root {{
-    --bg: #0c101c;
-    --card: #151d30;
-    --card-border: #222f4d;
-    --primary: #00d2ff;
-    --accent: #3a7bd5;
-    --success: #00e676;
-    --warning: #ffb300;
-    --text: #e0e6ed;
-    --muted: #8899a6;
-  }}
-  * {{ box-sizing: border-box; margin: 0; padding: 0; }}
-  body {{
-    background: var(--bg);
-    color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, monospace;
-    padding: 20px;
-  }}
-  .container {{ max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }}
-  .header {{
-    text-align: center;
-    border-bottom: 1px solid var(--card-border);
-    padding-bottom: 16px;
-  }}
-  .header h1 {{ color: var(--primary); font-size: 26px; }}
-  .header p {{ color: var(--muted); font-size: 14px; margin-top: 4px; }}
-  .card {{
-    background: var(--card);
-    border: 1px solid var(--card-border);
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-  }}
-  .card-title {{
-    color: var(--primary);
-    font-size: 16px;
-    font-weight: 600;
-    margin-bottom: 14px;
-    display: flex;
-    justify-content: space-between;
-  }}
-  .grid {{
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 16px;
-  }}
-  .stat-block {{
-    background: #0f1524;
-    border: 1px solid var(--card-border);
-    border-radius: 8px;
-    padding: 16px;
-    text-align: center;
-  }}
-  .stat-label {{ color: var(--muted); font-size: 12px; margin-bottom: 6px; }}
-  .stat-val {{ font-size: 22px; font-weight: bold; color: #fff; }}
-  table {{
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-    font-size: 14px;
-  }}
-  th, td {{
-    padding: 12px 14px;
-    text-align: left;
-    border-bottom: 1px solid var(--card-border);
-  }}
-  th {{ color: var(--muted); font-weight: 600; }}
-  .badge {{
-    background: #1f2b48;
-    color: var(--primary);
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 12px;
-  }}
-  .status-open {{ color: var(--primary); font-weight: bold; }}
-  .status-pending {{ color: var(--warning); font-weight: bold; }}
-  .status-resolved {{ color: var(--success); font-weight: bold; }}
-  .action-box {{
-    display: flex;
-    gap: 10px;
-  }}
-  input[type="text"] {{
-    flex: 1;
-    background: #0f1524;
-    border: 1px solid var(--card-border);
-    border-radius: 8px;
-    padding: 12px;
-    color: #fff;
-    outline: none;
-  }}
-  button {{
-    background: var(--primary);
-    color: #000;
-    font-weight: bold;
-    border: none;
-    border-radius: 8px;
-    padding: 12px 20px;
-    cursor: pointer;
-    transition: 0.2s;
-  }}
-  button:hover {{ filter: brightness(1.2); }}
-</style>
-</head>
-<body>
-<div class="container">
-  <div class="header">
-    <h1>🗂 FORUM CRM DISPATCHER</h1>
-    <p>Client Inquiries & Telegram Forum Topics Routing Hub (Offline Web Studio)</p>
-  </div>
 
-  <div class="card">
-    <div class="card-title"><span>📊 CRM PIPELINE OVERVIEW</span><span style="color:var(--primary)">PORT {PORT}</span></div>
-    <div class="grid">
-      <div class="stat-block">
-        <div class="stat-label">TOTAL TICKETS</div>
-        <div class="stat-val">{stats['total']}</div>
-      </div>
-      <div class="stat-block">
-        <div class="stat-label">OPEN INQUIRIES</div>
-        <div class="stat-val" style="color:var(--primary)">{stats['open']}</div>
-      </div>
-      <div class="stat-block">
-        <div class="stat-label">PENDING REPLIES</div>
-        <div class="stat-val" style="color:var(--warning)">{stats['pending']}</div>
-      </div>
-      <div class="stat-block">
-        <div class="stat-label">RESOLVED TICKETS</div>
-        <div class="stat-val" style="color:var(--success)">{stats['resolved']}</div>
-      </div>
-    </div>
-  </div>
+CRM_JS = r"""
+const $=s=>document.querySelector(s);
+$('#rf').onclick=()=>location.reload();
+$('#f').addEventListener('submit',async e=>{e.preventDefault();const v=$('#subj').value.trim();if(!v)return pb.toast(pb.t('w_need_subject'),true);
+  const b=$('#go');pb.busy(b,true);
+  try{const d=await pb.json('/api/create_ticket?cat='+encodeURIComponent($('#cat').dataset.value)+'&subj='+encodeURIComponent(v));
+    pb.toast(pb.t('w_created',{id:d.ticket_id||d.id||''}));setTimeout(()=>location.reload(),700)}
+  catch(err){pb.busy(b,false);pb.toast(pb.t('error')+': '+err.message,true)}});
+"""
 
-  <div class="card">
-    <div class="card-title"><span>✍️ SIMULATE CLIENT TICKET CREATION</span></div>
-    <div class="action-box">
-      <input type="text" id="subjInput" placeholder="Describe client issue (e.g. API webhook 500 error)...">
-      <button onclick="createTicket()">CREATE TICKET</button>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-title"><span>📋 DISPATCHED FORUM TOPICS & THREADS</span></div>
-    <table>
-      <thead>
-        <tr>
-          <th>TICKET ID</th>
-          <th>CATEGORY</th>
-          <th>SUBJECT</th>
-          <th>FORUM TOPIC</th>
-          <th>STATUS</th>
-        </tr>
-      </thead>
-      <tbody>
-        {ticket_rows}
-      </tbody>
-    </table>
-  </div>
-</div>
-
-<script>
-function createTicket() {{
-  const val = document.getElementById('subjInput').value.trim();
-  if(!val) return alert('Enter subject');
-  window.location.href = '/api/create_ticket?cat=Technical&subj=' + encodeURIComponent(val);
-}}
-</script>
-</body>
-</html>"""
 
 class ThreadedStudioServer(ThreadingHTTPServer):
     allow_reuse_address = True

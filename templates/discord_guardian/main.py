@@ -4,6 +4,7 @@ Features Rich Cyberpunk Embeds, guild language preferences, full 24-language sup
 
 from __future__ import annotations
 
+import pybionic_web as web
 import os
 import sys
 import json
@@ -176,270 +177,56 @@ def set_guild_lang(guild_id: int, lang_code: str) -> str:
 # Cyberpunk Web Studio Handler & HTML
 # ===========================================================================
 
-WEB_STUDIO_HTML = """<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Discord Guardian Pro — Web Studio</title>
-<style>
-:root {
-  --bg: #090d16;
-  --surface: #101726;
-  --card: #151f33;
-  --border: #1e2c47;
-  --accent: #5865f2;
-  --accent-glow: rgba(88, 101, 242, 0.35);
-  --cyan: #00d8ff;
-  --emerald: #00e676;
-  --gold: #ffc107;
-  --danger: #ff4757;
-  --text: #f1f5f9;
-  --text-muted: #94a3b8;
-}
-* { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-body { background: var(--bg); color: var(--text); padding: 16px; min-height: 100vh; }
-.container { max-width: 960px; margin: 0 auto; }
-header {
-  background: linear-gradient(135deg, rgba(88, 101, 242, 0.15), rgba(0, 216, 255, 0.05));
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 20px;
-  margin-bottom: 20px;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-.brand { display: flex; align-items: center; gap: 14px; }
-.logo-icon {
-  width: 48px; height: 48px; border-radius: 12px;
-  background: var(--accent);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 24px; box-shadow: 0 0 16px var(--accent-glow);
-}
-.brand h1 { font-size: 1.4rem; font-weight: 700; color: #fff; }
-.brand p { font-size: 0.85rem; color: var(--text-muted); margin-top: 2px; }
-.badges { display: flex; gap: 8px; flex-wrap: wrap; }
-.badge {
-  padding: 6px 12px; border-radius: 999px; font-size: 0.75rem; font-weight: 600;
-  display: inline-flex; align-items: center; gap: 6px;
-}
-.badge-online { background: rgba(0, 230, 118, 0.15); color: var(--emerald); border: 1px solid rgba(0, 230, 118, 0.3); }
-.badge-port { background: rgba(88, 101, 242, 0.15); color: var(--cyan); border: 1px solid rgba(88, 101, 242, 0.3); }
-.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 20px; }
-.stat-card {
-  background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px;
-  display: flex; flex-direction: column; gap: 6px; transition: transform 0.2s, border-color 0.2s;
-}
-.stat-card:hover { transform: translateY(-2px); border-color: var(--accent); }
-.stat-card .label { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
-.stat-card .value { font-size: 1.7rem; font-weight: 800; color: #fff; }
-.section-card {
-  background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
-  padding: 20px; margin-bottom: 20px;
-}
-.section-title { font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
-.filter-input-row { display: flex; gap: 10px; margin-bottom: 16px; }
-input[type="text"] {
-  flex: 1; background: var(--card); border: 1px solid var(--border);
-  color: #fff; padding: 10px 14px; border-radius: 10px; font-size: 0.95rem; outline: none;
-}
-input[type="text"]:focus { border-color: var(--cyan); box-shadow: 0 0 10px rgba(0, 216, 255, 0.2); }
-button.btn {
-  background: var(--accent); color: #fff; border: none; padding: 10px 18px;
-  border-radius: 10px; font-weight: 600; font-size: 0.9rem; cursor: pointer;
-  display: inline-flex; align-items: center; gap: 6px; transition: background 0.2s;
-}
-button.btn:hover { background: #4752c4; }
-.chips-container { display: flex; flex-wrap: wrap; gap: 8px; }
-.chip {
-  background: var(--card); border: 1px solid var(--border); padding: 6px 12px;
-  border-radius: 8px; font-size: 0.85rem; color: var(--text);
-  display: inline-flex; align-items: center; gap: 8px;
-}
-.chip .del-btn {
-  color: var(--danger); cursor: pointer; font-weight: bold; font-size: 1rem; line-height: 1;
-}
-.chip .del-btn:hover { color: #ff6b81; }
-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); }
-th { color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.75rem; }
-tr:hover { background: rgba(255, 255, 255, 0.02); }
-.badge-action {
-  padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 700;
-}
-.action-warn { background: rgba(255, 193, 7, 0.2); color: var(--gold); }
-.action-filter { background: rgba(255, 71, 87, 0.2); color: var(--danger); }
-.action-mod { background: rgba(0, 216, 255, 0.2); color: var(--cyan); }
-</style>
-</head>
-<body>
-<div class="container">
-  <header>
-    <div class="brand">
-      <div class="logo-icon">🛡️</div>
-      <div>
-        <h1>Discord Guardian Pro</h1>
-        <p>Anti-Spam • Word Filter • Moderation • XP Leaderboard</p>
-      </div>
-    </div>
-    <div class="badges">
-      <span class="badge badge-online">🟢 Web Studio Online</span>
-      <span class="badge badge-port" id="portBadge">PORT: ...</span>
-    </div>
-  </header>
+def render_studio(handler: Any) -> None:
+    lang = web.resolve_lang(handler)
+    T = web.translator(lang)
+    css = ("<style>.dg-add{display:flex;gap:8px;flex-wrap:wrap}.dg-add .pb-input-wrap{flex:1;min-width:200px}"
+           ".dg-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;min-height:36px}"
+           ".dg-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 6px 6px 12px;border-radius:99px;background:#ef444418;border:1px solid #ef444444;font-size:13.5px;font-weight:600;animation:dgIn .3s both}"
+           "@keyframes dgIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:none}}"
+           ".dg-chip button{width:22px;height:22px;border-radius:50%;border:0;background:transparent;color:var(--muted);cursor:pointer;display:grid;place-items:center;font-size:15px;line-height:1}"
+           ".dg-chip button:hover{background:#ef444433;color:#ef4444}"
+           ".dg-rank{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;font-weight:800;font-size:13px;background:var(--surface2)}"
+           ".dg-r1{background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#3b2600}.dg-r2{background:linear-gradient(135deg,#e5e7eb,#9ca3af);color:#1f2937}.dg-r3{background:linear-gradient(135deg,#fdba74,#c2410c);color:#fff}"
+           ".dg-xp{font-weight:800;color:#f59e0b}.dg-act{font-size:11.5px;font-weight:700;padding:4px 9px;border-radius:99px;background:var(--surface2);white-space:nowrap}"
+           ".dg-WARN{background:#f59e0b22;color:#f59e0b}.dg-WORD_FILTER{background:#ef444422;color:#ef4444}.dg-SPAM{background:#a855f722;color:#a855f7}"
+           ".dg-id{font-family:ui-monospace,Consolas,monospace;font-size:12.5px;color:var(--muted)}</style>")
+    words = web.card(T("w_card_words"),
+        '<form class="dg-add" id="f">' + web.input_("word", T("w_word_ph"), icon_name="shield", autocomplete="off", maxlength="64")
+        + web.button(T("add"), "addbtn", type="submit", icon_name="plus") + "</form>"
+        + '<div class="dg-chips" id="words"></div>' + web.note(T("w_words_note"), "info"), icon_name="shield")
+    how = web.card(T("w_card_how"), "".join(web.note(T(k), "info", ic) for k, ic in (("w_h_spam", "zap"), ("w_h_filter", "shield"), ("w_h_xp", "chart"))), icon_name="list")
+    board = web.card(T("w_card_board"), web.table(["#", T("w_user"), "XP", T("w_warns")], [], T("w_no_board"), id="board"), icon_name="chart")
+    logs = web.card(T("w_card_logs"), web.table([T("time"), T("w_user"), T("action"), T("reason")], [], T("w_no_logs"), id="logs"), icon_name="clock",
+                    aside=web.button(T("refresh"), "rf", kind="ghost", cls="pb-btn-sm", icon_name="refresh"))
+    st = web.stats([(T("w_st_words"), "0", "s1", "shield"), (T("w_st_logs"), "0", "s2", "list"), (T("w_st_users"), "0", "s3", "users"), (T("w_st_warns"), "0", "s4", "alert")])
+    hero = web.hero(T("w_title"), T("w_hero"), "🛡️", chips=[T("w_chip_spam"), T("w_chip_filter"), "XP", "Discord"])
+    web.send_page(handler, lang, title=T("w_title"), emoji="🛡️", brand="#5865f2", port=WEB_PORT, hero_html=hero,
+                  body=css + st + web.grid(words, how, min_width=330) + web.grid(board, logs, min_width=330), script=GUARDIAN_JS)
 
-  <div class="stats-grid">
-    <div class="stat-card">
-      <span class="label">🚫 Filter Words</span>
-      <span class="value" id="statWords">0</span>
-    </div>
-    <div class="stat-card">
-      <span class="label">⚖️ Mod Audit Logs</span>
-      <span class="value" id="statLogs">0</span>
-    </div>
-    <div class="stat-card">
-      <span class="label">👥 Tracked Users</span>
-      <span class="value" id="statUsers">0</span>
-    </div>
-    <div class="stat-card">
-      <span class="label">⚠️ Total Warnings</span>
-      <span class="value" id="statWarns">0</span>
-    </div>
-  </div>
 
-  <div class="section-card">
-    <h2 class="section-title">🚫 Word Filter Blacklist</h2>
-    <div class="filter-input-row">
-      <input type="text" id="wordInput" placeholder="Enter word or pattern to filter (e.g. scam-link)...">
-      <button class="btn" onclick="addWord()">+ Add Word</button>
-    </div>
-    <div class="chips-container" id="wordsContainer">
-      <span style="color:var(--text-muted);">Loading bad words...</span>
-    </div>
-  </div>
-
-  <div class="section-card">
-    <h2 class="section-title">🏆 Top XP Members</h2>
-    <table>
-      <thead>
-        <tr><th>Rank</th><th>Guild ID</th><th>User ID</th><th>XP Points</th><th>Warnings</th></tr>
-      </thead>
-      <tbody id="leaderboardBody">
-        <tr><td colspan="5" style="text-align:center; color:var(--text-muted);">Loading leaderboard...</td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="section-card">
-    <h2 class="section-title">📜 Recent Moderation Logs</h2>
-    <table>
-      <thead>
-        <tr><th>Time</th><th>User ID</th><th>Action</th><th>Reason / Details</th></tr>
-      </thead>
-      <tbody id="logsBody">
-        <tr><td colspan="4" style="text-align:center; color:var(--text-muted);">Loading logs...</td></tr>
-      </tbody>
-    </table>
-  </div>
-</div>
-
-<script>
-async function refreshData() {
-  try {
-    const res = await fetch('/api/status');
-    const data = await res.json();
-    document.getElementById('portBadge').textContent = 'PORT: ' + data.port;
-    document.getElementById('statWords').textContent = data.stats.bad_words;
-    document.getElementById('statLogs').textContent = data.stats.mod_logs;
-    document.getElementById('statUsers').textContent = data.stats.ranked_users;
-    document.getElementById('statWarns').textContent = data.stats.total_warns;
-  } catch(e) {}
-
-  try {
-    const res = await fetch('/api/words');
-    const words = await res.json();
-    const cont = document.getElementById('wordsContainer');
-    if (!words || words.length === 0) {
-      cont.innerHTML = '<span style="color:var(--text-muted)">No active filter words.</span>';
-    } else {
-      cont.innerHTML = words.map(w =>
-        `<span class="chip">${escapeHtml(w)} <span class="del-btn" onclick="deleteWord('${escapeHtml(w)}')">&times;</span></span>`
-      ).join('');
-    }
-  } catch(e) {}
-
-  try {
-    const res = await fetch('/api/leaderboard');
-    const top = await res.json();
-    const tbody = document.getElementById('leaderboardBody');
-    if (!top || top.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:var(--text-muted)">No members ranked yet.</td></tr>';
-    } else {
-      tbody.innerHTML = top.map((r, i) =>
-        `<tr>
-          <td><strong>#${i+1}</strong></td>
-          <td><code>${r.guild_id}</code></td>
-          <td><code>${r.user_id}</code></td>
-          <td><span style="color:var(--gold); font-weight:700;">${r.xp} XP</span></td>
-          <td>${r.warns > 0 ? '<span style="color:var(--danger)">⚠️ ' + r.warns + '</span>' : '0'}</td>
-        </tr>`
-      ).join('');
-    }
-  } catch(e) {}
-
-  try {
-    const res = await fetch('/api/logs');
-    const logs = await res.json();
-    const tbody = document.getElementById('logsBody');
-    if (!logs || logs.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--text-muted)">No moderation actions logged yet.</td></tr>';
-    } else {
-      tbody.innerHTML = logs.map(l => {
-        let cls = 'action-mod';
-        if (l.action === 'WARN') cls = 'action-warn';
-        if (l.action === 'WORD_FILTER') cls = 'action-filter';
-        const d = new Date(l.created_at * 1000).toLocaleTimeString();
-        return `<tr>
-          <td>${d}</td>
-          <td><code>${l.user_id}</code></td>
-          <td><span class="badge-action ${cls}">${escapeHtml(l.action)}</span></td>
-          <td>${escapeHtml(l.reason || '-')}</td>
-        </tr>`;
-      }).join('');
-    }
-  } catch(e) {}
-}
-
-async function addWord() {
-  const inp = document.getElementById('wordInput');
-  const w = inp.value.trim();
-  if (!w) return;
-  await fetch('/api/add_word?word=' + encodeURIComponent(w), { method: 'POST' });
-  inp.value = '';
-  refreshData();
-}
-
-async function deleteWord(w) {
-  await fetch('/api/delete_word?word=' + encodeURIComponent(w), { method: 'POST' });
-  refreshData();
-}
-
-function escapeHtml(str) {
-  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-}
-
-document.getElementById('wordInput').addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') addWord();
-});
-
-refreshData();
-setInterval(refreshData, 5000);
-</script>
-</body>
-</html>
+GUARDIAN_JS = r"""
+const $=s=>document.querySelector(s);
+const empty=(id,key,cols)=>{$(id+' tbody').innerHTML=`<tr class="pb-empty-row"><td colspan="${cols}">${pb.esc(pb.t(key))}</td></tr>`};
+const ACT={WARN:'w_a_warn',WORD_FILTER:'w_a_filter',SPAM:'w_a_spam',MUTE:'w_a_mute',KICK:'w_a_kick',BAN:'w_a_ban'};
+async function status(){const d=await pb.json('/api/status').catch(()=>null);if(d&&d.stats){const s=d.stats;pb.count($('#s1'),s.bad_words||0);pb.count($('#s2'),s.mod_logs||0);pb.count($('#s3'),s.ranked_users||0);pb.count($('#s4'),s.total_warns||0)}}
+function renderWords(ws){const c=$('#words');if(!ws||!ws.length){c.innerHTML=`<span class="pb-hint">${pb.esc(pb.t('w_no_words'))}</span>`;return}
+  c.innerHTML=ws.map(w=>`<span class="dg-chip">${pb.esc(w)}<button type="button" data-w="${pb.esc(w)}" aria-label="${pb.esc(pb.t('delete'))}">×</button></span>`).join('');
+  c.querySelectorAll('button').forEach(b=>b.onclick=async()=>{const d=await pb.post('/api/delete_word?word='+encodeURIComponent(b.dataset.w),{}).catch(()=>null);
+    if(d){renderWords(d.words);status();pb.toast(pb.t('deleted'))}else pb.toast(pb.t('error_conn'),true)})}
+async function load(){
+  pb.json('/api/words').then(renderWords).catch(()=>{});
+  pb.json('/api/leaderboard').then(top=>{if(!top||!top.length)return empty('#board','w_no_board',4);
+    $('#board tbody').innerHTML=top.map((r,i)=>`<tr><td><span class="dg-rank ${i<3?'dg-r'+(i+1):''}">${i+1}</span></td><td><span class="dg-id">${pb.esc(String(r.user_id))}</span></td>
+      <td><span class="dg-xp">${(+r.xp).toLocaleString(PB_LANG)}</span></td><td>${+r.warns>0?'⚠️ '+(+r.warns):'0'}</td></tr>`).join('')}).catch(()=>{});
+  pb.json('/api/logs').then(ls=>{if(!ls||!ls.length)return empty('#logs','w_no_logs',4);
+    $('#logs tbody').innerHTML=ls.slice(0,30).map(l=>{const a=String(l.action||'');const when=new Date(l.created_at*1000).toLocaleString(PB_LANG,{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+      return `<tr><td class="dg-id">${when}</td><td><span class="dg-id">${pb.esc(String(l.user_id))}</span></td><td><span class="dg-act dg-${pb.esc(a)}">${pb.esc(ACT[a]?pb.t(ACT[a]):a)}</span></td><td>${pb.esc(l.reason||'—')}</td></tr>`}).join('')}).catch(()=>{});
+  status()}
+$('#f').addEventListener('submit',async e=>{e.preventDefault();const w=$('#word').value.trim();if(!w)return;const b=$('#addbtn');pb.busy(b,true);
+  try{const d=await pb.post('/api/add_word?word='+encodeURIComponent(w),{});renderWords(d.words);$('#word').value='';status();pb.toast(pb.t('w_word_added'))}
+  catch(err){pb.toast(pb.t('error_conn'),true)}finally{pb.busy(b,false)}});
+$('#rf').onclick=load;load();
 """
 
 
@@ -469,10 +256,7 @@ class WebStudioHandler(BaseHTTPRequestHandler):
         query = urllib.parse.parse_qs(parsed.query)
 
         if path == "/":
-            self.send_response(200)
-            self.send_header("Content-Type", "text/html; charset=utf-8")
-            self.end_headers()
-            self.wfile.write(WEB_STUDIO_HTML.encode("utf-8"))
+            render_studio(self)
             return
 
         elif path == "/api/status":

@@ -13,6 +13,7 @@ Features:
 from __future__ import annotations
 
 import pybionic_core as core
+import pybionic_web as web
 import html
 import io
 import json
@@ -981,389 +982,58 @@ def setup_bot(bot: Any) -> None:
 # ---------------------------------------------------------------------------
 # Cyberpunk Web Studio HTTP Handler (Pure Python, No external cgi)
 # ---------------------------------------------------------------------------
-WEB_STUDIO_HTML = """<!DOCTYPE html>
-<html lang="ru">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Media Target Compressor Studio</title>
-<style>
-  :root {
-    --bg-dark: #0a0e17;
-    --card-bg: #111827;
-    --accent-cyan: #00f5ff;
-    --accent-green: #00ff9d;
-    --accent-pink: #ff007f;
-    --text-primary: #f3f4f6;
-    --text-muted: #9ca3af;
-    --border-color: #1f2937;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    background: radial-gradient(circle at top right, #131b2e 0%, var(--bg-dark) 100%);
-    color: var(--text-primary);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    min-height: 100vh;
-    padding: 24px 16px;
-  }
-  .container { max-width: 900px; margin: 0 auto; }
-  header {
-    text-align: center;
-    margin-bottom: 32px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid var(--border-color);
-  }
-  h1 {
-    font-size: 2.2rem;
-    font-weight: 800;
-    background: linear-gradient(135deg, var(--accent-cyan) 0%, var(--accent-green) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    letter-spacing: -0.5px;
-    margin-bottom: 8px;
-  }
-  .badge {
-    display: inline-block;
-    padding: 4px 12px;
-    border-radius: 9999px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    background: rgba(0, 245, 255, 0.15);
-    color: var(--accent-cyan);
-    border: 1px solid rgba(0, 245, 255, 0.3);
-    margin-bottom: 8px;
-    text-transform: uppercase;
-  }
-  p.subtitle { color: var(--text-muted); font-size: 0.95rem; }
+def render_studio(handler: Any) -> None:
+    """Веб-студия: новый дизайн PyBionic, все тексты на языке страницы."""
+    lang = web.resolve_lang(handler)
+    T = web.translator(lang)
+    presets = [("8", "8 MB"), ("16", "16 MB"), ("25", "25 MB"), ("50", "50 MB"), ("100", "100 MB"), ("200", "200 MB")]
+    sub = {"8": "Discord", "16": "WhatsApp", "25": "Email", "50": "Telegram", "100": "Web", "200": "HD"}
+    file_card = web.card(T("w_card_file"), web.dropzone("mf", T("drop_or_click"), T("w_formats"), accept="video/*,audio/*")
+                         + web.stats([(T("original"), "—", "st-orig", "file"), (T("w_target"), "8 MB", "st-target", "zap")]),
+                         icon_name="upload")
+    target_card = web.card(T("w_card_target"),
+        web.field(T("w_presets"), web.segmented("preset", presets, "8", sub=sub))
+        + web.field(T("w_target"), web.range_("target", 1, 250, 8, 1, " MB"))
+        + web.field(T("mode"), web.segmented("mode", [("2pass", T("w_mode_2pass")), ("1pass", T("w_mode_1pass")), ("audio", T("w_mode_audio"))],
+                                              "2pass", sub={"2pass": T("w_mode_2pass_sub"), "1pass": T("w_mode_1pass_sub"), "audio": T("w_mode_audio_sub")},
+                                              icons={"2pass": "sparkles", "1pass": "zap", "audio": "music"}))
+        + web.field(T("w_scale"), web.select("scale", [("auto", T("w_scale_auto")), ("keep", T("w_scale_keep")),
+                                                       ("720p", T("w_scale_720")), ("480p", T("w_scale_480"))], "auto"))
+        + web.note(T("w_reserve_note"), icon_name="settings")
+        + web.button(T("w_compress_btn"), "go", icon_name="zap", disabled=True)
+        + web.progress("prog") + web.result_box("res"), icon_name="settings")
+    hero = web.hero(T("w_title"), T("w_hero"), "🎯", chips=["Discord 8 MB", "WhatsApp 16 MB", "Telegram 50 MB", "2-pass FFmpeg"])
+    web.send_page(handler, lang, title=T("w_title"), emoji="🎯", brand="#7c5cff", port=WEB_PORT,
+                  hero_html=hero, body=web.grid(file_card, target_card, min_width=340), script=MTC_JS)
 
-  .grid { display: grid; grid-template-columns: 1fr; gap: 24px; }
-  @media(min-width: 768px) { .grid { grid-template-columns: 1fr 1fr; } }
 
-  .card {
-    background: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 16px;
-    padding: 24px;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
-  }
-  .card h2 {
-    font-size: 1.15rem;
-    margin-bottom: 16px;
-    color: var(--accent-cyan);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .dropzone {
-    border: 2px dashed rgba(0, 245, 255, 0.3);
-    border-radius: 12px;
-    padding: 32px 16px;
-    text-align: center;
-    cursor: pointer;
-    background: rgba(0, 0, 0, 0.2);
-    transition: all 0.2s ease;
-  }
-  .dropzone:hover, .dropzone.dragover {
-    border-color: var(--accent-green);
-    background: rgba(0, 255, 157, 0.05);
-  }
-  .dropzone svg { width: 44px; height: 44px; fill: var(--accent-cyan); margin-bottom: 12px; }
-  .dropzone p { color: var(--text-muted); font-size: 0.85rem; }
-  .dropzone strong { color: var(--text-primary); display: block; font-size: 1rem; margin-bottom: 4px; }
-
-  .presets-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-    margin-bottom: 16px;
-  }
-  .preset-btn {
-    background: #1f2937;
-    border: 1px solid #374151;
-    color: var(--text-primary);
-    padding: 10px;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.15s;
-    text-align: center;
-    font-size: 0.85rem;
-  }
-  .preset-btn:hover, .preset-btn.active {
-    background: rgba(0, 245, 255, 0.2);
-    border-color: var(--accent-cyan);
-    color: var(--accent-cyan);
-  }
-
-  .form-group { margin-bottom: 16px; }
-  label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px; font-weight: 600; }
-  input[type="range"] {
-    width: 100%;
-    accent-color: var(--accent-cyan);
-    background: #1f2937;
-    height: 6px;
-    border-radius: 3px;
-  }
-  .range-meta { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
-
-  select {
-    width: 100%;
-    padding: 10px 12px;
-    background: #1f2937;
-    border: 1px solid #374151;
-    border-radius: 8px;
-    color: var(--text-primary);
-    font-size: 0.9rem;
-    outline: none;
-  }
-
-  .calc-box {
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(0, 255, 157, 0.2);
-    border-radius: 12px;
-    padding: 16px;
-    margin-top: 16px;
-  }
-  .calc-row {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.85rem;
-    margin-bottom: 8px;
-  }
-  .calc-row:last-child { margin-bottom: 0; }
-  .calc-val { font-weight: 700; color: var(--accent-green); }
-
-  .action-btn {
-    width: 100%;
-    padding: 14px;
-    border-radius: 10px;
-    border: none;
-    background: linear-gradient(135deg, var(--accent-cyan) 0%, var(--accent-green) 100%);
-    color: #050b14;
-    font-weight: 700;
-    font-size: 1rem;
-    cursor: pointer;
-    box-shadow: 0 4px 15px rgba(0, 245, 255, 0.3);
-    transition: transform 0.1s ease, box-shadow 0.2s ease;
-    margin-top: 16px;
-  }
-  .action-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0, 245, 255, 0.4); }
-  .action-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
-
-  .progress-wrap {
-    display: none;
-    margin-top: 16px;
-  }
-  .progress-bar-bg {
-    background: #1f2937;
-    height: 8px;
-    border-radius: 4px;
-    overflow: hidden;
-  }
-  .progress-bar-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--accent-cyan), var(--accent-green));
-    width: 0%;
-    transition: width 0.3s ease;
-  }
-
-  .result-box {
-    display: none;
-    background: rgba(0, 255, 157, 0.05);
-    border: 1px solid var(--accent-green);
-    border-radius: 12px;
-    padding: 16px;
-    margin-top: 16px;
-  }
-  .download-btn {
-    display: block;
-    text-align: center;
-    background: var(--accent-green);
-    color: #050b14;
-    font-weight: 700;
-    padding: 12px;
-    border-radius: 8px;
-    text-decoration: none;
-    margin-top: 12px;
-  }
-</style>
-</head>
-<body>
-<div class="container">
-  <header>
-    <div class="badge">Level 10/10 Studio • Port 8096</div>
-    <h1>Media Target Compressor</h1>
-    <p class="subtitle">Сжатие видео и аудио точно в заданный размер (Discord, WhatsApp, Telegram, Email)</p>
-  </header>
-
-  <div class="grid">
-    <div class="card">
-      <h2>📁 1. Выберите файл</h2>
-      <div class="dropzone" id="dropzone" onclick="document.getElementById('fileInput').click()">
-        <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
-        <strong id="dropPrompt">Нажмите или перетащите файл</strong>
-        <p>Поддерживаются: MP4, MKV, MOV, WEBM, MP3, AAC, OGG</p>
-      </div>
-      <input type="file" id="fileInput" style="display:none" onchange="onFileSelected(this)">
-
-      <div id="fileMeta" style="display:none; margin-top:16px;">
-        <div class="calc-box">
-          <div class="calc-row"><span>Имя файла:</span><span id="metaName" class="calc-val">-</span></div>
-          <div class="calc-row"><span>Исходный размер:</span><span id="metaSize" class="calc-val">-</span></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <h2>🎯 2. Параметры сжатия</h2>
-      <label>Быстрые пресеты лимитов:</label>
-      <div class="presets-grid">
-        <button class="preset-btn active" onclick="setPreset(8)">8 MB<br><small>Discord</small></button>
-        <button class="preset-btn" onclick="setPreset(16)">16 MB<br><small>WhatsApp</small></button>
-        <button class="preset-btn" onclick="setPreset(25)">25 MB<br><small>Nitro/Mail</small></button>
-        <button class="preset-btn" onclick="setPreset(50)">50 MB<br><small>Telegram</small></button>
-        <button class="preset-btn" onclick="setPreset(100)">100 MB<br><small>Web</small></button>
-        <button class="preset-btn" onclick="setPreset(200)">200 MB<br><small>HD</small></button>
-      </div>
-
-      <div class="form-group">
-        <label>Целевой размер: <span id="targetLabel" style="color:var(--accent-cyan); font-weight:700;">8 MB</span></label>
-        <input type="range" id="targetSlider" min="1" max="250" value="8" oninput="onSliderChange(this.value)">
-        <div class="range-meta"><span>1 MB</span><span>125 MB</span><span>250 MB</span></div>
-      </div>
-
-      <div class="form-group">
-        <label>Режим кодирования:</label>
-        <select id="modeSelect">
-          <option value="2pass" selected>🎯 2-Pass Target Fit (Точно в байт)</option>
-          <option value="1pass">⚡ 1-Pass Fast (Быстро)</option>
-          <option value="audio">🎵 Только Аудио (MP3)</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label>Разрешение (масштаб):</label>
-        <select id="scaleSelect">
-          <option value="auto" selected>📐 Автоматически (по битрейту)</option>
-          <option value="keep">🖼 Сохранить исходное</option>
-          <option value="720p">📺 Максимум 720p</option>
-          <option value="480p">📱 Максимум 480p</option>
-        </select>
-      </div>
-
-      <div class="calc-box">
-        <div class="calc-row"><span>Резерв контейнера MP4:</span><span class="calc-val">4% (moov)</span></div>
-        <div class="calc-row"><span>Расчетная точность:</span><span class="calc-val">± 1.5%</span></div>
-      </div>
-
-      <button id="startBtn" class="action-btn" onclick="startCompression()" disabled>🚀 Сжать в точный размер</button>
-
-      <div id="progressWrap" class="progress-wrap">
-        <p id="progressStatus" style="font-size:0.85rem; margin-bottom:6px; color:var(--accent-cyan);">Обработка на сервере…</p>
-        <div class="progress-bar-bg"><div id="progressBar" class="progress-bar-fill"></div></div>
-      </div>
-
-      <div id="resultBox" class="result-box">
-        <h3 style="color:var(--accent-green); margin-bottom:8px;">✅ Сжатие завершено!</h3>
-        <p id="resultInfo" style="font-size:0.85rem; color:var(--text-muted);"></p>
-        <a id="downloadLink" class="download-btn" href="#" download>📥 Скачать файл</a>
-      </div>
-    </div>
-  </div>
-</div>
-
-<script>
-let selectedFile = null;
-let currentTargetMb = 8;
-
-function setPreset(mb) {
-  currentTargetMb = mb;
-  document.getElementById('targetSlider').value = mb;
-  document.getElementById('targetLabel').innerText = mb + ' MB';
-  document.querySelectorAll('.preset-btn').forEach(b => {
-    b.classList.toggle('active', b.innerText.includes(mb + ' MB'));
-  });
-}
-
-function onSliderChange(val) {
-  currentTargetMb = parseFloat(val);
-  document.getElementById('targetLabel').innerText = currentTargetMb + ' MB';
-  document.querySelectorAll('.preset-btn').forEach(b => {
-    b.classList.toggle('active', b.innerText.includes(currentTargetMb + ' MB'));
-  });
-}
-
-function onFileSelected(input) {
-  if (input.files && input.files[0]) {
-    selectedFile = input.files[0];
-    document.getElementById('dropPrompt').innerText = selectedFile.name;
-    document.getElementById('metaName').innerText = selectedFile.name;
-    document.getElementById('metaSize').innerText = (selectedFile.size / (1024 * 1024)).toFixed(2) + ' MB';
-    document.getElementById('fileMeta').style.display = 'block';
-    document.getElementById('startBtn').disabled = false;
-  }
-}
-
-const dropzone = document.getElementById('dropzone');
-dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('dragover'); });
-dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
-dropzone.addEventListener('drop', (e) => {
-  e.preventDefault();
-  dropzone.classList.remove('dragover');
-  if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-    document.getElementById('fileInput').files = e.dataTransfer.files;
-    onFileSelected(document.getElementById('fileInput'));
-  }
-});
-
-async function startCompression() {
-  if (!selectedFile) return;
-  const btn = document.getElementById('startBtn');
-  const progWrap = document.getElementById('progressWrap');
-  const progBar = document.getElementById('progressBar');
-  const progStatus = document.getElementById('progressStatus');
-  const resBox = document.getElementById('resultBox');
-
-  btn.disabled = true;
-  progWrap.style.display = 'block';
-  resBox.style.display = 'none';
-  progBar.style.width = '20%';
-  progStatus.innerText = 'Загрузка медиа…';
-
-  const formData = new FormData();
-  formData.append('file', selectedFile);
-  formData.append('target_mb', currentTargetMb);
-  formData.append('mode', document.getElementById('modeSelect').value);
-  formData.append('scale', document.getElementById('scaleSelect').value);
-
-  try {
-    progBar.style.width = '50%';
-    progStatus.innerText = 'Кодирование через FFmpeg (2-pass)…';
-    const resp = await fetch('/api/compress', { method: 'POST', body: formData });
-    if (!resp.ok) throw new Error(await resp.text());
-    const data = await resp.json();
-
-    progBar.style.width = '100%';
-    progStatus.innerText = 'Готово!';
-
-    resBox.style.display = 'block';
-    document.getElementById('resultInfo').innerHTML = 
-      'Исходный: <b>' + (data.orig_bytes / (1024*1024)).toFixed(2) + ' MB</b><br>' +
-      'Итоговый: <b>' + (data.final_bytes / (1024*1024)).toFixed(2) + ' MB</b> (' + data.pct + '% от оригинала)<br>' +
-      'Видео битрейт: <b>' + data.video_kbps + ' kbps</b> | Аудио: <b>' + data.audio_kbps + ' kbps</b>';
-    document.getElementById('downloadLink').href = '/download/' + data.filename;
-    document.getElementById('downloadLink').download = data.filename;
-  } catch (err) {
-    alert('Ошибка: ' + err.message);
-    progStatus.innerText = 'Ошибка обработки';
-  } finally {
-    btn.disabled = false;
-  }
-}
-</script>
-</body>
-</html>
+MTC_JS = r"""
+const $=s=>document.querySelector(s);let file=null;
+const slider=$('#target'), preset=$('#preset'), go=$('#go');
+function setTarget(mb){slider.value=mb;slider.dispatchEvent(new Event('input'));}
+preset.addEventListener('change',()=>setTarget(preset.dataset.value));
+slider.addEventListener('input',()=>{$('#st-target').textContent=slider.value+' MB';
+  preset.querySelectorAll('.pb-seg-btn').forEach(b=>{const on=b.dataset.value===slider.value;b.classList.toggle('on',on)});});
+$('#mf-zone').addEventListener('pb:files',e=>{file=e.detail[0]||null;go.disabled=!file;$('#st-orig').textContent=file?pb.bytes(file.size):'—';});
+go.onclick=async()=>{
+  if(!file){pb.toast(pb.t('w_need_file'),true);return}
+  pb.busy(go,true);pb.hide('res');
+  const fd=new FormData();fd.append('file',file);fd.append('target_mb',slider.value);fd.append('mode',$('#mode').dataset.value);fd.append('scale',$('#scale').value);
+  try{
+    const d=await pb.upload('/api/compress',fd,p=>{pb.progress('prog',p<100?p:null,p<100?pb.t('uploading',{pct:p}):pb.t('w_encoding'))});
+    if(d.error||!d.filename)throw new Error(d.error||pb.t('error'));
+    pb.progress('prog',100,pb.t('done'));
+    const r=$('#res');r.className='pb-result';r.hidden=false;
+    r.innerHTML=`<div class="pb-stats">
+      <div class="pb-stat"><b>${pb.bytes(d.orig_bytes)}</b><span>${pb.t('original')}</span></div>
+      <div class="pb-stat"><b>${pb.bytes(d.final_bytes)}</b><span>${pb.t('result')} · ${pb.t('w_pct_of_orig',{pct:d.pct})}</span></div>
+      <div class="pb-stat"><b>${d.video_kbps||0}</b><span>${pb.t('w_video_kbps')}</span></div>
+      <div class="pb-stat"><b>${d.audio_kbps||0}</b><span>${pb.t('w_audio_kbps')}</span></div></div>
+      <a class="pb-btn pb-btn-primary" href="/download/${encodeURIComponent(d.filename)}" download="${pb.esc(d.filename)}">${pb.t('download')}</a>`;
+    pb.toast(pb.t('done'));
+  }catch(err){pb.hide('prog');pb.toast(pb.t('error')+': '+err.message,true)}
+  finally{pb.busy(go,false)}
+};
 """
 
 
@@ -1376,11 +1046,7 @@ class WebStudioHandler(BaseHTTPRequestHandler):
         path = parsed.path
 
         if path in ("/", "/index.html"):
-            self.send_response(HTTPStatus.OK)
-            self.send_header("Content-Type", "text/html; charset=utf-8")
-            self.send_header("Cache-Control", "no-cache")
-            self.end_headers()
-            self.wfile.write(WEB_STUDIO_HTML.encode("utf-8"))
+            render_studio(self)
             return
 
         if path == "/api/status":

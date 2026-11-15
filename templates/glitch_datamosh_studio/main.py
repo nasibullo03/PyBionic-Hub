@@ -14,6 +14,7 @@ Features:
 from __future__ import annotations
 
 import pybionic_core as core
+import pybionic_web as web
 import html
 import http.server
 import json
@@ -456,6 +457,38 @@ def apply_glitch(
 # Offline Web Studio (Port 8094)
 # ---------------------------------------------------------------------------
 
+def render_studio(handler: Any, port: int) -> None:
+    lang = web.resolve_lang(handler)
+    T = web.translator(lang)
+    css = "<style>.gl-prev{border-radius:14px;overflow:hidden;background:#000;display:grid;place-items:center;min-height:120px}.gl-prev video,.gl-prev img{width:100%;max-height:320px;object-fit:contain}</style>"
+    left = web.card(T("w_card_media"), web.dropzone("mf", T("web_drop_prompt"), "MP4, MOV, MKV, WebM, JPG, PNG · ≤ 200 MB", accept="video/*,image/*", icon_name="image")
+                    + '<div class="gl-prev" id="prev" hidden></div>', icon_name="image")
+    modes = [("datamosh", "🌊 Datamosh"), ("rgb", "⚡ RGB Split"), ("vhs", "📺 VHS"), ("blocks", "🔲 Macroblocks")]
+    sub = {"datamosh": T("w_m_datamosh"), "rgb": T("w_m_rgb"), "vhs": T("w_m_vhs"), "blocks": T("w_m_blocks")}
+    right = web.card(T("web_effects_label"), web.segmented("mode", modes, "datamosh", sub=sub)
+                     + web.field(T("web_intensity_label"), web.range_("intensity", 1, 5, 3, 1, " / 5"))
+                     + web.toggles([("audio", "🎵 " + T("w_opt_bitcrush"), True), ("gif", "🎞 " + T("w_opt_gif"), False)])
+                     + web.button(T("web_btn_render"), "go", disabled=True) + web.progress("prog") + web.result_box("res"), icon_name="sparkles")
+    hero = web.hero(T("w_title"), T("web_subtitle"), "👾", chips=["Datamosh", "RGB Split", "VHS", "GIF"])
+    web.send_page(handler, lang, title=T("w_title"), emoji="👾", brand="#a855f7", port=port,
+                  hero_html=hero, body=css + web.grid(left, right, min_width=330), script=GLITCH_JS)
+
+
+GLITCH_JS = r"""
+const $=s=>document.querySelector(s);let file=null;const go=$('#go'),prev=$('#prev');
+$('#mf-zone').addEventListener('pb:files',e=>{file=e.detail[0]||null;go.disabled=!file;prev.hidden=!file;if(!file)return;
+  const u=URL.createObjectURL(file);prev.innerHTML=file.type.startsWith('image')?`<img src="${u}" alt="">`:`<video src="${u}" autoplay loop muted playsinline></video>`});
+go.onclick=async()=>{if(!file){pb.toast(pb.t('need_file'),true);return}pb.busy(go,true);pb.hide('res');
+  const fd=new FormData();fd.append('media',file);fd.append('mode',$('#mode').dataset.value);fd.append('intensity',$('#intensity').value);
+  fd.append('audio_glitch',$('#audio').checked?'1':'0');fd.append('gif',$('#gif').checked?'1':'0');
+  try{const d=await pb.upload('/api/render',fd,p=>pb.progress('prog',p<100?p:null,p<100?pb.t('uploading',{pct:p}):pb.t('processing')));
+    if(!d.ok)throw new Error(d.error||pb.t('error'));pb.progress('prog',100,pb.t('done'));
+    const r=$('#res');r.className='pb-result';r.hidden=false;const u=pb.esc(d.download_url);const img=/\.(gif|png|jpe?g)$/i.test(d.filename||'');
+    r.innerHTML=(img?`<img src="${u}" alt="">`:`<video controls playsinline src="${u}"></video>`)+`<a class="pb-btn pb-btn-primary" href="${u}" download>${pb.t('download')} · ${pb.esc(d.size_kb)} KB</a>`;
+    pb.toast(pb.t('done'))}catch(err){pb.hide('prog');pb.toast(pb.t('error')+': '+err.message,true)}finally{pb.busy(go,false)}};
+"""
+
+
 def start_web_studio(port: int = 8094) -> None:
     cache_dir = get_cache_dir()
 
@@ -497,318 +530,7 @@ def start_web_studio(port: int = 8094) -> None:
                 self.send_error(404)
                 return
 
-            lang = urllib.parse.parse_qs(u.query).get("lang", [current_lang()])[0]
-            rtl_attr = ' dir="rtl"' if is_rtl(lang) else ""
-
-            lang_options = "\n".join(
-                f'<option value="{code}"{" selected" if code == lang else ""}>{html.escape(label)}</option>'
-                for code, label in SUPPORTED_LANGUAGES
-            )
-
-            html_page = f"""<!doctype html>
-<html lang="{lang}"{rtl_attr}>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>{html.escape(t('web_title', lang_override=lang))}</title>
-<style>
-:root {{
-  --bg-deep: #0A0F1A;
-  --bg-card: #121A2B;
-  --bg-input: #0D1322;
-  --accent-cyan: #00D8FF;
-  --accent-magenta: #FF0055;
-  --accent-emerald: #00E676;
-  --text-main: #E6F1FF;
-  --text-dim: #8BA0C6;
-  --border: #1F2D4A;
-}}
-* {{ box-sizing: border-box; margin: 0; padding: 0; }}
-body {{
-  background: var(--bg-deep);
-  color: var(--text-main);
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-  padding: 16px;
-  max-width: 680px;
-  margin: 0 auto;
-}}
-header {{
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  border-bottom: 1px solid var(--border);
-  padding-bottom: 12px;
-}}
-.brand {{ font-size: 20px; font-weight: 800; color: var(--accent-magenta); text-shadow: 2px 0 var(--accent-cyan); }}
-.lang-sel {{
-  background: var(--bg-input);
-  color: var(--text-main);
-  border: 1px solid var(--border);
-  padding: 6px 10px;
-  border-radius: 8px;
-  font-size: 13px;
-}}
-.card {{
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 20px;
-  margin-bottom: 20px;
-  box-shadow: 0 4px 20px rgba(255,0,85,0.15);
-}}
-.drop-zone {{
-  border: 2px dashed var(--accent-magenta);
-  border-radius: 14px;
-  padding: 30px 16px;
-  text-align: center;
-  background: var(--bg-input);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  margin-bottom: 18px;
-}}
-.drop-zone:hover {{
-  border-color: var(--accent-cyan);
-  background: rgba(0, 216, 255, 0.05);
-}}
-.preview-box {{
-  width: 100%;
-  max-height: 320px;
-  border-radius: 12px;
-  overflow: hidden;
-  margin-bottom: 18px;
-  background: #000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}}
-.preview-box video, .preview-box img {{
-  max-width: 100%;
-  max-height: 320px;
-}}
-.control-group {{
-  margin-bottom: 14px;
-}}
-.control-group label {{
-  display: block;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-dim);
-  margin-bottom: 6px;
-}}
-.range-slider {{
-  width: 100%;
-  accent-color: var(--accent-magenta);
-}}
-.options-grid {{
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-bottom: 18px;
-}}
-.mode-btn {{
-  background: var(--bg-input);
-  border: 1px solid var(--border);
-  color: var(--text-main);
-  padding: 12px;
-  border-radius: 10px;
-  cursor: pointer;
-  font-weight: bold;
-  text-align: center;
-  transition: all 0.2s;
-}}
-.mode-btn.active {{
-  border-color: var(--accent-magenta);
-  background: rgba(255,0,85,0.15);
-  color: var(--accent-cyan);
-}}
-.btn-action {{
-  width: 100%;
-  background: linear-gradient(135deg, var(--accent-magenta), #9900FF);
-  color: #FFF;
-  font-weight: 800;
-  padding: 14px;
-  border: none;
-  border-radius: 12px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: transform 0.1s;
-}}
-.btn-action:hover {{ opacity: 0.95; transform: translateY(-1px); }}
-.btn-action:disabled {{ opacity: 0.5; cursor: not-allowed; }}
-.result-box {{
-  display: none;
-  margin-top: 20px;
-  padding: 16px;
-  border-radius: 12px;
-  background: rgba(0, 230, 118, 0.1);
-  border: 1px solid var(--accent-emerald);
-  text-align: center;
-}}
-.btn-download {{
-  display: inline-block;
-  margin-top: 10px;
-  background: var(--accent-emerald);
-  color: #003314;
-  font-weight: bold;
-  padding: 10px 20px;
-  border-radius: 8px;
-  text-decoration: none;
-}}
-.spinner {{
-  display: none;
-  margin: 15px auto;
-  width: 36px;
-  height: 36px;
-  border: 4px solid var(--border);
-  border-top-color: var(--accent-magenta);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}}
-@keyframes spin {{ to {{ transform: rotate(360deg); }} }}
-</style>
-</head>
-<body>
-<header>
-  <div class="brand">⚡ Glitch & Datamosh Studio</div>
-  <select class="lang-sel" onchange="location.href='?lang='+this.value">
-    {lang_options}
-  </select>
-</header>
-
-<div class="card">
-  <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
-    <div style="font-size: 32px; margin-bottom: 8px;">🎞</div>
-    <div style="font-weight: 600;">{html.escape(t('web_drop_prompt', lang_override=lang))}</div>
-    <div style="font-size: 12px; color: var(--text-dim); margin-top: 4px;">MP4, MOV, MKV, WebM, JPG, PNG (≤ 200 MB)</div>
-    <input type="file" id="fileInput" accept="video/*,image/*" style="display:none" onchange="handleFileSelect(this.files[0])">
-  </div>
-
-  <div class="preview-box" id="previewBox" style="display:none;">
-    <video id="previewVideo" autoplay loop muted playsinline style="display:none;"></video>
-    <img id="previewImage" style="display:none;">
-  </div>
-
-  <div class="control-group">
-    <label>{html.escape(t('web_intensity_label', lang_override=lang))}: <span id="intVal">3 / 5</span></label>
-    <input type="range" class="range-slider" id="intensity" min="1" max="5" value="3" oninput="document.getElementById('intVal').innerText = this.value + ' / 5'">
-  </div>
-
-  <div class="options-grid">
-    <div class="mode-btn active" id="btnModeDatamosh" onclick="selectMode('datamosh')">🌊 Datamosh</div>
-    <div class="mode-btn" id="btnModeRgb" onclick="selectMode('rgb')">⚡ RGB Split</div>
-    <div class="mode-btn" id="btnModeVhs" onclick="selectMode('vhs')">📺 VHS Tape</div>
-    <div class="mode-btn" id="btnModeBlocks" onclick="selectMode('blocks')">🔲 Macroblocks</div>
-  </div>
-
-  <div style="display:flex; gap:10px; margin-bottom:18px;">
-    <label style="flex:1; background:var(--bg-input); padding:10px; border-radius:8px; border:1px solid var(--border); font-size:13px; display:flex; align-items:center; gap:8px;">
-      <input type="checkbox" id="chkAudio" checked>
-      <span>🎵 Audio Bitcrush</span>
-    </label>
-    <label style="flex:1; background:var(--bg-input); padding:10px; border-radius:8px; border:1px solid var(--border); font-size:13px; display:flex; align-items:center; gap:8px;">
-      <input type="checkbox" id="chkGif">
-      <span>🎞 Export as GIF</span>
-    </label>
-  </div>
-
-  <button class="btn-action" id="btnSubmit" onclick="startRender()" disabled>
-    {html.escape(t('web_btn_render', lang_override=lang))}
-  </button>
-
-  <div class="spinner" id="spinner"></div>
-
-  <div class="result-box" id="resultBox">
-    <div style="font-weight: bold; color: var(--accent-emerald);">✅ Glitch render complete!</div>
-    <a href="#" class="btn-download" id="downloadLink">{html.escape(t('web_download', lang_override=lang))}</a>
-  </div>
-</div>
-
-<script>
-let selectedFile = null;
-let currentMode = 'datamosh';
-
-function selectMode(m) {{
-  currentMode = m;
-  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-  if (m === 'datamosh') document.getElementById('btnModeDatamosh').classList.add('active');
-  if (m === 'rgb') document.getElementById('btnModeRgb').classList.add('active');
-  if (m === 'vhs') document.getElementById('btnModeVhs').classList.add('active');
-  if (m === 'blocks') document.getElementById('btnModeBlocks').classList.add('active');
-}}
-
-function handleFileSelect(file) {{
-  if (!file) return;
-  selectedFile = file;
-  const pBox = document.getElementById('previewBox');
-  const vid = document.getElementById('previewVideo');
-  const img = document.getElementById('previewImage');
-  pBox.style.display = 'flex';
-
-  if (file.type.startsWith('video/')) {{
-    vid.style.display = 'block';
-    img.style.display = 'none';
-    vid.src = URL.createObjectURL(file);
-  }} else {{
-    vid.style.display = 'none';
-    img.style.display = 'block';
-    img.src = URL.createObjectURL(file);
-  }}
-  document.getElementById('btnSubmit').disabled = false;
-}}
-
-const dz = document.getElementById('dropZone');
-dz.addEventListener('dragover', (e) => {{ e.preventDefault(); dz.style.borderColor = 'var(--accent-cyan)'; }});
-dz.addEventListener('dragleave', (e) => {{ e.preventDefault(); dz.style.borderColor = 'var(--accent-magenta)'; }});
-dz.addEventListener('drop', (e) => {{
-  e.preventDefault();
-  dz.style.borderColor = 'var(--accent-magenta)';
-  if (e.dataTransfer.files.length) handleFileSelect(e.dataTransfer.files[0]);
-}});
-
-async function startRender() {{
-  if (!selectedFile) return;
-  const btn = document.getElementById('btnSubmit');
-  const sp = document.getElementById('spinner');
-  const resBox = document.getElementById('resultBox');
-  btn.disabled = true;
-  sp.style.display = 'block';
-  resBox.style.display = 'none';
-
-  const fd = new FormData();
-  fd.append('media', selectedFile);
-  fd.append('mode', currentMode);
-  fd.append('intensity', document.getElementById('intensity').value);
-  fd.append('audio_glitch', document.getElementById('chkAudio').checked ? '1' : '0');
-  fd.append('gif', document.getElementById('chkGif').checked ? '1' : '0');
-
-  try {{
-    const resp = await fetch('/api/render', {{ method: 'POST', body: fd }});
-    const data = await resp.json();
-    sp.style.display = 'none';
-    btn.disabled = false;
-    if (data.ok) {{
-      resBox.style.display = 'block';
-      const dl = document.getElementById('downloadLink');
-      dl.href = data.download_url;
-      dl.innerText = '⬇️ Download ' + data.filename + ' (' + data.size_kb + ' KB)';
-    }} else {{
-      alert('Error: ' + (data.error || 'Glitch render failed'));
-    }}
-  }} catch (err) {{
-    sp.style.display = 'none';
-    btn.disabled = false;
-    alert('Server error: ' + err);
-  }}
-}}
-</script>
-</body>
-</html>"""
-            self.send_response(200)
-            self.send_header("Content-Type", "text/html; charset=utf-8")
-            self.send_header("Content-Length", str(len(html_page.encode("utf-8"))))
-            self.end_headers()
-            self.wfile.write(html_page.encode("utf-8"))
+            render_studio(self, port)
 
         def do_POST(self) -> None:
             if self.path == "/api/render":

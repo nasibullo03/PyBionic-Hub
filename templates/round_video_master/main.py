@@ -14,6 +14,7 @@ Features:
 from __future__ import annotations
 
 import pybionic_core as core
+import pybionic_web as web
 import html
 import http.server
 import json
@@ -422,6 +423,47 @@ def convert_to_round_video(
 # Offline Web Studio (Port 8093)
 # ---------------------------------------------------------------------------
 
+def render_studio(handler: Any, port: int) -> None:
+    lang = web.resolve_lang(handler)
+    T = web.translator(lang)
+    css = ("<style>.rv-prev{width:min(260px,70vw);aspect-ratio:1;border-radius:50%;overflow:hidden;justify-self:center;background:var(--surface2);"
+           "border:4px solid transparent;background-image:linear-gradient(var(--surface2),var(--surface2)),linear-gradient(135deg,var(--brand),var(--brand2));"
+           "background-origin:border-box;background-clip:padding-box,border-box;box-shadow:0 18px 40px -18px var(--brand);display:grid;place-items:center}"
+           ".rv-prev video{width:100%;height:100%;object-fit:cover}.rv-prev.neon{box-shadow:0 0 0 4px #fff3,0 0 28px var(--brand)}"
+           ".rv-prev.flip video{transform:scaleX(-1)}</style>")
+    left = web.card(T("w_card_video"), web.dropzone("vf", T("web_drop_prompt"), "MP4, MOV, MKV, AVI, WebM · ≤ 200 MB", accept="video/*", icon_name="film")
+                    + f'<div class="rv-prev" id="prev"><span class="pb-hint">{web.esc(T("preview"))}</span></div>'
+                    + web.field(T("web_crop_label"), web.range_("pan", 0, 1, 0.5, 0.05), hint=T("w_crop_hint")), icon_name="film")
+    right = web.card(T("web_effects_label"),
+        web.toggles([("loud", "🔊 " + T("w_opt_loud"), True), ("fit60", "⚡ " + T("w_opt_fit60"), True), ("neon", "✨ " + T("w_opt_neon"), False),
+                     ("flip", "🪞 " + T("w_opt_flip"), False), ("mute", "🔇 " + T("w_opt_mute"), False)])
+        + web.field(T("quality"), web.segmented("res", [("480", "480×480"), ("384", "384×384")], "480",
+                                                sub={"480": T("w_res_hd"), "384": T("w_res_fast")}))
+        + web.button(T("web_btn_convert"), "go", disabled=True) + web.progress("prog") + web.result_box("res-box"), icon_name="sparkles")
+    hero = web.hero(T("w_title"), T("web_subtitle"), "⭕", chips=["1:1", "≤ 60 s", "EBU R128", "Telegram"])
+    web.send_page(handler, lang, title=T("w_title"), emoji="⭕", brand="#06b6d4", port=port,
+                  hero_html=hero, body=css + web.grid(left, right, min_width=330), script=ROUND_JS)
+
+
+ROUND_JS = r"""
+const $=s=>document.querySelector(s);let file=null;const go=$('#go'),prev=$('#prev');
+$('#vf-zone').addEventListener('pb:files',e=>{file=e.detail[0]||null;go.disabled=!file;
+  if(file){prev.innerHTML='<video autoplay loop muted playsinline></video>';const v=prev.querySelector('video');v.src=URL.createObjectURL(file);pan()}});
+function pan(){const v=prev.querySelector('video');if(v)v.style.objectPosition=($('#pan').value*100)+'% 50%'}
+$('#pan').addEventListener('input',pan);
+['neon','flip'].forEach(id=>$('#'+id).addEventListener('change',()=>prev.classList.toggle(id,$('#'+id).checked)));
+go.onclick=async()=>{if(!file){pb.toast(pb.t('need_file'),true);return}pb.busy(go,true);pb.hide('res-box');
+  const fd=new FormData();fd.append('video',file);fd.append('resolution',$('#res').dataset.value);fd.append('pan_x',$('#pan').value);
+  [['loudnorm','loud'],['fit60','fit60'],['neon','neon'],['flip','flip'],['mute','mute']].forEach(([k,id])=>fd.append(k,$('#'+id).checked?'1':'0'));
+  try{const d=await pb.upload('/api/convert',fd,p=>pb.progress('prog',p<100?p:null,p<100?pb.t('uploading',{pct:p}):pb.t('processing')));
+    if(!d.ok)throw new Error(d.error||pb.t('error'));pb.progress('prog',100,pb.t('done'));
+    const r=$('#res-box');r.className='pb-result';r.hidden=false;
+    r.innerHTML=`<video controls playsinline src="${pb.esc(d.download_url)}" style="width:min(260px,100%);aspect-ratio:1;border-radius:50%;object-fit:cover;justify-self:center"></video>
+      <a class="pb-btn pb-btn-primary" href="${pb.esc(d.download_url)}" download>${pb.t('download')} · ${pb.esc(d.size_kb)} KB</a>`;pb.toast(pb.t('done'))}
+  catch(err){pb.hide('prog');pb.toast(pb.t('error')+': '+err.message,true)}finally{pb.busy(go,false)}};
+"""
+
+
 def start_web_studio(port: int = 8093) -> None:
     cache_dir = get_cache_dir()
 
@@ -463,321 +505,7 @@ def start_web_studio(port: int = 8093) -> None:
                 self.send_error(404)
                 return
 
-            # Render HTML Web Studio
-            lang = urllib.parse.parse_qs(u.query).get("lang", [current_lang()])[0]
-            rtl_attr = ' dir="rtl"' if is_rtl(lang) else ""
-
-            lang_options = "\n".join(
-                f'<option value="{code}"{" selected" if code == lang else ""}>{html.escape(label)}</option>'
-                for code, label in SUPPORTED_LANGUAGES
-            )
-
-            html_page = f"""<!doctype html>
-<html lang="{lang}"{rtl_attr}>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>{html.escape(t('web_title', lang_override=lang))}</title>
-<style>
-:root {{
-  --bg-deep: #0A0F1A;
-  --bg-card: #121A2B;
-  --bg-input: #0D1322;
-  --accent-cyan: #00D8FF;
-  --accent-emerald: #00E676;
-  --accent-gold: #FFC107;
-  --text-main: #E6F1FF;
-  --text-dim: #8BA0C6;
-  --border: #1F2D4A;
-}}
-* {{ box-sizing: border-box; margin: 0; padding: 0; }}
-body {{
-  background: var(--bg-deep);
-  color: var(--text-main);
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-  padding: 16px;
-  max-width: 680px;
-  margin: 0 auto;
-}}
-header {{
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  border-bottom: 1px solid var(--border);
-  padding-bottom: 12px;
-}}
-.brand {{ font-size: 20px; font-weight: 800; color: var(--accent-cyan); }}
-.lang-sel {{
-  background: var(--bg-input);
-  color: var(--text-main);
-  border: 1px solid var(--border);
-  padding: 6px 10px;
-  border-radius: 8px;
-  font-size: 13px;
-}}
-.card {{
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 20px;
-  margin-bottom: 20px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-}}
-.drop-zone {{
-  border: 2px dashed var(--accent-cyan);
-  border-radius: 14px;
-  padding: 30px 16px;
-  text-align: center;
-  background: var(--bg-input);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  margin-bottom: 18px;
-}}
-.drop-zone:hover {{
-  border-color: var(--accent-emerald);
-  background: rgba(0, 230, 118, 0.05);
-}}
-.preview-container {{
-  position: relative;
-  width: 280px;
-  height: 280px;
-  margin: 0 auto 20px auto;
-  border-radius: 50%;
-  overflow: hidden;
-  box-shadow: 0 0 25px rgba(0, 216, 255, 0.3);
-  border: 3px solid var(--accent-cyan);
-  background: #000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}}
-.preview-container video {{
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}}
-.control-group {{
-  margin-bottom: 14px;
-}}
-.control-group label {{
-  display: block;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-dim);
-  margin-bottom: 6px;
-}}
-.range-slider {{
-  width: 100%;
-  accent-color: var(--accent-cyan);
-}}
-.options-grid {{
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-bottom: 18px;
-}}
-.option-toggle {{
-  background: var(--bg-input);
-  border: 1px solid var(--border);
-  padding: 10px 12px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 13px;
-  cursor: pointer;
-}}
-.option-toggle input {{
-  accent-color: var(--accent-emerald);
-  width: 16px;
-  height: 16px;
-}}
-.btn-action {{
-  width: 100%;
-  background: linear-gradient(135deg, var(--accent-cyan), #0099FF);
-  color: #001529;
-  font-weight: 800;
-  padding: 14px;
-  border: none;
-  border-radius: 12px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: transform 0.1s, opacity 0.2s;
-}}
-.btn-action:hover {{ opacity: 0.95; transform: translateY(-1px); }}
-.btn-action:disabled {{ opacity: 0.5; cursor: not-allowed; }}
-.result-box {{
-  display: none;
-  margin-top: 20px;
-  padding: 16px;
-  border-radius: 12px;
-  background: rgba(0, 230, 118, 0.1);
-  border: 1px solid var(--accent-emerald);
-  text-align: center;
-}}
-.btn-download {{
-  display: inline-block;
-  margin-top: 10px;
-  background: var(--accent-emerald);
-  color: #003314;
-  font-weight: bold;
-  padding: 10px 20px;
-  border-radius: 8px;
-  text-decoration: none;
-}}
-.spinner {{
-  display: none;
-  margin: 15px auto;
-  width: 36px;
-  height: 36px;
-  border: 4px solid var(--border);
-  border-top-color: var(--accent-cyan);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}}
-@keyframes spin {{ to {{ transform: rotate(360deg); }} }}
-</style>
-</head>
-<body>
-<header>
-  <div class="brand">⭕ Round Video Master</div>
-  <select class="lang-sel" onchange="location.href='?lang='+this.value">
-    {lang_options}
-  </select>
-</header>
-
-<div class="card">
-  <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
-    <div style="font-size: 32px; margin-bottom: 8px;">🎥</div>
-    <div style="font-weight: 600;">{html.escape(t('web_drop_prompt', lang_override=lang))}</div>
-    <div style="font-size: 12px; color: var(--text-dim); margin-top: 4px;">MP4, MOV, MKV, AVI, WebM (≤ 200 MB)</div>
-    <input type="file" id="fileInput" accept="video/*" style="display:none" onchange="handleFileSelect(this.files[0])">
-  </div>
-
-  <div class="preview-container" id="previewBox">
-    <video id="previewVideo" autoplay loop muted playsinline></video>
-  </div>
-
-  <div class="control-group">
-    <label>{html.escape(t('web_crop_label', lang_override=lang))}: <span id="panVal">Center (0.5)</span></label>
-    <input type="range" class="range-slider" id="panX" min="0" max="1" step="0.05" value="0.5" oninput="updateCrop(this.value)">
-  </div>
-
-  <div class="options-grid">
-    <label class="option-toggle">
-      <input type="checkbox" id="chkLoudnorm" checked>
-      <span>🔊 EBU R128 Boost</span>
-    </label>
-    <label class="option-toggle">
-      <input type="checkbox" id="chkFit60" checked>
-      <span>⚡ Fit into 60s</span>
-    </label>
-    <label class="option-toggle">
-      <input type="checkbox" id="chkNeon">
-      <span>✨ Neon Ring</span>
-    </label>
-    <label class="option-toggle">
-      <input type="checkbox" id="chkFlip">
-      <span>🪞 Mirror Selfie</span>
-    </label>
-    <label class="option-toggle">
-      <input type="checkbox" id="chkMute">
-      <span>🔇 Mute Audio</span>
-    </label>
-    <label class="option-toggle">
-      <select id="selRes" style="background:transparent; color:var(--text-main); border:none; width:100%;">
-        <option value="480" selected>📐 480x480 (HD)</option>
-        <option value="384">📐 384x384 (Fast)</option>
-      </select>
-    </label>
-  </div>
-
-  <button class="btn-action" id="btnSubmit" onclick="startConvert()" disabled>
-    {html.escape(t('web_btn_convert', lang_override=lang))}
-  </button>
-
-  <div class="spinner" id="spinner"></div>
-
-  <div class="result-box" id="resultBox">
-    <div style="font-weight: bold; color: var(--accent-emerald);">✅ {html.escape(t('msg_success', lang_override=lang, duration=0, size_kb=0))}</div>
-    <a href="#" class="btn-download" id="downloadLink">{html.escape(t('web_download', lang_override=lang))}</a>
-  </div>
-</div>
-
-<script>
-let selectedFile = null;
-
-function handleFileSelect(file) {{
-  if (!file) return;
-  selectedFile = file;
-  const vid = document.getElementById('previewVideo');
-  vid.src = URL.createObjectURL(file);
-  document.getElementById('btnSubmit').disabled = false;
-}}
-
-function updateCrop(val) {{
-  document.getElementById('panVal').innerText = val == 0.5 ? 'Center (0.5)' : (val < 0.5 ? 'Left ('+val+')' : 'Right ('+val+')');
-  const vid = document.getElementById('previewVideo');
-  vid.style.objectPosition = (val * 100) + '% 50%';
-}}
-
-// Drag & drop
-const dz = document.getElementById('dropZone');
-dz.addEventListener('dragover', (e) => {{ e.preventDefault(); dz.style.borderColor = 'var(--accent-emerald)'; }});
-dz.addEventListener('dragleave', (e) => {{ e.preventDefault(); dz.style.borderColor = 'var(--accent-cyan)'; }});
-dz.addEventListener('drop', (e) => {{
-  e.preventDefault();
-  dz.style.borderColor = 'var(--accent-cyan)';
-  if (e.dataTransfer.files.length) handleFileSelect(e.dataTransfer.files[0]);
-}});
-
-async function startConvert() {{
-  if (!selectedFile) return;
-  const btn = document.getElementById('btnSubmit');
-  const sp = document.getElementById('spinner');
-  const resBox = document.getElementById('resultBox');
-  btn.disabled = true;
-  sp.style.display = 'block';
-  resBox.style.display = 'none';
-
-  const fd = new FormData();
-  fd.append('video', selectedFile);
-  fd.append('resolution', document.getElementById('selRes').value);
-  fd.append('pan_x', document.getElementById('panX').value);
-  fd.append('loudnorm', document.getElementById('chkLoudnorm').checked ? '1' : '0');
-  fd.append('fit60', document.getElementById('chkFit60').checked ? '1' : '0');
-  fd.append('neon', document.getElementById('chkNeon').checked ? '1' : '0');
-  fd.append('flip', document.getElementById('chkFlip').checked ? '1' : '0');
-  fd.append('mute', document.getElementById('chkMute').checked ? '1' : '0');
-
-  try {{
-    const resp = await fetch('/api/convert', {{ method: 'POST', body: fd }});
-    const data = await resp.json();
-    sp.style.display = 'none';
-    btn.disabled = false;
-    if (data.ok) {{
-      resBox.style.display = 'block';
-      const dl = document.getElementById('downloadLink');
-      dl.href = data.download_url;
-      dl.innerText = '⬇️ Download ' + data.filename + ' (' + data.size_kb + ' KB)';
-    }} else {{
-      alert('Error: ' + (data.error || 'Conversion failed'));
-    }}
-  }} catch (err) {{
-    sp.style.display = 'none';
-    btn.disabled = false;
-    alert('Network/server error: ' + err);
-  }}
-}}
-</script>
-</body>
-</html>"""
-            self.send_response(200)
-            self.send_header("Content-Type", "text/html; charset=utf-8")
-            self.send_header("Content-Length", str(len(html_page.encode("utf-8"))))
-            self.end_headers()
-            self.wfile.write(html_page.encode("utf-8"))
+            render_studio(self, port)
 
         def do_POST(self) -> None:
             if self.path == "/api/convert":

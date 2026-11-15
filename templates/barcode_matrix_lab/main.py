@@ -15,6 +15,7 @@ Features:
 from __future__ import annotations
 
 import pybionic_core as core
+import pybionic_web as web
 import html
 import io
 import json
@@ -656,168 +657,37 @@ def setup_bot() -> telebot.TeleBot | None:
 # ---------------------------------------------------------------------------
 # Web Studio Handler (Cyberpunk Neon UI on Port 8104)
 # ---------------------------------------------------------------------------
-WEB_STUDIO_HTML = """<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Barcode Matrix Lab Studio</title>
-<style>
-:root {
-  --bg: #0a0e17;
-  --panel: #111927;
-  --accent: #00e5ff;
-  --accent-glow: rgba(0, 229, 255, 0.3);
-  --green: #00ff66;
-  --text: #e2e8f0;
-  --muted: #64748b;
-  --border: #1e293b;
-}
-* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
-body { background: var(--bg); color: var(--text); padding: 24px; }
-.container { max-width: 960px; margin: 0 auto; }
-header { margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
-h1 { font-size: 24px; color: var(--accent); text-shadow: 0 0 10px var(--accent-glow); display: flex; align-items: center; gap: 10px; }
-.badge { background: rgba(0, 229, 255, 0.15); color: var(--accent); padding: 4px 12px; border-radius: 999px; font-size: 12px; border: 1px solid var(--accent); }
-.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-@media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
-.card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
-.card-title { font-size: 16px; font-weight: 600; margin-bottom: 14px; color: #f8fafc; }
-.form-group { margin-bottom: 14px; }
-label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; font-weight: 600; }
-input[type="text"], textarea, select { width: 100%; background: #06090e; border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; color: #fff; font-size: 14px; outline: none; }
-input[type="text"]:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 8px var(--accent-glow); }
-.color-row { display: flex; gap: 14px; }
-.color-picker { display: flex; align-items: center; gap: 8px; background: #06090e; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border); flex: 1; }
-input[type="color"] { background: none; border: none; width: 30px; height: 30px; cursor: pointer; }
-.btn-group { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
-button { background: var(--panel); color: var(--text); border: 1px solid var(--border); padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: 500; transition: all 0.2s; }
-button:hover { border-color: var(--accent); color: var(--accent); }
-button.active { background: var(--accent); color: #000; font-weight: 600; border-color: var(--accent); box-shadow: 0 0 12px var(--accent-glow); }
-button.primary { background: var(--green); color: #000; font-weight: 600; border: none; }
-button.primary:hover { box-shadow: 0 0 12px rgba(0, 255, 102, 0.4); }
-.preview-box { background: #06090e; border: 1px solid var(--border); border-radius: 10px; padding: 24px; text-align: center; min-height: 280px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-.preview-img { max-width: 100%; max-height: 240px; border-radius: 6px; }
-.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; }
-.stat-box { background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border); border-radius: 8px; padding: 14px; text-align: center; }
-.stat-num { font-size: 26px; font-weight: 700; color: var(--accent); }
-.stat-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
-</style>
-</head>
-<body>
-<div class="container">
-  <header>
-    <h1>🏷 Barcode Matrix Lab Pro</h1>
-    <span class="badge">Port 8104 • Online</span>
-  </header>
+def render_studio(handler: Any) -> None:
+    lang = web.resolve_lang(handler)
+    T = web.translator(lang)
+    css = ("<style>.bc-colors{display:grid;grid-template-columns:1fr 1fr;gap:10px}.bc-color{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:12px;"
+           "border:1px solid var(--line);background:var(--surface2);cursor:pointer}.bc-color input{width:34px;height:34px;border:0;background:none;padding:0;cursor:pointer}"
+           ".bc-prev{display:grid;place-items:center;min-height:260px;border-radius:16px;background:repeating-conic-gradient(var(--surface2) 0 25%,transparent 0 50%) 0 0/20px 20px;border:1px solid var(--line)}"
+           ".bc-prev img{max-width:100%;max-height:300px;border-radius:12px;box-shadow:var(--sh2);transition:opacity .2s}</style>")
+    left = web.card(T("w_card_make"),
+        web.field(T("w_type"), web.segmented("type", [("qr", T("w_qr")), ("barcode", "Code128")], "qr",
+                                              sub={"qr": T("w_qr_sub"), "barcode": T("w_bar_sub")}, icons={"qr": "image", "barcode": "list"}))
+        + web.field(T("w_payload"), web.textarea("payload", T("w_payload_ph"), rows=3, value="https://github.com/nasibullo03/PyBionic-Hub"))
+        + web.field(T("w_colors"), f'<div class="bc-colors"><label class="bc-color"><input type="color" id="fg" value="#0f172a"><span>{web.esc(T("w_fg"))}</span></label>'
+                    f'<label class="bc-color"><input type="color" id="bg" value="#ffffff"><span>{web.esc(T("w_bg"))}</span></label></div>')
+        + '<div class="pb-row">' + web.button(T("w_dl_png"), "png", icon_name="download")
+        + web.button(T("w_dl_svg"), "svg", kind="ghost", icon_name="download") + "</div>", icon_name="sparkles")
+    right = web.card(T("preview"), '<div class="bc-prev"><img id="pv" alt=""></div>'
+                     + web.stats([(T("w_st_qr"), "0", "s1", "image"), (T("w_st_bar"), "0", "s2", "list")]), icon_name="image")
+    hero = web.hero(T("w_title"), T("w_hero"), "🏷", chips=["QR", "Code128", "PNG", "SVG"])
+    web.send_page(handler, lang, title=T("w_title"), emoji="🏷", brand="#0ea5e9", port=WEB_PORT,
+                  hero_html=hero, body=css + web.grid(left, right, min_width=330), script=BARCODE_JS)
 
-  <div class="grid">
-    <div>
-      <div class="card">
-        <div class="card-title">1. Code Type & Format</div>
-        <div class="btn-group" style="margin-top: 0; margin-bottom: 14px;">
-          <button class="type-btn active" data-type="qr">📱 Vector QR</button>
-          <button class="type-btn" data-type="barcode">🏷 Code128</button>
-        </div>
 
-        <div class="form-group">
-          <label>Payload Content</label>
-          <textarea id="payloadInput" rows="3" placeholder="Enter URL, text, or Wi-Fi info...">https://pybionic.org/bothub</textarea>
-        </div>
-
-        <div class="form-group color-row">
-          <div class="color-picker">
-            <input type="color" id="fgColor" value="#00e5ff">
-            <span style="font-size:12px;">Foreground</span>
-          </div>
-          <div class="color-picker">
-            <input type="color" id="bgColor" value="#0a0e17">
-            <span style="font-size:12px;">Background</span>
-          </div>
-        </div>
-
-        <div class="btn-group">
-          <button class="primary" id="btnGenerate">⚡ Generate Live Code</button>
-          <button id="btnDownloadSvg">⬇ Download Vector SVG</button>
-          <button id="btnDownloadPng">⬇ Download PNG</button>
-        </div>
-      </div>
-    </div>
-
-    <div>
-      <div class="card">
-        <div class="card-title">2. Real-Time Vector Preview</div>
-        <div class="preview-box" id="previewBox">
-          <img class="preview-img" id="previewImg" src="" alt="Code Preview" style="display:none;">
-          <span id="previewPlaceholder" style="color:var(--muted); font-size:14px;">Click Generate to preview</span>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-title">Engine Statistics</div>
-        <div class="stats-grid">
-          <div class="stat-box"><div class="stat-num" id="statQr">0</div><div class="stat-label">QR Codes</div></div>
-          <div class="stat-box"><div class="stat-num" id="statBar">0</div><div class="stat-label">Code128 Barcodes</div></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<script>
-let currentType = 'qr';
-document.querySelectorAll('.type-btn').forEach(b => {
-  b.addEventListener('click', () => {
-    document.querySelectorAll('.type-btn').forEach(btn => btn.classList.remove('active'));
-    b.classList.add('active');
-    currentType = b.dataset.type;
-    generateCode();
-  });
-});
-
-const payloadInput = document.getElementById('payloadInput');
-const fgColor = document.getElementById('fgColor');
-const bgColor = document.getElementById('bgColor');
-const previewImg = document.getElementById('previewImg');
-const previewPlaceholder = document.getElementById('previewPlaceholder');
-
-function generateCode() {
-  const p = payloadInput.value.trim() || 'PyBionic';
-  const fg = fgColor.value;
-  const bg = bgColor.value;
-  const url = `/api/generate?type=${currentType}&data=${encodeURIComponent(p)}&fg=${encodeURIComponent(fg)}&bg=${encodeURIComponent(bg)}&format=png`;
-
-  previewImg.src = url;
-  previewImg.style.display = 'block';
-  previewPlaceholder.style.display = 'none';
-  refreshStats();
-}
-
-document.getElementById('btnGenerate').addEventListener('click', generateCode);
-
-document.getElementById('btnDownloadPng').addEventListener('click', () => {
-  const p = payloadInput.value.trim() || 'PyBionic';
-  window.location.href = `/api/generate?type=${currentType}&data=${encodeURIComponent(p)}&fg=${encodeURIComponent(fgColor.value)}&bg=${encodeURIComponent(bgColor.value)}&format=png&dl=1`;
-});
-
-document.getElementById('btnDownloadSvg').addEventListener('click', () => {
-  const p = payloadInput.value.trim() || 'PyBionic';
-  window.location.href = `/api/generate?type=${currentType}&data=${encodeURIComponent(p)}&fg=${encodeURIComponent(fgColor.value)}&bg=${encodeURIComponent(bgColor.value)}&format=svg&dl=1`;
-});
-
-function refreshStats() {
-  fetch('/api/status').then(r => r.json()).then(data => {
-    if (data.stats) {
-      document.getElementById('statQr').textContent = data.stats.total_qr;
-      document.getElementById('statBar').textContent = data.stats.total_barcodes;
-    }
-  });
-}
-
-generateCode();
-</script>
-</body>
-</html>
+BARCODE_JS = r"""
+const $=s=>document.querySelector(s);let t=null;
+const url=(fmt,dl)=>`/api/generate?type=${$('#type').dataset.value}&data=${encodeURIComponent($('#payload').value.trim()||'PyBionic')}&fg=${encodeURIComponent($('#fg').value)}&bg=${encodeURIComponent($('#bg').value)}&format=${fmt}${dl?'&dl=1':''}`;
+async function stats(){const d=await pb.json('/api/status').catch(()=>({}));if(d.stats){pb.count($('#s1'),d.stats.total_qr||0);pb.count($('#s2'),d.stats.total_barcodes||0)}}
+function gen(){const img=$('#pv');img.style.opacity=.4;img.onload=()=>{img.style.opacity=1;stats()};img.onerror=()=>{img.style.opacity=1;pb.toast(pb.t('w_bad_payload'),true)};img.src=url('png')}
+const later=()=>{clearTimeout(t);t=setTimeout(gen,350)};
+['payload','fg','bg'].forEach(id=>$('#'+id).addEventListener('input',later));$('#type').addEventListener('change',gen);
+$('#png').onclick=()=>{location.href=url('png',1)};$('#svg').onclick=()=>{location.href=url('svg',1)};
+gen();
 """
 
 
@@ -843,10 +713,7 @@ class WebStudioHandler(BaseHTTPRequestHandler):
         qs = parse_qs(parsed.query)
 
         if parsed.path == "/":
-            self.send_response(HTTPStatus.OK)
-            self.send_header("Content-Type", "text/html; charset=utf-8")
-            self.end_headers()
-            self.wfile.write(WEB_STUDIO_HTML.encode("utf-8"))
+            render_studio(self)
 
         elif parsed.path == "/api/status":
             self.send_response(HTTPStatus.OK)

@@ -1,4 +1,6 @@
 import pybionic_core as core
+import pybionic_web as web
+from typing import Any
 import os
 import sys
 if hasattr(sys.stdout, "reconfigure"):
@@ -84,181 +86,54 @@ class StudioHandler(BaseHTTPRequestHandler):
             self.wfile.write(hist.encode("utf-8"))
             return
 
-        # Render HTML UI
-        self.send_response(200)
-        self.send_header("Content-Type", "text/html; charset=utf-8")
-        self.end_headers()
-        html = self._render_html()
-        self.wfile.write(html.encode("utf-8"))
+        render_studio(self)
 
-    def _render_html(self):
-        up = chronos_engine.get_uptime_report()
-        audit = chronos_engine.run_global_audit()
-        hist = chronos_engine.generate_ascii_histogram()
 
-        rows = "".join([
-            f"""<tr>
-                <td><b>{r['name']}</b></td>
-                <td><code>{r['host']}:{r['port']}</code></td>
-                <td><b>{r['latency_ms']:.1f} ms</b></td>
-                <td><span style="color:var(--success)">{r['status']} 🟢</span></td>
-            </tr>"""
-            for r in audit["results"]
-        ])
+def render_studio(handler: Any) -> None:
+    lang = web.resolve_lang(handler)
+    T = web.translator(lang)
+    up = chronos_engine.get_uptime_report()
+    css = ("<style>.ch-row{display:grid;grid-template-columns:minmax(120px,1.2fr) 2fr auto;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}.ch-row:last-child{border:0}"
+           ".ch-row b{display:block;font-weight:600}.ch-row small{color:var(--muted);font-family:ui-monospace,Consolas,monospace;font-size:12px}"
+           ".ch-bar{height:10px;border-radius:99px;background:var(--surface2);overflow:hidden;border:1px solid var(--line)}"
+           ".ch-bar i{display:block;height:100%;width:0;border-radius:99px;transition:width .8s cubic-bezier(.2,.8,.2,1)}"
+           ".ch-ms{font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap;min-width:78px;text-align:end}"
+           ".ch-hist{display:flex;align-items:flex-end;gap:10px;height:180px;padding-top:10px}.ch-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end}"
+           ".ch-col i{width:100%;border-radius:10px 10px 4px 4px;background:linear-gradient(180deg,var(--brand),var(--brand2));min-height:4px;transition:height .8s cubic-bezier(.2,.8,.2,1)}"
+           ".ch-col span{font-size:11.5px;color:var(--muted);white-space:nowrap}.ch-col b{font-size:13px}"
+           ".ch-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--muted);margin-top:10px}.ch-legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-inline-end:6px;vertical-align:-1px}</style>")
+    probes = web.card(T("w_card_probes"), '<div id="rows">' + "".join('<div class="pb-skel" style="height:46px;margin:8px 0"></div>' for _ in chronos_engine.TARGETS) + "</div>"
+                      + '<div class="ch-legend"><span><i style="background:#22c55e"></i>&lt; 50 ms</span><span><i style="background:#f59e0b"></i>50–150 ms</span><span><i style="background:#ef4444"></i>&gt; 150 ms</span></div>'
+                      + web.note(T("w_probe_note"), "info"), icon_name="wave",
+                      aside=web.button(T("w_probe"), "probe", cls="pb-btn-sm", icon_name="refresh"))
+    hist = web.card(T("w_card_hist"), '<div class="ch-hist" id="hist"></div><p class="pb-hint" id="hist-note"></p>', icon_name="chart")
+    st = web.stats([(T("w_st_uptime"), f'{up.get("uptime_pct", 0)}%', "s0", "shield"), ("P50", "—", "s1", "clock"),
+                    ("P99", "—", "s2", "zap"), (T("w_st_jitter"), "—", "s3", "wave"), (T("w_st_checks"), str(up.get("total_checks", 0)), "s4", "list")])
+    hero = web.hero(T("w_title"), T("w_hero"), "⏳", chips=["P50 · P90 · P99", T("w_chip_jitter"), "TCP"])
+    web.send_page(handler, lang, title=T("w_title"), emoji="⏳", brand="#0ea5e9", port=PORT,
+                  hero_html=hero, body=css + st + web.grid(probes, hist, min_width=340), script=CHRONOS_JS)
 
-        return f"""<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Chronos Deep Audit Studio</title>
-<style>
-  :root {{
-    --bg: #090e18;
-    --card: #131b2e;
-    --card-border: #1f2d4d;
-    --primary: #00e5ff;
-    --accent: #ff0077;
-    --success: #00e676;
-    --warning: #ffb300;
-    --text: #e0e6ed;
-    --muted: #8899a6;
-  }}
-  * {{ box-sizing: border-box; margin: 0; padding: 0; }}
-  body {{
-    background: var(--bg);
-    color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, monospace;
-    padding: 20px;
-  }}
-  .container {{ max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }}
-  .header {{
-    text-align: center;
-    border-bottom: 1px solid var(--card-border);
-    padding-bottom: 16px;
-  }}
-  .header h1 {{ color: var(--primary); font-size: 26px; }}
-  .header p {{ color: var(--muted); font-size: 14px; margin-top: 4px; }}
-  .card {{
-    background: var(--card);
-    border: 1px solid var(--card-border);
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-  }}
-  .card-title {{
-    color: var(--primary);
-    font-size: 16px;
-    font-weight: 600;
-    margin-bottom: 14px;
-    display: flex;
-    justify-content: space-between;
-  }}
-  .grid {{
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 16px;
-  }}
-  .stat-block {{
-    background: #0b1120;
-    border: 1px solid var(--card-border);
-    border-radius: 8px;
-    padding: 16px;
-    text-align: center;
-  }}
-  .stat-label {{ color: var(--muted); font-size: 12px; margin-bottom: 6px; }}
-  .stat-val {{ font-size: 22px; font-weight: bold; color: #fff; }}
-  table {{
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-    font-size: 14px;
-  }}
-  th, td {{
-    padding: 12px 14px;
-    text-align: left;
-    border-bottom: 1px solid var(--card-border);
-  }}
-  th {{ color: var(--muted); font-weight: 600; }}
-  pre {{
-    background: #080c14;
-    border: 1px solid var(--card-border);
-    border-radius: 8px;
-    padding: 14px;
-    color: #00ffcc;
-    font-family: monospace;
-    font-size: 14px;
-    line-height: 1.5;
-  }}
-  button {{
-    background: var(--primary);
-    color: #000;
-    font-weight: bold;
-    border: none;
-    border-radius: 8px;
-    padding: 10px 18px;
-    cursor: pointer;
-    transition: 0.2s;
-  }}
-  button:hover {{ filter: brightness(1.2); }}
-</style>
-</head>
-<body>
-<div class="container">
-  <div class="header">
-    <h1>⏳ CHRONOS DEEP AUDIT</h1>
-    <p>Network Latency Sonar, Percentiles (P50/P99) & SLA Monitoring (Offline Web Studio)</p>
-  </div>
 
-  <div class="card">
-    <div class="card-title"><span>📊 SLA & HEALTH TELEMETRY</span><span style="color:var(--success)">{up['status']}</span></div>
-    <div class="grid">
-      <div class="stat-block">
-        <div class="stat-label">UPTIME SLA</div>
-        <div class="stat-val" style="color:var(--success)">{up['uptime_pct']}%</div>
-      </div>
-      <div class="stat-block">
-        <div class="stat-label">MEDIAN LATENCY (P50)</div>
-        <div class="stat-val" style="color:var(--primary)">{audit['p50']:.1f} ms</div>
-      </div>
-      <div class="stat-block">
-        <div class="stat-label">TAIL LATENCY (P99)</div>
-        <div class="stat-val" style="color:var(--accent)">{audit['p99']:.1f} ms</div>
-      </div>
-      <div class="stat-block">
-        <div class="stat-label">NETWORK JITTER</div>
-        <div class="stat-val">{audit['jitter']:.2f} ms</div>
-      </div>
-    </div>
-  </div>
+CHRONOS_JS = r"""
+const $=s=>document.querySelector(s);const ms=v=>(+v).toFixed(1)+' '+pb.t('w_ms');
+const col=v=>v<50?'#22c55e':v<150?'#f59e0b':'#ef4444';
+async function hist(){const t=await fetch('/api/histogram').then(r=>r.text()).catch(()=>'');const bins=[];
+  t.split('\n').forEach(l=>{const m=l.match(/^\s*(\d+)\s*-\s*(\d+)ms.*\((\d+)\)\s*$/);if(m)bins.push({lo:+m[1],hi:+m[2],n:+m[3]})});
+  const mx=Math.max(1,...bins.map(b=>b.n));
+  $('#hist').innerHTML=bins.map(b=>`<div class="ch-col"><b>${b.n}</b><i style="height:0" data-h="${b.n*100/mx}"></i><span>${b.lo}–${b.hi}</span></div>`).join('');
+  requestAnimationFrame(()=>document.querySelectorAll('.ch-col i').forEach(i=>i.style.height=Math.max(3,+i.dataset.h)+'%'));
+  $('#hist-note').textContent=pb.t('w_hist_note',{n:bins.reduce((a,b)=>a+b.n,0)})}
+async function status(){const d=await pb.json('/api/status').catch(()=>null);if(d&&d.uptime){$('#s0').textContent=d.uptime.uptime_pct+'%';pb.count($('#s4'),d.uptime.total_checks||0)}}
+async function probe(){const b=$('#probe');pb.busy(b,true);
+  try{const d=await pb.json('/api/audit');const mx=Math.max(100,...d.results.map(r=>+r.latency_ms));
+    $('#rows').innerHTML=d.results.map(r=>`<div class="ch-row"><div><b>${pb.esc(r.name)}</b><small>${pb.esc(r.host)}:${+r.port}</small></div>
+      <div class="ch-bar"><i style="background:${col(+r.latency_ms)}" data-w="${(+r.latency_ms)*100/mx}"></i></div><div class="ch-ms" style="color:${col(+r.latency_ms)}">${ms(r.latency_ms)}</div></div>`).join('');
+    requestAnimationFrame(()=>document.querySelectorAll('.ch-bar i').forEach(i=>i.style.width=Math.max(2,+i.dataset.w)+'%'));
+    $('#s1').textContent=ms(d.p50);$('#s2').textContent=ms(d.p99);$('#s3').textContent=ms(d.jitter);hist();status()}
+  catch(e){pb.toast(pb.t('error_conn'),true)}finally{pb.busy(b,false)}}
+$('#probe').onclick=probe;probe();
+"""
 
-  <div class="card">
-    <div class="card-title">
-      <span>⚡ LIVE GLOBAL LATENCY PROBES</span>
-      <button onclick="location.reload()">PROBE NOW 📡</button>
-    </div>
-    <table>
-      <thead>
-        <tr>
-          <th>TARGET NODE</th>
-          <th>ENDPOINT</th>
-          <th>ROUNDTRIP</th>
-          <th>STATUS</th>
-        </tr>
-      </thead>
-      <tbody>
-        {rows}
-      </tbody>
-    </table>
-  </div>
-
-  <div class="card">
-    <div class="card-title"><span>📈 RESPONSE TIME DISTRIBUTION HISTOGRAM</span></div>
-    <pre>{hist}</pre>
-  </div>
-</div>
-</body>
-</html>"""
 
 class ThreadedStudioServer(ThreadingHTTPServer):
     allow_reuse_address = True

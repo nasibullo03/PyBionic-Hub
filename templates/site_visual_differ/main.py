@@ -14,6 +14,7 @@ Features:
 from __future__ import annotations
 
 import pybionic_core as core
+import pybionic_web as web
 import html
 import io
 import json
@@ -564,205 +565,49 @@ def setup_bot() -> telebot.TeleBot | None:
 # ---------------------------------------------------------------------------
 # Web Studio Handler (Cyberpunk Neon UI on Port 8105)
 # ---------------------------------------------------------------------------
-WEB_STUDIO_HTML = """<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Site Visual Differ Studio</title>
-<style>
-:root {
-  --bg: #0a0e17;
-  --panel: #111927;
-  --accent: #00e5ff;
-  --accent-glow: rgba(0, 229, 255, 0.3);
-  --pink: #ff007f;
-  --green: #00ff66;
-  --text: #e2e8f0;
-  --muted: #64748b;
-  --border: #1e293b;
-}
-* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
-body { background: var(--bg); color: var(--text); padding: 24px; }
-.container { max-width: 1000px; margin: 0 auto; }
-header { margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
-h1 { font-size: 24px; color: var(--accent); text-shadow: 0 0 10px var(--accent-glow); display: flex; align-items: center; gap: 10px; }
-.badge { background: rgba(0, 229, 255, 0.15); color: var(--accent); padding: 4px 12px; border-radius: 999px; font-size: 12px; border: 1px solid var(--accent); }
-.drop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
-.drop-card { background: var(--panel); border: 2px dashed var(--border); border-radius: 12px; padding: 24px; text-align: center; cursor: pointer; transition: all 0.2s; position: relative; }
-.drop-card:hover { border-color: var(--accent); background: rgba(0, 229, 255, 0.03); }
-.drop-card.has-file { border-color: var(--green); border-style: solid; }
-.card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
-.card-title { font-size: 16px; font-weight: 600; margin-bottom: 14px; color: #f8fafc; }
-.btn-group { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
-button { background: var(--panel); color: var(--text); border: 1px solid var(--border); padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: 500; transition: all 0.2s; }
-button:hover { border-color: var(--accent); color: var(--accent); }
-button.primary { background: var(--pink); color: #fff; font-weight: 600; border: none; }
-button.primary:hover { box-shadow: 0 0 14px rgba(255, 0, 127, 0.4); }
-.preview-box { background: #06090e; border: 1px solid var(--border); border-radius: 10px; padding: 16px; text-align: center; min-height: 240px; }
-.preview-img { max-width: 100%; border-radius: 6px; }
-.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; }
-.stat-box { background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border); border-radius: 8px; padding: 14px; text-align: center; }
-.stat-num { font-size: 26px; font-weight: 700; color: var(--accent); }
-.stat-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
-#statusMsg { margin-top: 10px; font-size: 13px; color: var(--accent); min-height: 20px; }
-</style>
-</head>
-<body>
-<div class="container">
-  <header>
-    <h1>🔍 Site Visual Differ Pro</h1>
-    <span class="badge">Port 8105 • Online</span>
-  </header>
+def render_studio(handler: Any) -> None:
+    lang = web.resolve_lang(handler)
+    T = web.translator(lang)
+    css = ("<style>.sd-res{display:grid;place-items:center;min-height:220px;border-radius:16px;background:var(--surface2);border:1px solid var(--line);overflow:hidden}"
+           ".sd-res img{max-width:100%;max-height:520px}</style>")
+    pair = web.grid(
+        web.card(T("w_base"), web.dropzone("fb", T("w_base_drop"), T("w_base_hint"), accept="image/*", icon_name="image"), icon_name="image"),
+        web.card(T("w_curr"), web.dropzone("fc", T("w_curr_drop"), T("w_curr_hint"), accept="image/*", icon_name="image"), icon_name="image"), min_width=300)
+    controls = web.card(T("w_card_compare"),
+        web.field(T("w_sens"), web.range_("thr", 5, 80, 25, 1), hint=T("w_sens_hint"))
+        + '<div class="pb-row">' + web.button(T("w_run_diff"), "diff", icon_name="search", disabled=True)
+        + web.button(T("w_run_gif"), "gif", kind="ghost", icon_name="film", disabled=True)
+        + web.button(T("clear"), "clr", kind="danger", icon_name="trash") + "</div>" + web.progress("prog")
+        + '<div class="sd-res"><img id="res" alt="" hidden>' + web.empty_state(T("w_res_empty"), "search", id="res-empty") + "</div>",
+        icon_name="search")
+    st = web.card(T("statistics"), web.stats([(T("w_st_diffs"), "0", "s1", "search"), (T("w_st_gifs"), "0", "s2", "film"),
+                                              (T("w_st_px"), "0", "s3", "chart")]), icon_name="chart")
+    hero = web.hero(T("w_title"), T("w_hero"), "🔍", chips=[T("w_chip_heatmap"), "GIF", "PNG · JPG"])
+    web.send_page(handler, lang, title=T("w_title"), emoji="🔍", brand="#14b8a6", port=WEB_PORT,
+                  hero_html=hero, body=css + pair + controls + st, script=DIFFER_JS)
 
-  <div class="drop-grid">
-    <div class="drop-card" id="dropBase">
-      <h3 style="color:#00e5ff; margin-bottom:8px;">📥 1. Baseline (Expected)</h3>
-      <p style="font-size:13px; color:var(--muted);" id="labelBase">Click or drag baseline image</p>
-      <input type="file" id="fileBase" accept="image/*" style="display:none;">
-    </div>
-    <div class="drop-card" id="dropCurr">
-      <h3 style="color:#ff007f; margin-bottom:8px;">📤 2. Current (Actual)</h3>
-      <p style="font-size:13px; color:var(--muted);" id="labelCurr">Click or drag current image</p>
-      <input type="file" id="fileCurr" accept="image/*" style="display:none;">
-    </div>
-  </div>
 
-  <div class="card">
-    <div class="card-title">Diff Controls</div>
-    <div style="display:flex; align-items:center; gap:14px;">
-      <label style="font-size:13px; color:var(--muted);">Sensitivity Threshold:</label>
-      <input type="range" id="thrSlider" min="5" max="80" value="25" style="flex:1;">
-      <span id="thrVal" style="color:var(--accent); font-weight:bold; width:30px;">25</span>
-    </div>
-    <div class="btn-group">
-      <button class="primary" id="btnRunDiff">🔍 Run Visual Diff Heatmap</button>
-      <button id="btnFlickerGif">🎞 Generate Comparison GIF</button>
-      <button id="btnClear">🗑 Clear Pair</button>
-    </div>
-    <div id="statusMsg"></div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">Analysis Result</div>
-    <div class="preview-box">
-      <img class="preview-img" id="resultImg" src="" style="display:none;" alt="Result">
-      <span id="placeholderResult" style="color:var(--muted);">Run diff to view highlighted layout discrepancies</span>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">Engine Statistics</div>
-    <div class="stats-grid">
-      <div class="stat-box"><div class="stat-num" id="statDiffs">0</div><div class="stat-label">Comparisons Run</div></div>
-      <div class="stat-box"><div class="stat-num" id="statGifs">0</div><div class="stat-label">GIF Animations</div></div>
-      <div class="stat-box"><div class="stat-num" id="statPx">0</div><div class="stat-label">Pixels Evaluated</div></div>
-    </div>
-  </div>
-</div>
-
-<script>
-const dropBase = document.getElementById('dropBase');
-const dropCurr = document.getElementById('dropCurr');
-const fileBase = document.getElementById('fileBase');
-const fileCurr = document.getElementById('fileCurr');
-const labelBase = document.getElementById('labelBase');
-const labelCurr = document.getElementById('labelCurr');
-const statusMsg = document.getElementById('statusMsg');
-const thrSlider = document.getElementById('thrSlider');
-const thrVal = document.getElementById('thrVal');
-const resultImg = document.getElementById('resultImg');
-const placeholderResult = document.getElementById('placeholderResult');
-
-thrSlider.addEventListener('input', () => thrVal.textContent = thrSlider.value);
-
-dropBase.addEventListener('click', () => fileBase.click());
-dropCurr.addEventListener('click', () => fileCurr.click());
-
-fileBase.addEventListener('change', () => {
-  if (fileBase.files.length) uploadImg(fileBase.files[0], 'baseline', labelBase, dropBase);
-});
-fileCurr.addEventListener('change', () => {
-  if (fileCurr.files.length) uploadImg(fileCurr.files[0], 'current', labelCurr, dropCurr);
-});
-
-function uploadImg(file, target, labelEl, cardEl) {
-  statusMsg.textContent = '⏳ Uploading ' + target + ' image...';
-  const fd = new FormData();
-  fd.append('target', target);
-  fd.append('file', file);
-  fetch('/api/upload', { method: 'POST', body: fd })
-    .then(r => r.json())
-    .then(data => {
-      if (data.success) {
-        labelEl.textContent = '✅ ' + file.name + ' (' + data.width + 'x' + data.height + ')';
-        cardEl.classList.add('has-file');
-        statusMsg.textContent = '✅ ' + target.toUpperCase() + ' uploaded!';
-      } else {
-        statusMsg.textContent = '❌ Upload failed: ' + data.error;
-      }
-    });
-}
-
-document.getElementById('btnRunDiff').addEventListener('click', () => {
-  statusMsg.textContent = '⏳ Calculating pixel-by-pixel color distance...';
-  fetch('/api/run_diff?thr=' + thrSlider.value, { method: 'POST' })
-    .then(r => r.json())
-    .then(data => {
-      if (data.success) {
-        statusMsg.textContent = '🎉 Diff: ' + data.diff_pct.toFixed(2) + '% altered (' + data.changed_px + ' px)';
-        resultImg.src = data.img_url + '?t=' + Date.now();
-        resultImg.style.display = 'block';
-        placeholderResult.style.display = 'none';
-        refreshStats();
-      } else {
-        statusMsg.textContent = '⚠️ ' + data.error;
-      }
-    });
-});
-
-document.getElementById('btnFlickerGif').addEventListener('click', () => {
-  statusMsg.textContent = '⏳ Compiling animated flicker GIF...';
-  fetch('/api/run_gif', { method: 'POST' })
-    .then(r => r.json())
-    .then(data => {
-      if (data.success) {
-        statusMsg.textContent = '🎞 GIF ready!';
-        resultImg.src = data.gif_url + '?t=' + Date.now();
-        resultImg.style.display = 'block';
-        placeholderResult.style.display = 'none';
-        refreshStats();
-      } else {
-        statusMsg.textContent = '⚠️ ' + data.error;
-      }
-    });
-});
-
-document.getElementById('btnClear').addEventListener('click', () => {
-  fetch('/api/clear', { method: 'POST' }).then(() => {
-    labelBase.textContent = 'Click or drag baseline image';
-    labelCurr.textContent = 'Click or drag current image';
-    dropBase.classList.remove('has-file');
-    dropCurr.classList.remove('has-file');
-    resultImg.style.display = 'none';
-    placeholderResult.style.display = 'block';
-    statusMsg.textContent = '🗑 Session cleared.';
-  });
-});
-
-function refreshStats() {
-  fetch('/api/status').then(r => r.json()).then(data => {
-    if (data.stats) {
-      document.getElementById('statDiffs').textContent = data.stats.total_diffs;
-      document.getElementById('statGifs').textContent = data.stats.total_gifs;
-      document.getElementById('statPx').textContent = data.stats.total_px.toLocaleString();
-    }
-  });
-}
-refreshStats();
-</script>
-</body>
-</html>
+DIFFER_JS = r"""
+const $=s=>document.querySelector(s);const ok={baseline:false,current:false};
+const upd=()=>{const r=ok.baseline&&ok.current;$('#diff').disabled=!r;$('#gif').disabled=!r};
+async function stats(){const d=await pb.json('/api/status').catch(()=>({}));if(d.stats){pb.count($('#s1'),d.stats.total_diffs||0);pb.count($('#s2'),d.stats.total_gifs||0);pb.count($('#s3'),d.stats.total_px||0)}}
+async function up(file,target){if(!file)return;const fd=new FormData();fd.append('target',target);fd.append('file',file);
+  try{const d=await pb.upload('/api/upload',fd,p=>pb.progress('prog',p<100?p:null,pb.t('uploading',{pct:p})));
+    if(!d.success)throw new Error(d.error||pb.t('error'));ok[target]=true;upd();pb.progress('prog',100,`${file.name} · ${d.width}×${d.height}`)}
+  catch(err){pb.hide('prog');pb.toast(pb.t('error')+': '+err.message,true)}}
+$('#fb-zone').addEventListener('pb:files',e=>up(e.detail[0],'baseline'));
+$('#fc-zone').addEventListener('pb:files',e=>up(e.detail[0],'current'));
+function show(url){const i=$('#res');i.src=url+'?t='+Date.now();i.hidden=false;$('#res-empty').hidden=true}
+$('#diff').onclick=async()=>{const b=$('#diff');pb.busy(b,true);pb.progress('prog',null,pb.t('w_calc'));
+  try{const d=await pb.post('/api/run_diff?thr='+$('#thr').value,{});if(!d.success)throw new Error(d.error||pb.t('error'));
+    show(d.img_url);pb.progress('prog',100,pb.t('w_diff_result',{pct:(+d.diff_pct).toFixed(2),px:(+d.changed_px).toLocaleString(PB_LANG)}));stats()}
+  catch(err){pb.hide('prog');pb.toast(pb.t('error')+': '+err.message,true)}finally{pb.busy(b,false);upd()}};
+$('#gif').onclick=async()=>{const b=$('#gif');pb.busy(b,true);pb.progress('prog',null,pb.t('w_making_gif'));
+  try{const d=await pb.post('/api/run_gif',{});if(!d.success)throw new Error(d.error||pb.t('error'));show(d.gif_url);pb.progress('prog',100,pb.t('done'));stats()}
+  catch(err){pb.hide('prog');pb.toast(pb.t('error')+': '+err.message,true)}finally{pb.busy(b,false);upd()}};
+$('#clr').onclick=async()=>{await pb.post('/api/clear',{}).catch(()=>{});ok.baseline=ok.current=false;upd();$('#res').hidden=true;$('#res-empty').hidden=false;pb.hide('prog');
+  document.querySelectorAll('.pb-drop').forEach(z=>{z.classList.remove('has');const s=z.querySelector('strong');s.textContent=s.dataset.default;z.querySelector('input').value=''});pb.toast(pb.t('w_cleared'))};
+stats();
 """
 
 
@@ -772,10 +617,7 @@ class WebStudioHandler(BaseHTTPRequestHandler):
         u_dir = get_user_dir("web_user")
 
         if parsed.path == "/":
-            self.send_response(HTTPStatus.OK)
-            self.send_header("Content-Type", "text/html; charset=utf-8")
-            self.end_headers()
-            self.wfile.write(WEB_STUDIO_HTML.encode("utf-8"))
+            render_studio(self)
 
         elif parsed.path == "/api/status":
             self.send_response(HTTPStatus.OK)

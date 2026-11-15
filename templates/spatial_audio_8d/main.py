@@ -13,6 +13,7 @@ Features:
 from __future__ import annotations
 
 import pybionic_core as core
+import pybionic_web as web
 import html
 import io
 import json
@@ -703,321 +704,57 @@ def setup_bot(bot: Any) -> None:
 # ---------------------------------------------------------------------------
 # Cyberpunk Web Studio HTTP Handler (Interactive 2D/3D Radar Canvas)
 # ---------------------------------------------------------------------------
-WEB_STUDIO_HTML = """<!DOCTYPE html>
-<html lang="ru">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>8D Spatial Audio Studio</title>
-<style>
-  :root {
-    --bg-dark: #070a13;
-    --card-bg: #0f172a;
-    --accent-cyan: #00f5ff;
-    --accent-violet: #8b5cf6;
-    --text-primary: #f8fafc;
-    --text-muted: #94a3b8;
-    --border-color: #1e293b;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    background: radial-gradient(circle at top right, #1e1b4b 0%, var(--bg-dark) 100%);
-    color: var(--text-primary);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    min-height: 100vh;
-    padding: 24px 16px;
-  }
-  .container { max-width: 900px; margin: 0 auto; }
-  header {
-    text-align: center;
-    margin-bottom: 24px;
-    padding-bottom: 16px;
-    border-bottom: 1px solid var(--border-color);
-  }
-  h1 {
-    font-size: 2.2rem;
-    font-weight: 800;
-    background: linear-gradient(135deg, var(--accent-cyan) 0%, var(--accent-violet) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin-bottom: 8px;
-  }
-  .badge {
-    display: inline-block;
-    padding: 4px 12px;
-    border-radius: 9999px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    background: rgba(0, 245, 255, 0.15);
-    color: var(--accent-cyan);
-    border: 1px solid rgba(0, 245, 255, 0.3);
-    margin-bottom: 8px;
-    text-transform: uppercase;
-  }
-  p.subtitle { color: var(--text-muted); font-size: 0.95rem; }
+def render_studio(handler: Any) -> None:
+    lang = web.resolve_lang(handler)
+    T = web.translator(lang)
+    radar = web.card(T("w_card_radar"),
+        '<canvas id="radar" width="320" height="320" style="width:100%;max-width:320px;aspect-ratio:1;justify-self:center"></canvas>'
+        + web.note(T("w_radar_note"), icon_name="wave"), icon_name="wave")
+    speeds = [("0.1", T("w_speed_slow")), ("0.166", T("w_speed_std")), ("0.333", T("w_speed_fast")), ("0.666", T("w_speed_storm"))]
+    speed_sub = {"0.1": T("w_sec_per_turn", sec="10"), "0.166": T("w_sec_per_turn", sec="6"), "0.333": T("w_sec_per_turn", sec="3"),
+                 "0.666": T("w_sec_per_turn", sec="1.5")}
+    cfg = web.card(T("settings"),
+        web.dropzone("af", T("drop_or_click"), "MP3, WAV, FLAC, OGG, AAC", accept="audio/*,video/*", icon_name="music")
+        + web.field(T("w_speed"), web.segmented("speed", speeds, "0.166", sub=speed_sub))
+        + web.field(T("w_traj"), web.segmented("traj", [("circle", T("w_traj_circle")), ("infinity", T("w_traj_inf"))], "circle",
+                                                sub={"circle": "360°", "infinity": "∞"}))
+        + web.field(T("w_hall"), web.segmented("hall", [("club", T("w_hall_club")), ("cathedral", T("w_hall_cathedral")), ("open", T("w_hall_open"))],
+                                                "club", sub={"club": T("w_hall_club_sub"), "cathedral": T("w_hall_cathedral_sub"), "open": T("w_hall_open_sub")}))
+        + web.button(T("w_render"), "go", icon_name="sparkles", disabled=True) + web.progress("prog") + web.result_box("res"),
+        icon_name="settings")
+    hero = web.hero(T("w_title"), T("w_hero"), "🎧", chips=["360°", "Binaural", "MP3 320k"])
+    web.send_page(handler, lang, title=T("w_title"), emoji="🎧", brand="#10b5a5", port=WEB_PORT,
+                  hero_html=hero, body=web.grid(radar, cfg, min_width=340), script=S8D_JS)
 
-  .grid { display: grid; grid-template-columns: 1fr; gap: 24px; }
-  @media(min-width: 768px) { .grid { grid-template-columns: 1fr 1fr; } }
 
-  .card {
-    background: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 16px;
-    padding: 24px;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
-  }
-  .card h2 {
-    font-size: 1.15rem;
-    margin-bottom: 16px;
-    color: var(--accent-cyan);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .radar-wrap {
-    text-align: center;
-    position: relative;
-    padding: 12px;
-  }
-  canvas#radarCanvas {
-    background: #090e1a;
-    border-radius: 50%;
-    border: 2px solid rgba(0, 245, 255, 0.3);
-    box-shadow: 0 0 30px rgba(0, 245, 255, 0.15);
-  }
-
-  .form-group { margin-bottom: 16px; }
-  label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px; font-weight: 600; }
-  select {
-    width: 100%;
-    padding: 10px 12px;
-    background: #1e293b;
-    border: 1px solid #334155;
-    border-radius: 8px;
-    color: var(--text-primary);
-    font-size: 0.9rem;
-    outline: none;
-  }
-
-  .dropzone {
-    border: 2px dashed rgba(0, 245, 255, 0.3);
-    border-radius: 12px;
-    padding: 24px 16px;
-    text-align: center;
-    cursor: pointer;
-    background: rgba(0, 0, 0, 0.2);
-    transition: all 0.2s;
-    margin-bottom: 16px;
-  }
-  .dropzone:hover { border-color: var(--accent-cyan); }
-
-  .action-btn {
-    width: 100%;
-    padding: 14px;
-    border-radius: 10px;
-    border: none;
-    background: linear-gradient(135deg, var(--accent-cyan) 0%, var(--accent-violet) 100%);
-    color: #070a13;
-    font-weight: 700;
-    font-size: 1rem;
-    cursor: pointer;
-    box-shadow: 0 4px 15px rgba(0, 245, 255, 0.3);
-    transition: transform 0.1s ease;
-  }
-  .action-btn:hover { transform: translateY(-1px); }
-  .action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-  audio { width: 100%; margin-top: 16px; border-radius: 8px; }
-  .download-btn {
-    display: block;
-    text-align: center;
-    background: var(--accent-cyan);
-    color: #070a13;
-    font-weight: 700;
-    padding: 12px;
-    border-radius: 8px;
-    text-decoration: none;
-    margin-top: 12px;
-  }
-</style>
-</head>
-<body>
-<div class="container">
-  <header>
-    <div class="badge">Spatial Studio • Port 8098</div>
-    <h1>8D Spatial Audio Studio</h1>
-    <p class="subtitle">360° бинауральное панорамирование, орбитальный радар и акустика зала</p>
-  </header>
-
-  <div class="grid">
-    <div class="card">
-      <h2>🛰 Интерактивный 8D Радар</h2>
-      <div class="radar-wrap">
-        <canvas id="radarCanvas" width="260" height="260"></canvas>
-      </div>
-      <p style="text-align:center; font-size:0.8rem; color:var(--text-muted); margin-top:8px;">
-        Голова слушателя по центру • Зеленый маркер: орбитальная траектория звука
-      </p>
-    </div>
-
-    <div class="card">
-      <h2>🎛 Настройка 8D параметров</h2>
-      <div class="dropzone" id="dropzone" onclick="document.getElementById('fileInput').click()">
-        <strong id="filePrompt">Нажмите или перетащите аудиофайл</strong>
-        <p style="font-size:0.8rem; color:var(--text-muted); margin-top:4px;">MP3, WAV, FLAC, OGG, AAC</p>
-      </div>
-      <input type="file" id="fileInput" accept="audio/*,video/*" onchange="onFileSelected(this)" style="display:none">
-
-      <div class="form-group">
-        <label>Скорость вращения орбиты:</label>
-        <select id="speedSelect" onchange="updateRadarSpeed(this.value)">
-          <option value="0.1">🌊 Медленная (10 сек на оборот / 0.1 Гц)</option>
-          <option value="0.166" selected>🎧 Стандарт 8D (6 сек на оборот / 0.166 Гц)</option>
-          <option value="0.333">⚡ Быстрая (3 сек на оборот / 0.333 Гц)</option>
-          <option value="0.666">🌪 Шторм (1.5 сек на оборот / 0.666 Гц)</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label>Траектория движения звука:</label>
-        <select id="trajSelect" onchange="updateRadarTraj(this.value)">
-          <option value="circle" selected>🔄 Круговая 360° орбита</option>
-          <option value="infinity">♾ Восьмёрка (Лиссажу перед-зад-лево-право)</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label>Акустическое пространство:</label>
-        <select id="hallSelect">
-          <option value="club" selected>🏢 Ночной клуб (+Bass Boost)</option>
-          <option value="cathedral">🏛 Кафедральный собор (Глубокое эхо)</option>
-          <option value="open">🌌 Открытое поле (Мягкое окружение)</option>
-        </select>
-      </div>
-
-      <button id="renderBtn" class="action-btn" onclick="render8DAudio()" disabled>🎧 Сгенерировать 8D Аудио</button>
-
-      <div id="resultBox" style="display:none; margin-top:16px;">
-        <h3 style="color:var(--accent-cyan); font-size:1rem; margin-bottom:8px;">✅ 8D Аудио готово:</h3>
-        <audio id="audioPlayer" controls></audio>
-        <a id="downloadLink" class="download-btn" href="#" download>📥 Скачать 8D Аудио (MP3 320k)</a>
-      </div>
-    </div>
-  </div>
-</div>
-
-<script>
-let currentSpeedHz = 0.166;
-let currentTraj = 'circle';
-let chosenFile = null;
-
-function updateRadarSpeed(val) { currentSpeedHz = parseFloat(val); }
-function updateRadarTraj(val) { currentTraj = val; }
-
-function onFileSelected(input) {
-  if (input.files && input.files[0]) {
-    chosenFile = input.files[0];
-    document.getElementById('filePrompt').innerText = 'Выбран: ' + chosenFile.name;
-    document.getElementById('renderBtn').disabled = false;
-  }
-}
-
-// Interactive Canvas Radar
-const canvas = document.getElementById('radarCanvas');
-const ctx = canvas.getContext('2d');
-let animTime = 0;
-
-function drawRadar() {
-  const w = canvas.width;
-  const h = canvas.height;
-  const cx = w / 2;
-  const cy = h / 2;
-  const r = 95;
-
-  ctx.clearRect(0, 0, w, h);
-
-  // Radar grid rings
-  ctx.strokeStyle = 'rgba(0, 245, 255, 0.2)';
-  ctx.lineWidth = 1;
-  ctx.beginPath(); ctx.arc(cx, cy, r * 0.33, 0, Math.PI * 2); ctx.stroke();
-  ctx.beginPath(); ctx.arc(cx, cy, r * 0.66, 0, Math.PI * 2); ctx.stroke();
-  ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
-
-  // Crosshairs
-  ctx.beginPath();
-  ctx.moveTo(cx, cy - r); ctx.lineTo(cx, cy + r);
-  ctx.moveTo(cx - r, cy); ctx.lineTo(cx + r, cy);
-  ctx.stroke();
-
-  // Listener Head Center (Headphones Icon)
-  ctx.fillStyle = '#f8fafc';
-  ctx.beginPath(); ctx.arc(cx, cy, 14, 0, Math.PI * 2); ctx.fill();
-  ctx.fillStyle = '#00f5ff';
-  ctx.beginPath(); ctx.arc(cx - 15, cy, 5, 0, Math.PI * 2); ctx.fill(); // Left Ear
-  ctx.beginPath(); ctx.arc(cx + 15, cy, 5, 0, Math.PI * 2); ctx.fill(); // Right Ear
-
-  // Sound source orbital position
-  animTime += 0.016;
-  let sx, sy;
-  if (currentTraj === 'infinity') {
-    const angle = 2 * Math.PI * currentSpeedHz * animTime;
-    sx = cx + r * Math.sin(angle);
-    sy = cy + r * 0.65 * Math.sin(2 * angle);
-  } else {
-    const angle = 2 * Math.PI * currentSpeedHz * animTime;
-    sx = cx + r * Math.cos(angle);
-    sy = cy + r * Math.sin(angle);
-  }
-
-  // Sound orb glow
-  const grad = ctx.createRadialGradient(sx, sy, 2, sx, sy, 18);
-  grad.addColorStop(0, '#00ff9d');
-  grad.addColorStop(0.5, 'rgba(0, 245, 255, 0.6)');
-  grad.addColorStop(1, 'rgba(0, 245, 255, 0)');
-  ctx.fillStyle = grad;
-  ctx.beginPath(); ctx.arc(sx, sy, 18, 0, Math.PI * 2); ctx.fill();
-
-  ctx.fillStyle = '#ffffff';
-  ctx.beginPath(); ctx.arc(sx, sy, 4, 0, Math.PI * 2); ctx.fill();
-
-  requestAnimationFrame(drawRadar);
-}
-requestAnimationFrame(drawRadar);
-
-async function render8DAudio() {
-  if (!chosenFile) return;
-  const btn = document.getElementById('renderBtn');
-  btn.disabled = true;
-  btn.innerText = 'Рендеринг 8D-аудио…';
-
-  const formData = new FormData();
-  formData.append('file', chosenFile);
-  formData.append('speed_hz', currentSpeedHz);
-  formData.append('trajectory', currentTraj);
-  formData.append('hall', document.getElementById('hallSelect').value);
-  formData.append('format', 'audio');
-
-  try {
-    const resp = await fetch('/api/render', { method: 'POST', body: formData });
-    if (!resp.ok) throw new Error(await resp.text());
-    const data = await resp.json();
-
-    const player = document.getElementById('audioPlayer');
-    player.src = '/download/' + data.filename;
-    document.getElementById('downloadLink').href = '/download/' + data.filename;
-    document.getElementById('downloadLink').download = data.filename;
-    document.getElementById('resultBox').style.display = 'block';
-  } catch (err) {
-    alert('Ошибка: ' + err.message);
-  } finally {
-    btn.disabled = false;
-    btn.innerText = '🎧 Сгенерировать 8D Аудио';
-  }
-}
-</script>
-</body>
-</html>
+S8D_JS = r"""
+const $=s=>document.querySelector(s);let file=null;const go=$('#go');
+$('#af-zone').addEventListener('pb:files',e=>{file=e.detail[0]||null;go.disabled=!file});
+const cv=$('#radar'),ctx=cv.getContext('2d');let t=0;
+function col(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim()||'#10b5a5'}
+function draw(){const w=cv.width,h=cv.height,cx=w/2,cy=h/2,r=w*0.38;const brand=col('--brand'),fg=col('--fg'),line=col('--muted');
+  const hz=parseFloat($('#speed').dataset.value||'0.166'),traj=$('#traj').dataset.value;
+  ctx.clearRect(0,0,w,h);ctx.globalAlpha=.35;ctx.strokeStyle=line;ctx.lineWidth=1;
+  [.33,.66,1].forEach(k=>{ctx.beginPath();ctx.arc(cx,cy,r*k,0,Math.PI*2);ctx.stroke()});
+  ctx.beginPath();ctx.moveTo(cx,cy-r);ctx.lineTo(cx,cy+r);ctx.moveTo(cx-r,cy);ctx.lineTo(cx+r,cy);ctx.stroke();ctx.globalAlpha=1;
+  ctx.fillStyle=fg;ctx.beginPath();ctx.arc(cx,cy,16,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=brand;[-1,1].forEach(s=>{ctx.beginPath();ctx.arc(cx+s*18,cy,6,0,Math.PI*2);ctx.fill()});
+  if(!matchMedia('(prefers-reduced-motion: reduce)').matches)t+=0.016;
+  const a=2*Math.PI*hz*t;let sx,sy;
+  if(traj==='infinity'){sx=cx+r*Math.sin(a);sy=cy+r*.65*Math.sin(2*a)}else{sx=cx+r*Math.cos(a);sy=cy+r*Math.sin(a)}
+  for(let i=12;i>0;i--){const b=a-i*0.06;let px,py;if(traj==='infinity'){px=cx+r*Math.sin(b);py=cy+r*.65*Math.sin(2*b)}else{px=cx+r*Math.cos(b);py=cy+r*Math.sin(b)}
+    ctx.globalAlpha=(12-i)/40;ctx.fillStyle=brand;ctx.beginPath();ctx.arc(px,py,7,0,Math.PI*2);ctx.fill()}
+  ctx.globalAlpha=1;const g=ctx.createRadialGradient(sx,sy,2,sx,sy,22);g.addColorStop(0,'#fff');g.addColorStop(.4,brand);g.addColorStop(1,'transparent');
+  ctx.fillStyle=g;ctx.beginPath();ctx.arc(sx,sy,22,0,Math.PI*2);ctx.fill();requestAnimationFrame(draw)}
+requestAnimationFrame(draw);
+go.onclick=async()=>{if(!file){pb.toast(pb.t('need_file'),true);return}pb.busy(go,true);pb.hide('res');
+  const fd=new FormData();fd.append('file',file);fd.append('speed_hz',$('#speed').dataset.value);fd.append('trajectory',$('#traj').dataset.value);
+  fd.append('hall',$('#hall').dataset.value);fd.append('format','audio');
+  try{const d=await pb.upload('/api/render',fd,p=>pb.progress('prog',p<100?p:null,p<100?pb.t('uploading',{pct:p}):pb.t('w_rendering')));
+    if(d.error||!d.filename)throw new Error(d.error||pb.t('error'));pb.progress('prog',100,pb.t('done'));
+    const u='/download/'+encodeURIComponent(d.filename);const r=$('#res');r.className='pb-result';r.hidden=false;
+    r.innerHTML=`<b>${pb.t('w_ready')}</b><audio controls src="${u}"></audio><a class="pb-btn pb-btn-primary" href="${u}" download="${pb.esc(d.filename)}">${pb.t('download')} · MP3 320k</a>`;
+    pb.toast(pb.t('done'))}catch(err){pb.hide('prog');pb.toast(pb.t('error')+': '+err.message,true)}finally{pb.busy(go,false)}};
 """
 
 
@@ -1030,11 +767,7 @@ class WebStudioHandler(BaseHTTPRequestHandler):
         path = parsed.path
 
         if path in ("/", "/index.html"):
-            self.send_response(HTTPStatus.OK)
-            self.send_header("Content-Type", "text/html; charset=utf-8")
-            self.send_header("Cache-Control", "no-cache")
-            self.end_headers()
-            self.wfile.write(WEB_STUDIO_HTML.encode("utf-8"))
+            render_studio(self)
             return
 
         if path == "/api/status":
