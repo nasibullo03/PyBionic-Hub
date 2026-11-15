@@ -1438,13 +1438,6 @@
           "secret": false,
           "defaultValue": "8108",
           "hint": "8108"
-        },
-        {
-          "key": "ALLOWED_USER_IDS",
-          "required": false,
-          "secret": false,
-          "defaultValue": "",
-          "hint": "12345678,87654321"
         }
       ]
     },
@@ -1487,13 +1480,6 @@
           "secret": false,
           "defaultValue": "8109",
           "hint": "8109"
-        },
-        {
-          "key": "ALLOWED_USER_IDS",
-          "required": false,
-          "secret": false,
-          "defaultValue": "",
-          "hint": "12345678,87654321"
         }
       ]
     },
@@ -1588,7 +1574,7 @@
         },
         {
           "key": "ALLOWED_USER_IDS",
-          "required": false,
+          "required": true,
           "secret": false,
           "defaultValue": "",
           "hint": "12345678,87654321"

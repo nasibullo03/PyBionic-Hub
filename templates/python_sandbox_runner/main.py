@@ -295,16 +295,14 @@ def start_bot():
     from telebot import types
 
     bot = telebot.TeleBot(BOT_TOKEN)
+
+    _allowed_ids = {int(x) for x in os.environ.get("ALLOWED_USER_IDS", "").replace(" ", "").split(",") if x.isdigit()}
+
+    @bot.message_handler(func=lambda m: not m.from_user or m.from_user.id not in _allowed_ids)
+    def _deny_access(m):
+        bot.reply_to(m, "⛔ Access denied / Доступ закрыт")
+
     user_state = {}
-
-    ALLOWED = {int(x) for x in os.environ.get("ALLOWED_USER_IDS", "").replace(" ", "").split(",") if x.isdigit()}
-
-    def is_allowed(user_id: int) -> bool:
-        return not ALLOWED or user_id in ALLOWED
-
-    @bot.message_handler(func=lambda m: not is_allowed(m.from_user.id))
-    def access_denied(m):
-        bot.reply_to(m, f"⛔ Доступ ограничен владельцем бота (ваш ID: {m.from_user.id}).")
 
     def get_user_lang(chat_id):
         return user_state.get(chat_id, {}).get("lang", "ru")
