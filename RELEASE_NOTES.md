@@ -4,6 +4,29 @@
 
 ---
 
+## 🛡️ Что нового в версии 2.1.8 (SemVer Patch Release — P0 Runtime & Kernel Hardening)
+
+- **Эмуляция псевдотерминала и обход termios ioctl (PTY / TTY Emulation — #1)**:
+  - В `sitecustomize.py` и `BionicPaths` реализована эмуляция псевдотерминала (`isatty` для `sys.stdin`, `sys.stdout`, `sys.stderr`, `os.isatty(0, 1, 2)`), а также безопасные перехватчики `termios.tcgetattr` и `termios.tcsetattr`. Это предотвращает сбои `termios.error: (25, Inappropriate ioctl for device)` в библиотеках `Click`, `Rich`, `prompt_toolkit`, `getpass`, `tqdm`.
+  - В среду исполнения добавлены флаги принудительного вывода ANSI-цветов (`CLICOLOR_FORCE=1`, `FORCE_COLOR=1`).
+- **Защита от циклического переиспользования PID (PID Wrapping Race Guard — #5)**:
+  - В `ProcessTreeKiller` реализована валидация `/proc/[pid]/cmdline`, предотвращающая случайное уничтожение невинных системных процессов при переиспользовании номеров PID ядром Linux.
+- **Мониторинг приоритета выгрузки памяти ядра Linux (OOM Score Adjust — #8)**:
+  - В `ServiceDiagnostics` и `RunnerForegroundService` добавлен мониторинг `/proc/self/oom_score_adj`.
+  - В шторку телеметрии выведен информативный индикатор OOM Score с цветовой градацией приоритетов (Foreground 0..200, Visible 201..500, LMK Risk > 500).
+- **Диагностика отсутствия C-заголовков Python.h и несовместимости glibc (ABI & Header Advisor — #36, #86, #87)**:
+  - В `PipErrorAdvisor` добавлены анализаторы отсутствия C-заголовков `Python.h` (с рекомендацией пакета `python-dev`) и несовместимости символов glibc `GLIBC_` / `dlopen symbol lookup error` (с рекомендацией чистых Python-пакетов или Bionic ABI).
+- **Специализированные инструкции автозапуска и защиты от заморозки для ведущих OEM (OEM Protection Guides — #174, #175, #183)**:
+  - В `OemPowerHelper` добавлены детальные пошаговые руководства для Xiaomi / POCO (HyperOS / MIUI), Samsung Galaxy (OneUI), Huawei / Honor (EMUI / MagicOS), Oppo / Realme / OnePlus (ColorOS), и Infinix / Tecno (XOS).
+- **Предохранитель от цикла падений службы (Service Crash Loop Circuit Breaker — #202)**:
+  - В `RunnerForegroundService` реализован автоматический предохранитель: при более чем 3 падениях службы за 60 секунд автоперезапуск приостанавливается с показом системного оповещения для защиты аккумулятора и процессора от перегрева.
+- **Безопасность запуска Foreground Service и контроль POST_NOTIFICATIONS на Android 13+ (#189, #190)**:
+  - Обработка исключений запуска `ForegroundServiceStartNotAllowedException` с выводом диагностики в лог проекта и информационным баннером в списке ботов при отключенных уведомлениях на Android 13+.
+- **Пользовательские переключатели (Правило 5)**:
+  - В `SettingsScreen` добавлены реактивные переключатели для PTY-эмуляции, защиты от переиспользования PID и сервисного предохранителя падений, синхронизированные по всем 22 языковым пакетам.
+
+---
+
 ## 🛡️ Что нового в версии 2.1.7 (SemVer Patch Release — P0 Security & Stability Hardening)
 
 - **Автоматическое восстановление прав исполнения бинарников (Exec Permissions Auto-Recovery — #61)**:
