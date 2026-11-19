@@ -4,6 +4,25 @@
 
 ---
 
+## 🛡️ Что нового в версии 2.1.10 (SemVer Patch Release — P0 Pip Concurrency, Crash Incidents & Roaming Guard)
+
+- **Изоляция кэша pip per-project и защита от повреждения колес (Pip Concurrency Defense — #506)**:
+  - В `BionicPaths` переменная `PIP_CACHE_DIR` изолирована для каждого каталога проекта (`$PROJECT_DIR/.cache/pip`). Это полностью исключает race condition и повреждение архивов кэша колес (`BadZipFile`) при одновременной установке зависимостей в нескольких параллельных ботах.
+  - Добавлен реактивный тумблер `pipCacheIsolationEnabled` в `SettingsScreen` (согласно Правилу 5).
+- **Выделенный буфер аварийных инцидентов и трассировок (Crash Incident Store — #741)**:
+  - В `RuntimeBus` внедрен отдельный буфер `errorIncidentsMap` (до 500 записей), который сохраняет логи потока `STDERR`, ошибки, исключения и полные стектрейсы `Traceback (most recent call last):`. Ошибки больше не вытесняются из памяти даже при тысячах строк информационного вывода в `STDOUT`.
+  - Добавлены методы `getErrorIncidents()`, `getLatestCrashTraceback()` и очистка инцидентов.
+- **Защита от финансового списания трафика в международном роуминге (Dual-SIM Roaming Guard — #1005)**:
+  - В `OemPowerHelper` и `ServiceDiagnostics` добавлено определение статуса роуминга через `NetworkCapabilities.NET_CAPABILITY_NOT_ROAMING`.
+  - В `RunnerForegroundService` реализована автоматическая приостановка активных фоновых ботов при работе в международном мобильном роуминге, если включена соответствующая настройка `blockRoamingTrafficEnabled`.
+  - В `ProjectsScreen` добавлен предупреждающий индикатор при обнаружении активного роуминга.
+- **Персистентность разрешений Storage Access Framework (SAF Permission Retention — #961)**:
+  - В `ProjectRepository` метод `takePersistableUriPermissionSafely` обеспечивает фиксацию постоянных системных прав (`takePersistableUriPermission`) на выбранные пользователем каталоги и архивы, исключая потерю доступа после перезагрузки смартфона.
+- **Реестр дефектов и аудит архитектуры**:
+  - Устранено и верифицировано еще 13 дефектов приоритета P0 (#267, #302, #306, #312, #325, #329, #338, #506, #741, #961, #1005, #1016, #1027). Общее число устраненных дефектов достигло **69**, а количество оставшихся дефектов P0 сократилось до рекордных **28**!
+
+---
+
 ## 🛡️ Что нового в версии 2.1.9 (SemVer Patch Release — P0 Service & Security Hardening)
 
 - **Защита от 5-секундных зависаний ANR при остановке службы (FGS Stop Timeout ANR Defense — #236)**:
