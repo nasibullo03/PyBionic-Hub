@@ -38,7 +38,14 @@ To maximize agent speed, autonomy, and reduce repetitive manual cycles:
   - Develop custom AST validators, template checkers, or quick runners to test components without waiting for heavyweight builds when not needed.
 - **Host Safety Constraint:** All automation scripts must remain strictly isolated to the project directory, execute safely, and never harm the user's host OS or external systems.
 
-## 5. Android Device & Build Guidelines
+## 5. Configurable Guards & User Control Policy
+- Never introduce hardcoded limits, guardrails, circuit breakers, or throttling policies without providing user-facing configuration toggles.
+- Every architectural safety mechanism (e.g., Crash Loop Circuit Breaker, Fork Bomb / process limits, OOM thresholds, log sanitization, thermal cutoffs, auto-restarts) must have:
+  1. A corresponding reactive preference in `AppPreferences` / `ProjectConfig`.
+  2. Sensible safe default values out-of-the-box (e.g. enabled by default).
+  3. A toggle / parameter in the UI settings allowing developers and advanced power users to adjust thresholds or disable the guard completely when needed for high-concurrency workloads.
+
+## 6. Android Device & Build Guidelines
 - DO NOT execute `assembleRelease` without explicit user permission.
 - Testing on the physical Android device or emulator must be executed **strictly upon user request**.
 - Always verify changes on the physical device or emulator when connected via ADB.
