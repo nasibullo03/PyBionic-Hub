@@ -4,6 +4,35 @@
 
 ---
 
+## 🛡️ Что нового в версии 2.1.14 (SemVer Patch Release — System Shutdown Interception, PID Registry & Socket Collision Guard)
+
+- **Грациозная остановка ботов при выключении и перезагрузке устройства (#219)**:
+  - Создан `ShutdownReceiver`, зарегистрированный на системные события `ACTION_SHUTDOWN` и `QUICKBOOT_POWEROFF`.
+  - В `RunnerForegroundService` реализован метод `handleDeviceShutdown()`, отправляющий сигнал SIGTERM воркерам и сбрасывающий WAL-журналы SQLite без очистки персистентного списка `desired_running`, обеспечивая автоматическое продолжение работы ботов после включения устройства.
+- **Персистентный реестр PID и очистка осиротевших процессов (#62)**:
+  - Реализован механизм атомарного сохранения активных PID воркеров на диск в `active_workers_state.json`.
+  - При запуске службы метод `cleanupOrphanedPidsFromPreviousCrash()` сканирует `/proc/[pid]/cmdline`, обнаруживает и утилизирует процессы Python/PyBionic, оставшиеся в случае внезапного падения приложения или выгрузки памяти ОС Android.
+- **Предотвращение гонки TCP-портов при быстром перезапуске (Fast Restart Port Race — #69)**:
+  - Внедрена корутина активного ожидания `awaitPortRelease(port)` с флагом `SO_REUSEADDR` перед запуском процесса (таймаут 3000 мс, опрос каждые 150 мс), полностью исключающая сбои `OSError: [Errno 98] Address already in use`.
+- **Защита от повреждения кэша байткода .pyc (Bytecode Corruption Guard — #54)**:
+  - Реализован сторож `cleanBytecodeCache()`: при обнаружении ошибок `bad magic number` или `bad marshal data` поврежденные каталоги `__pycache__` и файлы `*.pyc` автоматически очищаются перед повторным запуском. Добавлен переключатель `pycCorruptionGuardEnabled` в настройки.
+- **Нормализация символических ссылок в PYTHONPATH (Symlink Realpath — #48)**:
+  - В `BionicPaths.buildEnv()` пути к каталогу проекта и системным библиотекам `site-packages` разрешаются через канонический путь (`canonicalFile`), исключая циклический поиск и дублирование загрузки модулей.
+- **Автоматическое расширение лимита открытых файловых дескрипторов (RLIMIT_NOFILE — #53)**:
+  - В системный перехватчик `sitecustomize.py` добавлено повышение мягкого лимита `RLIMIT_NOFILE` до системного максимума через `resource.setrlimit()`. В настройки добавлен переключатель `expandNofileEnabled`.
+- **Интеллектуальный поиск нативных библиотек ctypes в Android Bionic (#91)**:
+  - Перехвачен `ctypes.util.find_library()` с расширенным сканированием `$PREFIX/lib`, `/system/lib64`, `/apex/com.android.runtime/lib64` и `/system/lib`, восстанавливая работоспособность библиотек SoundFile, CFFI и криптографии.
+- **Кроссплатформенный шим для Windows asyncio Policy (#101)**:
+  - В `sitecustomize.py` добавлены шимы `WindowsSelectorEventLoopPolicy` и `WindowsProactorEventLoopPolicy`, исключающие падения при переносе кода с Windows на Android.
+- **Экспорт часового пояса Android $TZ (#63)**:
+  - В окружение каждого процесса экспортируется системный часовой пояс Android (`TimeZone.getDefault().id`), обеспечивая корректное вычисление локального времени в `time.tzset()` и `datetime`.
+- **Персистентность сетевых мониторов и восстановление состояния (#215, #218, #50)**:
+  - Гарантировано освобождение сетевых колбэков в `onDestroy()`, устранение парсинга `/proc/[pid]/stat` с пробелами, и надежный автозапуск проектов при получении `intent == null` в `START_STICKY`.
+- **Реестр дефектов и аудит архитектуры**:
+  - Устранено и верифицировано **12 дефектов** категории P1/P2 (#48, #50, #53, #54, #62, #63, #69, #91, #101, #215, #218, #219). Общее число устраненных дефектов достигло **120** (осталось **925** | P0: 0, P1: 365, P2: 560).
+
+---
+
 ## 🛡️ Что нового в версии 2.1.13 (SemVer Patch Release — P1 High-Priority Kernel & Process Lifecycle Enhancements)
 
 - **Ликвидация утечек файловых дескрипторов процессов (FD_CLOEXEC & Stream Closure — #3)**:
