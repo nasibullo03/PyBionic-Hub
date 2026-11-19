@@ -4,6 +4,26 @@
 
 ---
 
+## 🛡️ Что нового в версии 2.1.7 (SemVer Patch Release — P0 Security & Stability Hardening)
+
+- **Автоматическое восстановление прав исполнения бинарников (Exec Permissions Auto-Recovery — #61)**:
+  - В `BionicPaths` реализован метод `ensureExecutablePermissions()`, гарантирующий принудительное восстановление флагов исполнения `0755` (`setExecutable(true, false)`) на `python3`, `pip`, `sh` и всех исполняемых файлах каталога `$PREFIX/bin`.
+  - Предотвращает ошибки `EACCES (Permission denied)` после обновлений APK через Google Play / GitHub Release или восстановления резервных копий.
+- **Безопасная изоляция sys.path и детектор конфликтов модулей (Safe Sys.path Isolation — #114)**:
+  - Интерпретатор Python запускается с переменной `PYTHONSAFEPATH=1` (эквивалент флага `-P`), исключающей потенциально небезопасный каталог запуска из начала `sys.path`.
+  - В `ProjectRepository` и `ProjectDetailScreen` добавлен статический сканер `detectStdlibCollisions(projectId)`, предупреждающий пользователя о файлах в корне проекта (`token.py`, `email.py`, `queue.py`, `socket.py`, `http.py`, `json.py`), которые могут нарушать работу стандартной библиотеки Python.
+- **Защита от дедлоков multiprocessing на Android Bionic (Multiprocessing Spawn Guard — #132)**:
+  - Внедрён модуль перехвата `sitecustomize.py`, принудительно устанавливающий безопасный метод запуска `multiprocessing.set_start_method("spawn", force=True)`, исключая дедлоки POSIX `fork()` в многопоточных процессах на Android.
+- **Изоляция групп процессов и завершение при гибели службы (Process Group Isolation & PDEATHSIG — #2, #19)**:
+  - Каждый процесс бота автоматически изолируется в собственную группу процессов через `os.setpgrp()`, что позволяет `ProcessTreeKiller` отправлять атомарные сигналы всей группе процессов (`killpg`).
+  - Установлен системный флаг ядра Linux `prctl(PR_SET_PDEATHSIG, SIGKILL)`, гарантирующий автоматическое мгновенное уничтожение всех фоновых процессов Python при падении или закрытии службы Android.
+- **Защита от Zip Slip в tar-архивах (PEP 706 Tarfile Filter — #143)**:
+  - В среду исполнения внедрён параметр `PYTHON_TARFILE_DEFAULT_FILTER=data`, активирующий встроенную защиту Python 3.14 от атак Path Traversal при распаковке архивов.
+- **Пользовательские переключатели новых защит (Configurable Guards Policy — Правило 5)**:
+  - В `SettingsScreen` и `AppPreferences` выведены удобные реактивные тумблеры для безопасной изоляции `sys.path`, метода `spawn`, изоляции групп процессов, `PDEATHSIG` и автовосстановления прав `chmod +x`, синхронизированные по всем 22 языкам.
+
+---
+
 ## 🌐 Что нового в версии 2.1.6 (SemVer Patch Release)
 
 - **Полная интернационализация и устранение хардкода (Systematic i18n Localization)**:
