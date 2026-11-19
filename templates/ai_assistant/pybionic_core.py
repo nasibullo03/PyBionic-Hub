@@ -518,4 +518,54 @@ def start_polling(bot: Any, **kwargs: Any) -> None:
             delay = min(delay * 2, 300)
 
 
+# ---------------------------------------------------------------------------
+# Криптографическая валидация вебхуков (HMAC-SHA256, Stripe, Telegram) - #337
+# ---------------------------------------------------------------------------
+def verify_webhook_hmac_sha256(payload_bytes: bytes, signature_header: str, secret: str, prefix: str = "sha256=") -> bool:
+    """Проверяет криптографическую HMAC-SHA256 подпись тела запроса с защитой от тайминг-атак."""
+    import hashlib
+    import hmac
+    if not secret or not signature_header:
+        return False
+    raw_sig = signature_header.strip()
+    if prefix and raw_sig.startswith(prefix):
+        raw_sig = raw_sig[len(prefix):]
+    expected = hmac.new(secret.encode("utf-8"), payload_bytes, hashlib.sha256).hexdigest()
+    return hmac.compare_digest(raw_sig.lower(), expected.lower())
+
+
+def verify_stripe_signature(payload_bytes: bytes, sig_header: str, secret: str, tolerance_sec: int = 300) -> bool:
+    """Проверяет подпись Stripe-Signature (t=timestamp,v1=signature)."""
+    import hashlib
+    import hmac
+    if not secret or not sig_header:
+        return False
+    items = {}
+    for part in sig_header.split(","):
+        kv = part.strip().split("=", 1)
+        if len(kv) == 2:
+            items[kv[0]] = kv[1]
+    ts_str = items.get("t")
+    v1 = items.get("v1")
+    if not ts_str or not v1:
+        return False
+    try:
+        ts = int(ts_str)
+        if abs(time.time() - ts) > tolerance_sec:
+            return False
+    except ValueError:
+        return False
+    signed_payload = f"{ts_str}.".encode("utf-8") + payload_bytes
+    expected = hmac.new(secret.encode("utf-8"), signed_payload, hashlib.sha256).hexdigest()
+    return hmac.compare_digest(v1.lower(), expected.lower())
+
+
+def verify_telegram_secret_token(header_value: str, expected_token: str) -> bool:
+    """Проверяет заголовок X-Telegram-Bot-Api-Secret-Token с защитой от тайминг-атак."""
+    import hmac
+    if not expected_token or not header_value:
+        return False
+    return hmac.compare_digest(header_value.strip(), expected_token.strip())
+
+
 setup_telegram_proxy()
