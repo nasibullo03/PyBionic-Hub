@@ -4,7 +4,6 @@
 
 from __future__ import annotations
 
-import pybionic_core as core
 import html
 import http.server
 import json
@@ -145,6 +144,9 @@ def normalize_feed_url(kind: str, target: str) -> str:
     return tgt
 
 
+RELAY_WATERMARK = "[PyBionic-Relayed]"
+
+
 def fetch_feed_items(url: str) -> list[tuple[str, str, str]]:
     req = urllib.request.Request(url, headers={"User-Agent": "PyBionic-MultiRelay/1.0"})
     with urllib.request.urlopen(req, timeout=20) as resp:
@@ -157,7 +159,7 @@ def fetch_feed_items(url: str) -> list[tuple[str, str, str]]:
         title = (item.findtext("title") or "").strip()
         link = (item.findtext("link") or "").strip()
         uid = (item.findtext("guid") or link or title).strip()
-        if uid:
+        if uid and RELAY_WATERMARK not in title:
             items.append((uid, title, link))
 
     # Atom (YouTube / GitHub Releases)
@@ -167,7 +169,7 @@ def fetch_feed_items(url: str) -> list[tuple[str, str, str]]:
         uid = (entry.findtext("a:id", default="", namespaces=ns) or title).strip()
         link_el = entry.find("a:link", ns)
         link = link_el.attrib.get("href", "") if link_el is not None else ""
-        if uid:
+        if uid and RELAY_WATERMARK not in title:
             items.append((uid, title, link))
 
     return items[:10]
@@ -178,7 +180,11 @@ def post_json(url: str, payload: dict) -> None:
     req = urllib.request.Request(
         url,
         data=body,
-        headers={"Content-Type": "application/json", "User-Agent": "PyBionic-MultiRelay/1.0"},
+        headers={
+            "Content-Type": "application/json",
+            "User-Agent": "PyBionic-MultiRelay/1.0",
+            "X-PyBionic-Relayed": "1",
+        },
         method="POST",
     )
     with urllib.request.urlopen(req, timeout=15):
@@ -186,7 +192,14 @@ def post_json(url: str, payload: dict) -> None:
 
 
 def broadcast(source_label: str, title: str, link: str) -> list[str]:
+    # Prevent infinite loop between relays/webhooks (#624)
+    if RELAY_WATERMARK in title or RELAY_WATERMARK in source_label:
+        log("log_err_target", target="LoopGuard", err="Skipping broadcast to prevent infinite relay loop")
+        return []
+
     text = t("msg_new_item", source=source_label, title=title, link=link)
+    if RELAY_WATERMARK not in text:
+        text = f"{text}\n\n{RELAY_WATERMARK}"
     delivered: list[str] = []
 
     tg_token = os.environ.get("BOT_TOKEN", "").strip()
@@ -518,16 +531,16 @@ def run_telegram_bot(token: str) -> None:
     def build_main_reply_kb(uid: int) -> types.ReplyKeyboardMarkup:
         kb = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=False)
         kb.row(
-            types.KeyboardButton(core.btn("kb_check_updates", uid)),
-            types.KeyboardButton(core.btn("kb_test_broadcast", uid)),
+            types.KeyboardButton("🔄 Проверить обновления"),
+            types.KeyboardButton("📢 Тестовая рассылка"),
         )
         kb.row(
-            types.KeyboardButton(core.btn("kb_my_sources", uid)),
-            types.KeyboardButton(core.btn("kb_add_source", uid)),
+            types.KeyboardButton("📋 Мои источники"),
+            types.KeyboardButton("➕ Добавить источник"),
         )
         kb.row(
-            types.KeyboardButton(core.btn("btn_lang", uid)),
-            types.KeyboardButton(core.btn("btn_help", uid)),
+            types.KeyboardButton("🌐 Выбрать язык"),
+            types.KeyboardButton("ℹ️ Инструкция"),
         )
         return kb
 
@@ -548,7 +561,7 @@ def run_telegram_bot(token: str) -> None:
         bot.reply_to(
             msg,
             t("tg_lang_title", user_id=uid),
-            reply_markup=build_reply_language_keyboard(user_id=uid, back_text=core.btn("btn_menu", uid)),
+            reply_markup=build_reply_language_keyboard(user_id=uid, back_text="◀ Главное меню"),
         )
 
     @bot.message_handler(func=lambda m: bool(m.text and parse_lang_choice(m.text)))
@@ -559,17 +572,17 @@ def run_telegram_bot(token: str) -> None:
             set_user_lang(uid, code)
             bot.reply_to(msg, t("tg_lang_changed", user_id=uid), reply_markup=build_main_reply_kb(uid))
 
-    @bot.message_handler(func=lambda m: core.is_btn(m.text, "btn_menu", "btn_cancel"))
+    @bot.message_handler(func=lambda m: m.text in ("◀ Главное меню", "❌ Отмена", "◀ Назад"))
     def on_back(msg: Any) -> None:
         uid = msg.from_user.id
         clear_user_state(uid)
         bot.reply_to(msg, "Главное меню:", reply_markup=build_main_reply_kb(uid))
 
-    @bot.message_handler(func=lambda m: core.is_btn(m.text, "btn_lang"))
+    @bot.message_handler(func=lambda m: m.text in ("🌐 Выбрать язык", "🌐 Язык"))
     def on_lang_btn(msg: Any) -> None:
         on_lang_cmd(msg)
 
-    @bot.message_handler(func=lambda m: core.is_btn(m.text, "btn_help"))
+    @bot.message_handler(func=lambda m: m.text in ("ℹ️ Инструкция", "ℹ️ Помощь"))
     def on_help_btn(msg: Any) -> None:
         on_help(msg)
 
@@ -590,7 +603,7 @@ def run_telegram_bot(token: str) -> None:
             lines.append(f"• <b>[{r['kind'].upper()}]</b> {html.escape(r['label'] or r['target'])}")
         bot.reply_to(msg, "\n".join(lines), reply_markup=build_main_reply_kb(uid))
 
-    @bot.message_handler(func=lambda m: core.is_btn(m.text, "kb_my_sources"))
+    @bot.message_handler(func=lambda m: m.text == "📋 Мои источники")
     def on_sources_btn(msg: Any) -> None:
         on_sources(msg)
 
@@ -605,7 +618,7 @@ def run_telegram_bot(token: str) -> None:
 
         threading.Thread(target=do_poll, daemon=True).start()
 
-    @bot.message_handler(func=lambda m: core.is_btn(m.text, "kb_check_updates"))
+    @bot.message_handler(func=lambda m: m.text == "🔄 Проверить обновления")
     def on_poll_btn(msg: Any) -> None:
         on_poll_cmd(msg)
 
@@ -621,7 +634,7 @@ def run_telegram_bot(token: str) -> None:
 
         threading.Thread(target=do_test, daemon=True).start()
 
-    @bot.message_handler(func=lambda m: core.is_btn(m.text, "kb_test_broadcast"))
+    @bot.message_handler(func=lambda m: m.text == "📢 Тестовая рассылка")
     def on_test_btn(msg: Any) -> None:
         on_test_cmd(msg)
 
@@ -640,14 +653,14 @@ def run_telegram_bot(token: str) -> None:
         else:
             set_user_state(uid, "WAITING_FEED_URL")
             kb = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=False)
-            kb.row(types.KeyboardButton(core.btn("btn_menu", uid)))
+            kb.row(types.KeyboardButton("◀ Главное меню"))
             bot.reply_to(
                 msg,
                 "✏️ <b>Отправьте URL или репозиторий:</b>\n\n• RSS URL: <code>https://example.com/feed.xml</code>\n• GitHub: <code>owner/repo</code>\n• YouTube: <code>UC...</code>",
                 reply_markup=kb,
             )
 
-    @bot.message_handler(func=lambda m: core.is_btn(m.text, "kb_add_source"))
+    @bot.message_handler(func=lambda m: m.text == "➕ Добавить источник")
     def on_add_btn(msg: Any) -> None:
         on_add(msg)
 
@@ -670,7 +683,7 @@ def run_telegram_bot(token: str) -> None:
         bot.reply_to(msg, "Главное меню:", reply_markup=build_main_reply_kb(uid))
 
     log("log_started")
-    core.start_polling(bot, timeout=30, long_polling_timeout=25)
+    bot.infinity_polling(timeout=30, long_polling_timeout=25)
 
 
 def main() -> int:
