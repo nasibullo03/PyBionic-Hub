@@ -4,6 +4,35 @@
 
 ---
 
+## 🛡️ Что нового в версии 2.1.26 (SemVer Patch Release — Bionic stat64 Shim, CPU Share Throttling, Free-Threading GIL Guard, Synthetic Venv, LibFFI & Diagnostics)
+
+- **Нормализация вызовов stat64/fstat64 и наносекундных меток времени (Bionic stat64 / fstat64 ABI Shim — #16)**:
+  - В `sitecustomize.py` (сниппет 50) добавлен перехватчик `os.stat` и `os.fstat`, нормализующий поля `st_atime_ns` и `st_mtime_ns` между Bionic libc и glibc ABI, предотвращая сбои компиляции и ошибочные нулевые размеры файлов в сторонних C-модулях. В настройки добавлен переключатель `bionicStat64ShimEnabled`.
+- **Кооперативное регулирование нагрузки на CPU и защита от перегрева (Kernel CPU Share Throttling — #76)**:
+  - В `OemPowerHelper` и `RunnerForegroundService` реализовано назначение фонового nice-приоритета (`Process.THREAD_PRIORITY_BACKGROUND`) для воркеров, предотвращая монополизацию 100% CPU зависшими циклами и аварийный термальный троттлинг ядра. В настройки добавлен переключатель `cpuShareThrottlingEnabled`.
+- **Очистка мьютексов и блокировок при fork() процесса воркера (Pthread Atfork Mutex Reset — #81)**:
+  - В `sitecustomize.py` (сниппет 51) через `os.register_at_fork(after_in_child=...)` внедрен механизм сброса состояния мьютексов и потоковых блокировок в дочернем процессе после fork(), исключая дедлоки при захвате ресурсов. В настройки добавлен переключатель `pthreadAtforkResetEnabled`.
+- **Принудительная фиксация GIL и безопасность Free-Threading в Python 3.14 (Python 3.14 GIL Enforcement — #89)**:
+  - В `BionicPaths.buildEnv` и `sitecustomize.py` (сниппет 52) активирована фиксация `PYTHON_GIL=1`: при обнаружении Free-Threading сборки выводится предупреждение `[GIL_GUARD]` и блокируется небезопасный запуск устаревших бинарных модулей без GIL. В настройки добавлен переключатель `pythonGilEnforcementEnabled`.
+- **Синтетическая генерация виртуальных окружений venv без ensurepip (Synthetic VirtualEnv Scaffolding — #92)**:
+  - В `BionicPaths.ensureSyntheticVenv` реализовано автоматическое создание файловой структуры `venv/` с файлом `pyvenv.cfg`, прилинкованным бинарником `python3` и локальным `site-packages`, позволяя изолировать зависимости даже на минимальных bootstrap-дистрибутивах без модуля `ensurepip`. В настройки добавлен переключатель `syntheticVenvEnabled`.
+- **Защита от исчерпания static TLS слотов динамического линковщика (Dlopen TLS Slots Limit Guard — #95)**:
+  - В `sitecustomize.py` (сниппет 53) перехвачен метод `ctypes.CDLL`: ведется аудит количества одновременно загруженных разделяемых библиотек и выводится системное предупреждение `[TLS_GUARD]` при приближении к аппаратному лимиту TLS Bionic libc (64/128 библиотек). В настройки добавлен переключатель `dlopenTlsLimitGuardEnabled`.
+- **Синтез путей и флагов компиляции для LibFFI (LibFFI Path Enforcer — #103)**:
+  - В `BionicPaths.buildEnv` добавлена автогенерация путей `C_INCLUDE_PATH`, `LIBRARY_PATH` и `PKG_CONFIG_PATH` для системной библиотеки `libffi`, обеспечивая успешную сборку CFFI и ctypes-расширений при установке из исходников. В настройки добавлен переключатель `libffiPathEnforcerEnabled`.
+- **Базовый режим REPL в Python 3.14 для веб-консоли (Python 3.14 Basic REPL Fallback — #110)**:
+  - В `BionicPaths.buildEnv` и `sitecustomize.py` (сниппет 54) добавлен экспорт `PYTHON_BASIC_REPL=1`: при запуске в нетерминальных потоках отключаются сложные escape-последовательности нового REPL Python 3.14, исключая мусорные ANSI-символы в веб-консоли. В настройки добавлен переключатель `pythonBasicReplFallbackEnabled`.
+- **Интеллектуальный советник по замене парсера lxml (LXML Parser Diagnostic Advisor — #115)**:
+  - В `PipErrorAdvisor` добавлен детектор ошибок компиляции `lxml`: при сбое сборки тяжелых C-библиотек `libxml2`/`libxslt` разработчику выдается рекомендация перехода на стандартный `html.parser` или `html5lib`. В настройки добавлен переключатель `lxmlParserAdvisorEnabled`.
+- **Диагностический советник по системным утилитам FFmpeg / FFprobe (FFmpeg Diagnostic Advisor — #116)**:
+  - В `PipErrorAdvisor` внедрено обнаружение отсутствия исполняемых файлов `ffmpeg`/`ffprobe` при запуске аудио/видео ботов с выдачей четких инструкций по установке или переходу на чистые Python-библиотеки (`moviepy`, `mutagen`, `pydub`). В настройки добавлен переключатель `ffmpegDiagnosticAdvisorEnabled`.
+- **Модульная архитектура настроек Compose (BionicAbiAndPackagingHardeningCard)**:
+  - Создан независимый UI-компонент `BionicAbiAndPackagingHardeningCard.kt` со всеми 10 переключателями и полной синхронизацией строк на 22 языка.
+- **Реестр дефектов и аудит архитектуры**:
+  - Устранено и верифицировано **10 дефектов** категории P1 (#16, #76, #81, #89, #92, #95, #103, #110, #115, #116). Общее число устраненных дефектов достигло **238** (осталось **807** | P0: 0, P1: 264, P2: 543).
+
+---
+
 ## 🛡️ Что нового в версии 2.1.25 (SemVer Patch Release — Bionic Linker Path Enforcer, Pthread Cancel Emulation, RTLD_DEEPBIND Workaround, Captive Portal & Backlog Shield)
 
 - **Синтез путей линковщика Bionic для нативных библиотек (Bionic Linker Path Enforcer — #12)**:
