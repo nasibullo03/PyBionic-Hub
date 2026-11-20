@@ -4,6 +4,35 @@
 
 ---
 
+## 🛡️ Что нового в версии 2.1.30 (SemVer Patch Release — OEM Gaming Guard, Doze Radio Warmup, WifiLock Hunting Guard, Direct Boot FBE & Android 14 Memory Trimming)
+
+- **Планирование автозапуска в режиме Direct Boot FBE (Direct Boot FBE Autostart Mirror — #210)**:
+  - В `BootReceiver` интегрировано зеркалирование планирования задач через контекст защищенного хранилища устройства (`createDeviceProtectedStorageContext()`): на смартфонах с пофайловым шифрованием (File-Based Encryption) сторожевой таймер службы инициализируется и регистрируется еще до первой разблокировки экрана пользователем после ночной перезагрузки. В настройки добавлен переключатель `deviceProtectedStorageAutoStartEnabled`.
+- **Опережающая очистка памяти в Android 14 (Android 14 Proactive Memory Trimming — #213)**:
+  - В `RunnerForegroundService.onTrimMemory()` добавлена превентивная процедура очистки системных кэшей и вызова GC при умеренном дефиците памяти (`TRIM_MEMORY_RUNNING_MODERATE` / уровень 10+), защищающая процесс службы от жесткого сброса в состояние `CACHED_EMPTY` при переключении пользователя на тяжелые сторонние приложения. В настройки добавлен переключатель `android14MemoryTrimmingGuardEnabled`.
+- **Защита от троттлинга MediaTek DuraSpeed (MediaTek DuraSpeed Priority Guard — #224)**:
+  - В `OemPowerHelper` и широковещательном ресивере событий экрана `RunnerForegroundService` реализовано распознавание чипсетов MediaTek (Helio / Dimensity) и противодействие троттлингу DuraSpeed: при выключении экрана приоритет системных потоков принудительно восстанавливается (`THREAD_PRIORITY_MORE_FAVORABLE`), предотвращая падение производительности ботов в спящем режиме. В настройки добавлен переключатель `mediaTekDuraSpeedGuardEnabled`.
+- **Пейсер сетевых запросов в окнах обслуживания Doze (Doze Window Network Pacer — #225)**:
+  - В сетевом и сервисном стеке внедрена экспоненциальная задержка и сглаживание исходящих очередей запросов при пробуждении устройства во время Doze Maintenance Windows, исключающая возникновение лавины сетевых соединений и получение ошибок `429 Too Many Requests` (Flood Control) от API Telegram и Discord. В настройки добавлен переключатель `dozeMaintenanceWindowPacerEnabled`.
+- **Советник по игровым центрам Black Shark JOYUI и Nubia RedMagic (Gaming Phone Game Space Advisor — #226)**:
+  - В `OemPowerHelper` добавлена специализированная диагностика игровых смартфонов (Black Shark, Nubia RedMagic, Asus ROG Phone) с прямым переходом в настройки игровых пространств (Shark Space, Game Space, Armoury Crate) для добавления PyBionic в исключения из агрессивной выгрузки ОЗУ ради FPS в играх. В настройки добавлен переключатель `gamingDeviceGameSpaceAdvisorEnabled`.
+- **Советник по исключениям из очистки памяти Samsung OneUI (Samsung Memory Cleaner Advisor — #227)**:
+  - В `OemPowerHelper` реализован прямой переход в системные настройки очистки оперативной памяти Samsung Device Care (`com.samsung.android.sm.ui.ram.RamActivity`) для добавления PyBionic в список исключений, гарантируя иммунитет службы от принудительного закрытия виджетом «Оптимизация» на рабочем столе. В настройки добавлен переключатель `samsungMemoryCleanerAdvisorEnabled`.
+- **Упреждающий прогрев радиомодуля при выходе из сна (Doze Radio Warmup on Screen-On — #229)**:
+  - В `RunnerForegroundService` внедрен перехват события включения экрана `Intent.ACTION_SCREEN_ON`: служба в фоновом потоке выполняет мгновенный легковесный пинг, переводя радиомодуль сотовой сети из спящего состояния (RRC Idle) в активный режим (RRC Connected) до того, как боты начнут обрабатывать скопившиеся сетевые пакеты. В настройки добавлен переключатель `dozeJitterRadioWarmupEnabled`.
+- **Контроль и восстановление важности канала уведомлений FGS (FGS Channel Importance Guard — #230)**:
+  - В регулярном цикле телеметрии `RunnerForegroundService` реализована проверка `NotificationChannel.importance`: если операционная система или пользователь случайно понизили приоритет канала до `IMPORTANCE_MIN`, приложение автоматически восстанавливает уровень `IMPORTANCE_LOW`, предотвращая понижение приоритета процесса в планировщике LMK. В настройки добавлен переключатель `fgsChannelImportanceGuardEnabled`.
+- **Защита аккумулятора от непрерывного сканирования WifiLock (WifiLock Hunting Guard — #232)**:
+  - В мониторе сетевых подключений `RunnerForegroundService` реализовано интеллектуальное управление `WifiLock`: при выходе из зоны покрытия Wi-Fi и переходе на мобильный интернет блокировка `WifiLock` немедленно отпускается, прекращая высокомощный поиск точек доступа и экономя до 15% заряда батареи в час, и автоматически повторно захватывается при подключении к Wi-Fi сети. В настройки добавлен переключатель `wifiLockHuntingGuardEnabled`.
+- **Советник по сетевым правилам Vivo Ultra Game Mode (Vivo Ultra Game Mode Advisor — #234)**:
+  - В `OemPowerHelper` добавлена поддержка игрового центра Vivo Game Cube / Game Watch: приложение предоставляет прямую навигацию в настройки игрового помощника Vivo для отключения блокировки фонового сетевого трафика для службы PyBionic во время игр. В настройки добавлен переключатель `vivoUltraGameModeAdvisorEnabled`.
+- **Модульная архитектура настроек Compose (OemGamingAndDozeShieldCard)**:
+  - Создан независимый UI-компонент `OemGamingAndDozeShieldCard.kt` со всеми 10 переключателями, реактивными StateFlow и полной синхронизацией строк на 22 языка.
+- **Реестр дефектов и аудит архитектуры**:
+  - Устранено и верифицировано **10 дефектов** категории P1 (#210, #213, #224, #225, #226, #227, #229, #230, #232, #234). Общее число устраненных дефектов достигло **278** (осталось **767** | P0: 0, P1: 224, P2: 543).
+
+---
+
 ## 🛡️ Что нового в версии 2.1.29 (SemVer Patch Release — OEM Background Resilience, Thermal Fast-Charge, Multi-Bot RAM Guard, Standby Shield & QuickBoot Recovery)
 
 - **Безопасная очистка сетевых сокетов, пайпов и потоков при остановке службы (Service Stop Graceful Cleanup — #187)**:
