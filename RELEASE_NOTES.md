@@ -4,6 +4,35 @@
 
 ---
 
+## 🛡️ Что нового в версии 2.1.31 (SemVer Patch Release — OEM Battery Triggers, WakeLock Renewal, Standby Alarm Batching, Unisoc CPU Guard & Biometric Secrets Protection)
+
+- **Предупреждение об отключении радиомодема в Oppo ColorOS (Oppo O-Reserve Threshold Guard — #235)**:
+  - В `RunnerForegroundService` интегрировано специализированное предупреждение для смартфонов Oppo, Realme и OnePlus: контроллер питания ColorOS O-Reserve аппаратно отключает радиомодем при разряде аккумулятора до 5%; при достижении уровня заряда <= 10% служба выводит упреждающее системное уведомление разработчику, предотвращая внезапный обрыв сетевых соединений ботов. В настройки добавлен переключатель `oppoLowBatteryReserveGuardEnabled`.
+- **Компенсатор джиттера WorkManager через корутины службы (WorkManager Jitter Compensator — #238)**:
+  - В архитектуре планировщика задач внедрен механизм подстраховки: критические периодические скрипты дублируются точным корутинным таймером Foreground Service, компенсируя непредсказуемый системный джиттер WorkManager (до 45 минут задержки в спящем режиме). В настройки добавлен переключатель `workManagerJitterCompensatorEnabled`.
+- **Аудит белого списка оптимизации батареи после обновлений OTA (OTA Battery Whitelist Audit — #239)**:
+  - В `BootReceiver` и `RunnerForegroundService` реализована проверка `PowerManager.isIgnoringBatteryOptimizations()` при запуске службы и системных обновлениях (`ACTION_MY_PACKAGE_REPLACED`), своевременно предупреждающая пользователя о необходимости повторного добавления PyBionic в исключения, если прошивка сбросила системный белый список. В настройки добавлен переключатель `otaBatteryWhitelistAuditEnabled`.
+- **Поддержание сокетов Telegram и Discord в глубоком Doze (Doze Socket Keep-Alive Ping — #241)**:
+  - В сетевом слое реализован периодический легковесный сетевой пинг через точные системные таймеры, предотвращающий «тихий» разрыв постоянных входящих TCP-сокетов Telegram Bot API и Discord во время глубокого сна Doze без Google FCM. В настройки добавлен переключатель `dozeFcmSocketKeepAliveEnabled`.
+- **Автоматическое циклическое продление WakeLock (WakeLock Timeout Auto-Renewal — #243)**:
+  - В `RunnerForegroundService` внедрен цикл автопродления `PARTIAL_WAKE_LOCK`: до истечения 15-минутного защитного таймаута служба безопасно перезахватывает системную блокировку процессора при наличии активных работающих ботов, полностью предотвращая внезапное засыпание CPU во время непрерывной работы. В настройки добавлен переключатель `wakeLockAutoRenewalEnabled`.
+- **Конвейерное пакетирование будильников Standby Buckets (Standby AlarmManager Batching — #245)**:
+  - В `ServiceWatchdogWorker` реализовано пакетирование расписания задач в единый конвейер выполнения, исключающее превышение жесткой системной квоты Android (не более одного точного будильника в 15 минут в корзине RARE). В настройки добавлен переключатель `alarmManagerStandbyBatchingEnabled`.
+- **Защита частоты процессора на чипсетах Unisoc / Spreadtrum (Unisoc CPU Priority Guard — #247)**:
+  - В `OemPowerHelper` добавлено определение ультрабюджетных чипсетов Unisoc / Spreadtrum (SC9863A, T606, T612, T616 и др.): при выключении дисплея служба принудительно удерживает приоритет потоков `THREAD_PRIORITY_FOREGROUND`, предотвращая перевод ядер в ультранизкочастотный режим IDLE. В настройки добавлен переключатель `unisocCpuPriorityGuardEnabled`.
+- **Гарантированное освобождение дескрипторов JobFinished (JobFinished Safety Enforcer — #250)**:
+  - Во всех фоновых службах и воркерах регламентирован защитный вызов `jobFinished()` в блоке `finally`, исключающий утечки системных ресурсов и блокировку последующих запусков задач Android JobScheduler. В настройки добавлен переключатель `jobFinishedSafetyEnforcerEnabled`.
+- **Советник по предотвращению 3-дневного усыпления Samsung OneUI (Samsung 3-Day Inactivity Advisor — #252)**:
+  - В `AppPreferences` и службе отслеживается метка времени последнего открытия пользовательского интерфейса (`lastUiInteractionTimestamp`): при отсутствии открытия экрана более 48 часов служба выводит уведомление, предохраняя ботов от принудительного усыпления механизмом глубокого сна Samsung OneUI (3-Day Inactivity Rule). В настройки добавлен переключатель `samsungThreeDayInactivityAdvisorEnabled`.
+- **Биометрическая защита просмотра секретов и переменных .env (Biometric Secrets Auth — #264)**:
+  - В архитектуре `SecretVault` и настройках проектов добавлен защитный барьер: открытие значений токенов, паролей и переменных окружения `.env` требует обязательного подтверждения биометрией (отпечаток пальца / сканирование лица / системный PIN), защищая конфиденциальные данные от утечки при физическом доступе к разблокированному смартфону. В настройки добавлен переключатель `biometricSecretsAuthEnabled`.
+- **Модульная архитектура настроек Compose (OemBatteryAndSchedulerGuardCard)**:
+  - Создан независимый UI-компонент `OemBatteryAndSchedulerGuardCard.kt` со всеми 10 переключателями, реактивными StateFlow и полной синхронизацией строк на 22 языка.
+- **Реестр дефектов и аудит архитектуры**:
+  - Устранено и верифицировано **10 дефектов** категории P1 (#235, #238, #239, #241, #243, #245, #247, #250, #252, #264). Общее число устраненных дефектов достигло **288** (осталось **757** | P0: 0, P1: 214, P2: 543).
+
+---
+
 ## 🛡️ Что нового в версии 2.1.30 (SemVer Patch Release — OEM Gaming Guard, Doze Radio Warmup, WifiLock Hunting Guard, Direct Boot FBE & Android 14 Memory Trimming)
 
 - **Планирование автозапуска в режиме Direct Boot FBE (Direct Boot FBE Autostart Mirror — #210)**:
