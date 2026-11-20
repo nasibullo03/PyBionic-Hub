@@ -4,6 +4,35 @@
 
 ---
 
+## 🛡️ Что нового в версии 2.1.23 (SemVer Patch Release — SSRF Metadata Shield, Debug Routes Guard, Pickle State Audit, Pip Pinning & Network Hardening)
+
+- **Защита от SSRF и блокировка запросов к link-local метаданным (SSRF Metadata Shield — #308)**:
+  - В `sitecustomize.py` (сниппет 35) перехвачен метод `socket.socket.connect`: исходящие сетевые подключения ботов к облачным сервисам метаданных (169.254.x.x link-local) и приватным подсетям RFC 1918 строго контролируются и блокируются с исключением `PermissionError` при отсутствии явного разрешения (`PYBIONIC_ALLOW_LOCAL_CONNECT`). В настройки добавлен реактивный переключатель `ssrfGuardEnabled`.
+- **Защита от случайной доступности отладочных маршрутов (Debug Endpoints Exposure Guard — #324)**:
+  - В `WebDashboardServer` и `WebAuthGuard` внедрен метод `isDebugRoute(path)`: маршруты отладки и профилирования (`/debug`, `/debug/*`, `/api/debug`, `/api/debug/*`) в релизных сборках немедленно отклоняются с HTTP 404 Not Found и фиксацией в журнале безопасности. В настройки добавлен переключатель `debugEndpointsDisabled`.
+- **Аудит и предотвращение десериализации состояния через Pickle (State Restoration Pickle Guard — #335)**:
+  - В `sitecustomize.py` (сниппет 36) перехвачен `pickle.load`: при попытке десериализации файлов состояния (`.pkl`, `.pickle`, `.state`) в stderr выводится предупреждение `[PICKLE_GUARD]` с рекомендацией миграции на безопасные форматы JSON или SQLite во избежание риска RCE. В настройки добавлен переключатель `pickleStateGuardEnabled`.
+- **Защита от атак подмены зависимостей в pip (Pip Dependency Confusion Guard — #276)**:
+  - В `ProjectRepository.sanitizePipArgs` реализована фильтрация аргументов установки пакетов: неавторизованные флаги `--extra-index-url` автоматически вырезаются, и принудительно закрепляется официальный индекс `--index-url https://pypi.org/simple`. В настройки добавлен переключатель `pipDependencyConfusionGuardEnabled`.
+- **Ограничение небезопасного динамического исполнения кода (Safe Code Execution Guard — #278)**:
+  - В `sitecustomize.py` (сниппет 37) перехвачены вызовы `builtins.eval`, `builtins.exec` и `__import__`: при обнаружении вызовов системных команд (`os.system`, `subprocess`, `__import__`) генерируется предупреждение в stderr `[SAFE_EVAL_GUARD]`. В настройки добавлен переключатель `safeCodeExecutionGuardEnabled`.
+- **Автоматическая детекция и замена дефолтных паролей (Weak Password Detection & Mitigation — #295)**:
+  - В `ProjectRepository.detectAndMitigateWeakPassword` реализован сканер словарных и дефолтных паролей (`admin`, `1234`, `password`, `root` и т.д.) для ключей `PASSWORD`, `SECRET`, `TOKEN`. При обнаружении дефолтного значения выполняется автоматическая генерация криптографически стойкого 24-значного токена через `SecureRandom`. В настройки добавлен переключатель `weakPasswordDetectionEnabled`.
+- **Минимизация отрицательного кэширования DNS (DNS Negative Caching Minimizer — #351)**:
+  - В `PyBionicApp` сконфигурировано JVM-свойство `networkaddress.cache.negative.ttl = "5"`, а в `sitecustomize.py` (сниппет 38) введена оптимизация разрешения имен, предотвращающая бесконечное кэширование неудачных DNS-ответов при переключении между Wi-Fi и мобильной сетью. В настройки добавлен переключатель `dnsNegativeCacheTuneEnabled`.
+- **Утилизация портов и предотвращение зависания сокетов TCP FIN_WAIT (TCP SO_REUSEADDR Guard — #367)**:
+  - В `sitecustomize.py` (сниппет 39) перехвачен конструктор сокетов `socket.socket.__init__`: для потоковых сокетов TCP автоматически устанавливается флаг `SO_REUSEADDR = 1`, ускоряя освобождение сокетов и предотвращая их зависание в состоянии `TIME_WAIT` и `FIN_WAIT_2`. В настройки добавлен переключатель `tcpReuseAddrEnabled`.
+- **Защита URL вебхуков от перебора и предсказуемых путей (Webhook Path Brute-Force Guard — #371)**:
+  - В `WebDashboardServer` и `WebAuthGuard` внедрен метод `isPredictableWebhookId(id)`: запросы к тривиальным путям (`/webhook/telegram`, `/webhook/bot`, `/webhook/webhook`, `/webhook/api`) немедленно отклоняются с HTTP 403 Forbidden, требуя обязательного использования уникального идентификатора проекта. В настройки добавлен переключатель `strictWebhookPathValidationEnabled`.
+- **Предотвращение исчерпания клиентских портов при частых перезапусках (Port Exhaustion Backoff — #380)**:
+  - В `RunnerForegroundService` реализована защита от циклического падения: при частых аварийных остановках ботов задержка автоперезапуска увеличивается по экспоненциальному закону (5с -> 15с -> 45с -> 60с), предотвращая исчерпание пула эфемерных портов Linux. В настройки добавлен переключатель `portExhaustionBackoffEnabled`.
+- **Модульная архитектура настроек Compose (NetworkAndRuntimeHardeningCard)**:
+  - Все новые переключатели безопасности и сетевого тюнинга вынесены в отдельную карточку `NetworkAndRuntimeHardeningCard.kt` с локализацией на все 22 языка, что полностью защищает от переполнения метода байткода JVM (`MethodTooLargeException`).
+- **Реестр дефектов и аудит архитектуры**:
+  - Устранено и верифицировано **10 дефектов** категории P1 (#276, #278, #295, #308, #324, #335, #351, #367, #371, #380). Общее число устраненных дефектов достигло **208** (осталось **837** | P0: 0, P1: 294, P2: 543).
+
+---
+
 ## 🛡️ Что нового в версии 2.1.22 (SemVer Patch Release — Strict CORS, HTTP Body Ceiling, SecretVault FileLock, XXE Shield & ReDoS Guard)
 
 - **Строгая защита от подстановочных доменов CORS (CORS Wildcard & Safe Preflight — #321)**:
