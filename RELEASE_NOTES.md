@@ -4,6 +4,33 @@
 
 ---
 
+## 🌐 Что нового в версии 2.1.34 (SemVer Patch Release — Webhook Reverse Proxy, Outbound Proxy Support, Heartbeat Drop Detection, DoH, Terminal Persistence, Backpressure Queue & Flapping Auto-Recovery)
+
+- **Реверс-прокси шлюз входящих вебхуков (Webhook Reverse Proxy Gateway — #350)**:
+  - В `NetworkResilienceHelper.resolveWebhookProxyTarget()` и `WebDashboardServer` реализован встроенный прокси-шлюз для входящих вебхуков Telegram, Discord, GitHub и GitLab. Внешние вебхук-запросы автоматически маршрутизируются в локальный порт бота с сохранением HMAC-сигнатур и токенов валидации. В настройки добавлен переключатель `webhookReverseProxyEnabled`.
+- **Поддержка исходящих прокси (Outbound Proxy Support — #354)**:
+  - В `NetworkResilienceHelper.buildProxyEnvironment()` реализована автоматическая генерация переменных окружения `HTTPS_PROXY`, `HTTP_PROXY` и `ALL_PROXY` для протоколов SOCKS5 и HTTP с исключением локального трафика (`NO_PROXY=127.0.0.1,localhost,::1`), позволяя ботам безопасно работать в регионах с сетевыми блокировками. В настройки добавлен переключатель `outboundProxyConfigEnabled`.
+- **Двусторонний Heartbeat и баннер разрыва связи (Web Connection Heartbeat & Drop Detection — #357)**:
+  - В `WebDashboardServer` и `web_dashboard.html` добавлен протокол проверки доступности соединения с интервалом 15 секунд (`/api/heartbeat`) и немедленным отображением всплывающего предупреждения о потере связи и переподключении при уходе устройства в сон или кратковременном сбое сети. В настройки добавлен переключатель `webConnectionHeartbeatEnabled`.
+- **Безопасный резолвер DNS over HTTPS (DNS Over HTTPS DoH Resolver — #376)**:
+  - Внедрена поддержка DoH-провайдеров (Cloudflare 1.1.1.1, Google DNS 8.8.8.8, Quad9) в `NetworkResilienceHelper` с передачей защищенных параметров в окружение бота, предотвращая перехват и подмену DNS-запросов со стороны сотовых операторов и интернет-провайдеров. В настройки добавлен переключатель `dnsOverHttpsEnabled`.
+- **Сохранение сессий веб-терминала при F5 (Web Terminal Session Reconnection & Persistence — #381)**:
+  - В `NetworkResilienceHelper.TerminalSessionManager` реализован менеджер удержания терминальных сессий с настраиваемым таймаутом (grace period 120s), благодаря чему случайное обновление вкладки браузера или временный разрыв Wi-Fi не прерывает длительные операции сборки и консольные воркеры. В настройки добавлен переключатель `terminalSessionPersistenceEnabled`.
+- **Кольцевой буфер и Backpressure в терминале (WebSocket Backpressure Ring Buffer — #386)**:
+  - Внедрен потокобезопасный кольцевой буфер `NetworkResilienceHelper.WebSocketRingBuffer` с ограничением емкости очереди и подсчетом отброшенных строк, предотвращающий исчерпание оперативной памяти (OOM) и падение службы при выводе сотен тысяч строк логов в секунду. В настройки добавлен переключатель `webSocketBackpressureGuardEnabled`.
+- **Автоматическое восстановление при скачках сети (Rapid Network Flapping Auto-Recovery — #392)**:
+  - В сетевом сервере `WebDashboardServer` внедрен перехват исключений сетевых каналов (`ClosedChannelException`, `SocketException`) при быстром переключении режима 'В самолете' или сменах Wi-Fi вышек, с автоматическим перезапуском слушающего сокета с экспоненциальной задержкой. В настройки добавлен переключатель `networkFlappingAutoRecoveryEnabled`.
+- **Изоляция блокирующих сокетных операций (Blocking Socket Pool Isolation — #409)**:
+  - Все блокирующие операции `accept()` и ввода-вывода потоков сокетов строго изолированы в специализированном пуле корутин `Dispatchers.IO`, устраняя риск зависания главного диспетчера и задержек в отрисовке интерфейса Jetpack Compose. В настройки добавлен переключатель `blockingSocketPoolIsolationEnabled`.
+- **Ограничение сетевого трафика при критическом заряде (Low Battery Traffic Throttler — #411)**:
+  - В `NetworkResilienceHelper.shouldThrottleBackgroundTraffic()` и `RunnerForegroundService` реализовано автоматическое троттлирование тяжелого фонового сетевого трафика при падении уровня заряда аккумулятора ниже 10% без подключенного зарядного устройства, предотвращая внезапное отключение смартфона. В настройки добавлен переключатель `lowBatteryTrafficThrottlerEnabled`.
+- **Дефрагментация кадров веб-сокетов (WebSocket Frame Defragmenter — #417)**:
+  - В `NetworkResilienceHelper.WebSocketFrameDefragmenter` реализована агрегация многокомпонентных сетевых фрагментов с проверкой флага FIN перед отправкой команд в псевдотерминал, гарантируя целостность длинных скриптов и команд. В настройки добавлен переключатель `webSocketFrameDefragmenterEnabled`.
+- **Модульная карточка настроек Compose (NetworkResilienceAndProxyCard)**:
+  - Создан специализированный UI-компонент `NetworkResilienceAndProxyCard.kt` со всеми 10 переключателями устойчивости сети и прокси, реактивными StateFlow и полной локализацией на 22 языка.
+
+---
+
 ## 🛡️ Что нового в версии 2.1.33 (SemVer Patch Release — Network Security Config, KeyStore UUID Aliases, Auto-Backup Vault Exclusion, Pyc Integrity, SSE Log Streaming & IPv6 Dual-Stack)
 
 - **Ограничение открытого Cleartext HTTP трафика (Cleartext Traffic Restriction — #286)**:
