@@ -4,6 +4,35 @@
 
 ---
 
+## 🛡️ Что нового в версии 2.1.28 (SemVer Patch Release — Bionic Named Semaphores Fallback, Ctypes ARM64 Alignment, Weakref Safety, Adaptive WakeLock, OEM Samsung/Vivo/Oppo Advisors & LMK Watchdog)
+
+- **Резервные анонимные семафоры для Multiprocessing (Bionic Named Semaphores Fallback — #153)**:
+  - В `sitecustomize.py` (сниппет 61) перехвачен класс `multiprocessing.synchronize.SemLock`: при возникновении ошибки `[Errno 38] Function not implemented` из-за отсутствия доступа к `/dev/shm` в Android Bionic libc семафоры автоматически и прозрачно перенаправляются на анонимные системные блокировки, исключая сбои при параллельных вычислениях в ботах. В настройки добавлен переключатель `bionicNamedSemaphoresFallbackEnabled`.
+- **Контроль выравнивания и смещения полей структур Ctypes на ARM64 (Ctypes ARM64 Alignment Guard — #158)**:
+  - В `sitecustomize.py` (сниппет 62) внедрен аудит объявлений `ctypes.Structure`: интерпретатор проверяет выравнивание 64-битных указателей на архитектуре aarch64 и предупреждает об отсутствующем атрибуте упаковки `_pack_`, защищая от чтения мусорных данных из системных C-библиотек. В настройки добавлен переключатель `ctypesArm64AlignmentCheckEnabled`.
+- **Безопасная очистка финалайзеров Weakref при выходе из интерпретатора (Weakref Teardown Safety — #165)**:
+  - В `sitecustomize.py` (сниппет 63) зарегистрирован ранний atexit-обработчик, безопасно очищающий незавершенные колбэки слабых ссылок до начала выгрузки модулей в `Py_Finalize`, полностью предотвращая дедлоки завершения процессов. В настройки добавлен переключатель `weakrefTeardownSafetyEnabled`.
+- **Адаптивное управление WakeLock для максимального энергосбережения (Adaptive WakeLock Management — #172)**:
+  - В `RunnerForegroundService` реализован адаптивный режим энергопотребления: когда все запущенные боты простаивают в ожидании входящих сетевых событий (polling), постоянный `PARTIAL_WAKE_LOCK` временно отпускается, позволяя процессору смартфона переходить в режим глубокого сна (Deep Sleep) и снижая разряд батареи до 5 раз. В настройки добавлен переключатель `adaptiveWakeLockEnabled`.
+- **Советник по предотвращению глубокого сна в Samsung OneUI (Samsung Deep Sleep Advisor — #176)**:
+  - В `OemPowerHelper` добавлены методы обнаружения устройств Samsung и прямой переход в системные настройки OneUI для добавления PyBionic в список «Никогда не спящие приложения» (Never Sleeping Apps), защищая от внезапной заморозки фоновых служб после нескольких дней работы. В настройки добавлен переключатель `samsungDeepSleepAdvisorEnabled`.
+- **Двойной сторожевой таймер службы с AlarmManager (Dual Service Watchdog — #180)**:
+  - В `ServiceWatchdogWorker` добавлено дублирование периодических проверок через точные системные будильники `AlarmManager.setAndAllowWhileIdle()`: если OEM-система безопасности или сборщик памяти принудительно убивает Foreground Service, системный AlarmManager перехватывает событие через `BootReceiver` и мгновенно восстанавливает службу. В настройки добавлен переключатель `serviceHeartbeatWatchdogEnabled`.
+- **Адаптивный переход для будильников в Android 12+ (Android 12+ Exact Alarm Fallback — #186)**:
+  - В `ServiceWatchdogWorker` реализована проверка `AlarmManager.canScheduleExactAlarms()`: на смартфонах с Android 12 и новее приложение безопасно переключается между точными будильниками (`setExactAndAllowWhileIdle`) и адаптивными интервалами (`setAndAllowWhileIdle`), исключая SecurityException при отсутствии системного разрешения. В настройки добавлен переключатель `exactAlarmScheduleFallbackEnabled`.
+- **Советник по сетевым ограничениям Vivo iManager (Vivo iManager Network Advisor — #188)**:
+  - В `OemPowerHelper` внедрено детектирование прошивок Vivo (Funtouch OS / OriginOS) и предоставлен прямой переход в настройки iManager для выдачи разрешения на фоновый сетевой обмен, исключая блокировку исходящих сетевых сокетов ботов. В настройки добавлен переключатель `vivoNetworkRestrictionAdvisorEnabled`.
+- **Советник по быстрой заморозке в Oppo / Realme ColorOS (Oppo Quick Freeze Advisor — #192)**:
+  - В `OemPowerHelper` добавлено обнаружение смартфонов Oppo, Realme и OnePlus с прямым вызовом настроек исключения из механизма «Быстрая заморозка приложений» (App Quick Freeze / Battery Guard Elf). В настройки добавлен переключатель `oppoQuickFreezeAdvisorEnabled`.
+- **Сторожевой таймер Android Low Memory Killer (LMK Child Process Watchdog — #208)**:
+  - В `RunnerForegroundService` реализован мониторинг завершения дочерних процессов: при аварийном прибивании нативного Python-процесса ядром Linux (SIGKILL / код выхода 137) служба мгновенно выводит уведомление `[LMK_WATCHDOG]` в консоль и автоматически перезапускает упавшего бота без рассинхронизации статуса в интерфейсе. В настройки добавлен переключатель `lmkChildProcessWatchdogEnabled`.
+- **Модульная архитектура настроек Compose (OemPowerAndProcessWatchdogCard)**:
+  - Создан независимый UI-компонент `OemPowerAndProcessWatchdogCard.kt` со всеми 10 переключателями, реактивными StateFlow и полной синхронизацией строк на 22 языка.
+- **Реестр дефектов и аудит архитектуры**:
+  - Устранено и верифицировано **10 дефектов** категории P1 (#153, #158, #165, #172, #176, #180, #186, #188, #192, #208). Общее число устраненных дефектов достигло **258** (осталось **787** | P0: 0, P1: 244, P2: 543).
+
+---
+
 ## 🛡️ Что нового в версии 2.1.27 (SemVer Patch Release — Mobile ML Threads Optimizer, Aiohttp Threaded DNS, Pure-Python Decimal Fallback, Popen Safety, UVLoop Shim & Fast Close FDs)
 
 - **Интеллектуальный советник по сборке Pillow и внешних библиотек изображений (Pillow Prebuilt Wheel Advisor — #117)**:
