@@ -4,6 +4,37 @@
 
 ---
 
+## 🛡️ Что нового в версии 2.1.22 (SemVer Patch Release — Strict CORS, HTTP Body Ceiling, SecretVault FileLock, XXE Shield & ReDoS Guard)
+
+- **Строгая защита от подстановочных доменов CORS (CORS Wildcard & Safe Preflight — #321)**:
+  - В `WebDashboardServer` и `WebAuthGuard` внедрен метод `isAllowedOrigin(origin, hostHeader)` и полноценная обработка HTTP-запросов `OPTIONS`.
+  - Запрещено использование подстановочного знака `*` в заголовке `Access-Control-Allow-Origin`. Межсайтовые preflight-запросы от сторонних сайтов немедленно блокируются с кодом HTTP 403 Forbidden, а доверенным клиентам возвращается 204 No Content с точным совпадением origin и заголовком `Vary: Origin`. В настройки добавлен переключатель `strictCorsEnabled`.
+- **Строгий лимит входящего тела HTTP-запросов и защита от DoS (Inbound HTTP Body Limiter — #387)**:
+  - В `WebDashboardServer` внедрен настраиваемый потолок размера входящего тела HTTP-запросов (`maxHttpBodySizeMb`, по умолчанию 10 МБ).
+  - Реализован безопасный парсер `readChunkedBodyCompat` с подсчетом накопленных байт для `Transfer-Encoding: chunked`. Запросы, превышающие лимит, немедленно отклоняются с HTTP 413 Payload Too Large без аллокации памяти. В настройки добавлен переключатель `httpBodyLimitEnabled` и слайдер `maxHttpBodySizeMb`.
+- **Периодическая очистка протухших сессий и неактивных лимитов (Session Eviction Cleaner — #408)**:
+  - В фоновом цикле обслуживания `inactivityJob` раз в минуту выполняется принудительный вызов `authGuard.pruneExpired(now)` и очистка устаревших записей скользящих лимитов `uploadRateLimits` (старше 5 минут), устраняя утечки ссылок и рост JVM Heap. В настройки добавлен переключатель `sessionEvictionEnabled`.
+- **Мгновенное восстановление связи при выходе вкладки из сна (Visibility & Focus Reconnect — #423)**:
+  - В `web_dashboard.html` зарегистрированы обработчики событий `document.addEventListener('visibilitychange')`, `window.addEventListener('focus')` и `window.addEventListener('online')`. При возвращении пользователя на заснувшую или неактивную вкладку браузера телеметрия и журналы логов мгновенно обновляются без необходимости перезагрузки страницы.
+- **Глобальный таймаут обработки API-запросов сервера (API Request Timeout — #424)**:
+  - В `WebDashboardServer` диспетчеризация авторизованных маршрутов API обернута в `withTimeoutOrNull(timeoutSec * 1000L)` с настраиваемым лимитом (`apiRequestTimeoutSeconds`, по умолчанию 30 с). В случае блокировки обработчика клиенту немедленно отдается HTTP 504 Gateway Timeout, предотвращая исчерпание слотов соединений на мобильном устройстве.
+- **Межпроцессная блокировка файлов хранилища секретов (SecretVault File Lock — #315)**:
+  - В `SecretVault` операции чтения, записи и удаления секретов защищены атомарной блокировкой `FileChannel.lock()` поверх скрытого файла `.lock`. Исключаются состояния гонки (Race Condition) и повреждение зашифрованного хранилища при одновременной записи из нескольких процессов или потоков. В настройки добавлен переключатель `secretVaultFileLockEnabled`.
+- **Атомарная замена небезопасной функции mktemp (mktemp Race Condition Guard — #326)**:
+  - В `sitecustomize.py` (сниппет 31) вызов `tempfile.mktemp()` перехвачен и заменен на атомарное создание файла через `tempfile.mkstemp()` с закрытыми правами `0o600`, исключая возможность Symlink-атак и перезаписи чужих файлов во временном каталоге. В настройки добавлен переключатель `mktempGuardEnabled`.
+- **Принудительное отключение режима отладки в продакшене (Web Server Production Debug Guard — #285)**:
+  - В `sitecustomize.py` (сниппет 32) переменные окружения `FLASK_DEBUG` и `DEBUG` принудительно сбрасываются в `0`, а в методе `Flask.run()` аргумент `debug=True` автоматически нейтрализуется с выводом предупреждения в stderr, предотвращая запуск интерактивной консоли Werkzeug с возможностью RCE при возникновении исключений. В настройки добавлен переключатель `productionDebugGuardEnabled`.
+- **Защита от атак XML External Entity и Billion Laughs (XXE Shield — #307)**:
+  - В `sitecustomize.py` (сниппет 33) парсер `xml.etree.ElementTree.XMLParser` дополнен блокировкой объявлений DTD-сущностей (`EntityDeclHandler`), нейтрализующей атаки чтения локальных файлов и исчерпания памяти при парсинге XML/RSS. В настройки добавлен переключатель `xxeProtectionEnabled`.
+- **Защита от катастрофического бэктрекинга регулярных выражений (ReDoS Guard — #327)**:
+  - В `sitecustomize.py` (сниппет 34) перехвачена функция `re.compile()` для статического аудита шаблонов регулярных выражений: при обнаружении экспоненциально уязвимых конструкций с вложенными квантификаторами `(a+)+` или `(.*a)*` в лог выводится предупреждение `[REDOS_GUARD]`. В настройки добавлен переключатель `redosGuardEnabled`.
+- **Модульная архитектура настроек Compose (AdvancedSecurityGuardsCard)**:
+  - Настройки сетевой и системной безопасности вынесены в отдельный независимый компонент `AdvancedSecurityGuardsCard.kt`, обеспечивая строгую модульность и гарантируя отсутствие ошибок переполнения метода байткода JVM (`MethodTooLargeException`).
+- **Реестр дефектов и аудит архитектуры**:
+  - Устранено и верифицировано **10 дефектов** категории P1 (#285, #307, #315, #321, #326, #327, #387, #408, #423, #424). Общее число устраненных дефектов достигло **198** (осталось **847** | P0: 0, P1: 304, P2: 543).
+
+---
+
 ## 🛡️ Что нового в версии 2.1.21 (SemVer Patch Release — Web Session Hardening, Filename Sanitization, Env Injection Shield & Subprocess LD_PRELOAD Protection)
 
 - **Защита от фиксации сессии при авторизации в веб-панели (Session Fixation Guard — #318)**:
