@@ -4,6 +4,35 @@
 
 ---
 
+## 🛡️ Что нового в версии 2.1.27 (SemVer Patch Release — Mobile ML Threads Optimizer, Aiohttp Threaded DNS, Pure-Python Decimal Fallback, Popen Safety, UVLoop Shim & Fast Close FDs)
+
+- **Интеллектуальный советник по сборке Pillow и внешних библиотек изображений (Pillow Prebuilt Wheel Advisor — #117)**:
+  - В `BionicPaths.buildEnv` добавлен автоматический экспорт путей `JPEG_ROOT` и `ZLIB_ROOT` для заголовочных файлов и библиотек. В `PipErrorAdvisor` добавлен детектор сбоев компиляции Pillow с рекомендацией использовать флаг `--only-binary=:all:` или сборки колес PyBionic. В настройки добавлен переключатель `pillowBuildAdvisorEnabled`.
+- **Оптимизация пулов потоков ML и защита от троттлинга CPU (Mobile ML Inference Threads Optimizer — #124)**:
+  - В `sitecustomize.py` (сниппет 55) внедрено автоматическое ограничение количества рабочих потоков для библиотек машинного обучения (`OMP_NUM_THREADS=2`, `MKL_NUM_THREADS=2`, `OPENBLAS_NUM_THREADS=2`, `NUMEXPR_NUM_THREADS=2`, `VECLIB_MAXIMUM_THREADS=2`) и уровень логирования `TORCH_CPP_LOG_LEVEL=WARNING`, предотвращая перегрев процессора и аварийный сброс частот при инференсе на смартфоне. В настройки добавлен переключатель `mlThreadsOptimizerEnabled`.
+- **Принудительный потоковый резолвер DNS для Aiohttp (Aiohttp Threaded DNS Resolver — #125)**:
+  - В `sitecustomize.py` (сниппет 56) перехвачен класс `aiohttp.ClientSession`: по умолчанию внедряется `aiohttp.ThreadedResolver` вместо системного асинхронного резолвера, что полностью устраняет подвисания сетевых запросов при переключениях мобильного интернета и нестабильном мобильном DNS. В настройки добавлен переключатель `aiohttpThreadedResolverEnabled`.
+- **Резервный модуль чистого Python для Decimal (Pure-Python Decimal Fallback — #129)**:
+  - В `sitecustomize.py` (сниппет 57) внедрен защитный перехват импорта модуля `decimal`: в случае повреждения или отсутствия нативного C-расширения `_decimal` интерпретатор автоматически и бесшовно подключает чистую реализацию `_pydecimal`, предотвращая крах финансовых и вычислительных ботов. В настройки добавлен переключатель `pydecimalFallbackEnabled`.
+- **Безопасная очистка каналов в деструкторе Popen (Popen Destructor Safety — #138)**:
+  - В `sitecustomize.py` (сниппет 58) перехвачен деструктор `subprocess.Popen.__del__`: дескрипторы каналов (pipes) безопасно закрываются без блокирующего ожидания и предупреждений ResourceWarning, исключая дедлоки сборщика мусора при завершении подпроцессов. В настройки добавлен переключатель `popenDestructorSafetyEnabled`.
+- **Диагностический советник для Scipy и Fortran-зависимостей (Scipy / Fortran Advisor — #142)**:
+  - В `PipErrorAdvisor` реализовано распознавание ошибок сборки пакета `scipy` и отсутствия компилятора `gfortran`, предоставляя разработчику точные рекомендации по установке предварительно собранных бинарных колес (`--prefer-binary`) либо переходу на numpy-эквиваленты. В настройки добавлен переключатель `scipyAdvisorEnabled`.
+- **Бесшовный резервный переход для UVLoop (UVLoop Graceful Fallback — #148)**:
+  - В `sitecustomize.py` (сниппет 59) и `PipErrorAdvisor` внедрен защитный шим-модуль `uvloop`: если сторонний фреймворк или бот вызывает `uvloop.install()`, а бинарная библиотека отсутствует, интерпретатор прозрачно активирует стандартную политику `asyncio.DefaultEventLoopPolicy` без падения приложения. В настройки добавлен переключатель `uvloopFallbackAdvisorEnabled`.
+- **Советник по сборке Pydantic-Core и Rust/Cargo тулчейна (Pydantic-Core Wheel Advisor — #149)**:
+  - В `PipErrorAdvisor` добавлен детектор сбоев сборки `pydantic-core` и `maturin`, информирующий разработчика о необходимости установки готового колеса через `pip install pydantic --prefer-binary` или использовании Pydantic V1 для исключения долгой и безуспешной компиляции Rust на устройстве. В настройки добавлен переключатель `pydanticBuildAdvisorEnabled`.
+- **Быстрое закрытие файловых дескрипторов через /proc (Fast Close FDs via Proc — #154)**:
+  - В `BionicPaths.buildEnv` активирована переменная `PYTHON_CLOSE_FDS_USE_PROC=1`: при создании дочерних процессов модуль `subprocess` использует прямое чтение директории `/proc/self/fd` вместо медленного линейного сканирования 32768 файловых дескрипторов, ускоряя запуск подпроцессов в десятки раз. В настройки добавлен переключатель `fastCloseFdsEnabled`.
+- **Гарантированный сброс буферов потоков-демонов в atexit (Daemon Thread Atexit Flush — #168)**:
+  - В `sitecustomize.py` (сниппет 59) зарегистрирован финальный хук `atexit`, выполняющий принудительный сброс буферов `sys.stdout` и `sys.stderr`, гарантируя сохранение всех логов, записанных фоновыми потоками-демонами непосредственно перед остановкой процесса. В настройки добавлен переключатель `daemonThreadJoinAtexitEnabled`.
+- **Модульная архитектура настроек Compose (PythonRuntimeAndOptimizationCard)**:
+  - Создан независимый UI-компонент `PythonRuntimeAndOptimizationCard.kt` со всеми 10 переключателями, реактивными StateFlow и полной синхронизацией строк на 22 языка.
+- **Реестр дефектов и аудит архитектуры**:
+  - Устранено и верифицировано **10 дефектов** категории P1 (#117, #124, #125, #129, #138, #142, #148, #149, #154, #168). Общее число устраненных дефектов достигло **248** (осталось **797** | P0: 0, P1: 254, P2: 543).
+
+---
+
 ## 🛡️ Что нового в версии 2.1.26 (SemVer Patch Release — Bionic stat64 Shim, CPU Share Throttling, Free-Threading GIL Guard, Synthetic Venv, LibFFI & Diagnostics)
 
 - **Нормализация вызовов stat64/fstat64 и наносекундных меток времени (Bionic stat64 / fstat64 ABI Shim — #16)**:
