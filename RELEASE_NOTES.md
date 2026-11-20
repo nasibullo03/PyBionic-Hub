@@ -4,6 +4,25 @@
 
 ---
 
+## 🛡️ Что нового в версии 2.1.19 (SemVer Patch Release — Dynamic Multi-Language i18n & Zero Hardcoded Strings)
+
+- **Реактивное переключение языков без перезапуска приложения (Dynamic Locale Recomposition)**:
+  - В `MainActivity.kt` внедрены `CompositionLocalProvider` с явным провайдингом `LocalContext provides localizedContext`, `LocalConfiguration provides localizedConfig` и `LocalLayoutDirection provides layoutDirection`. При изменении настройки языка в `SettingsScreen` все экраны Compose мгновенно рекомпозируются на выбранном языке интерфейса без необходимости перезапуска активности.
+  - В `PyBionicApp.kt` реализован оверрайд `attachBaseContext(base: Context)` с оборачиванием `LocaleHelper.wrap(base)`, а также добавлен статический синглтон-контекст `PyBionicApp.getLocalizedContext()`, гарантирующий доступ к актуальной локали для всех фоновых сервисов, репозиториев и утилит.
+  - В `LocaleHelper.kt` метод `applyLocale` дополнен явной синхронизацией конфигурации дисплея и локали приложения (`applicationContext.resources.updateConfiguration`), устраняя застревание фоновых синглтонов в дефолтной системной локали.
+  - В `PyBionicViewModel.kt` в метод `setLanguageTag` добавлен немедленный вызов `LocaleHelper.applyLocale(getApplication(), tag)`.
+- **Полное устранение хардкоденных строк во всех слоях приложения**:
+  - В `SqliteBrowserDialog.kt` все 8 системных сообщений Toast (`sqlite_error_fmt`, `sqlite_integrity_error_fmt`, `sqlite_backup_error_fmt`, `sqlite_ddl_error_fmt`, `sqlite_csv_copied_fmt`, `sqlite_json_copied_fmt`, `sqlite_export_error_fmt`), а также плейсхолдер ввода SQL (`sqlite_query_placeholder`) переведены на строковые ресурсы `R.string.*`.
+  - В `BotHubScreen.kt` текстовая метка URL каталога GitHub заменена на ресурс `R.string.bothub_github_catalog_url_label`.
+  - В `ProjectDetailScreen.kt` метки кнопок и заголовки («Git Pull», «GitOps & Deploy») переведены на строковые ресурсы `R.string.git_pull` и `R.string.gitops_deploy_title`.
+  - В `TelemetrySheets.kt` заголовок приоритета OOM заменен на `R.string.oom_score_adj_title`.
+  - В `ProjectRepository.kt` системные сообщения об ошибках («Rename failed», «Failed to create folder», «Python runtime is not installed», «Project not found», «pip freeze timed out», «pip freeze failed with code...», логи деплоя и отката) заменены на вызовы `context.getString(R.string.*)`.
+  - В `PipErrorAdvisor.kt` русскоязычный хардкод заменен на вызовы локализованного контекста с нейтральным English-фоллбэком для pure-JVM тестов.
+- **100% паритет всех 22 поддерживаемых языковых локалей**:
+  - С помощью скрипта `tools/sync_strings.py` все 20 новых строковых ключей автоматически синхронизированы по всем 22 директориям локализации (`values-*/strings.xml`).
+
+---
+
 ## 🛡️ Что нового в версии 2.1.18 (SemVer Patch Release — TCP Fast Open, tracemalloc, Git Credential Vault & Strict Sandbox Permissions)
 
 - **Безопасная обработка паузы SIGSTOP и возобновления SIGCONT без ложных срабатываний сторожевых таймеров (#24)**:
