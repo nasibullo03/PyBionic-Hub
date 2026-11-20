@@ -4,6 +4,35 @@
 
 ---
 
+## 🛡️ Что нового в версии 2.1.25 (SemVer Patch Release — Bionic Linker Path Enforcer, Pthread Cancel Emulation, RTLD_DEEPBIND Workaround, Captive Portal & Backlog Shield)
+
+- **Синтез путей линковщика Bionic для нативных библиотек (Bionic Linker Path Enforcer — #12)**:
+  - В `BionicPaths.buildEnv` реализован динамический синтез переменной `LD_LIBRARY_PATH`: пути к системным библиотекам `$PREFIX/lib`, python site-packages и директории проекта объединяются и экспортируются, разрешая зависимости для нативных wheels, у которых отсутствует `DT_RUNPATH` или `$ORIGIN`. В настройки добавлен переключатель `bionicLinkerPathEnforcerEnabled`.
+- **Эмуляция отмены потоков pthread_cancel в Bionic Libc (Pthread Cancel Emulation — #25)**:
+  - В `sitecustomize.py` (сниппет 45) зарегистрирован обработчик сигнала `signal.SIGUSR1` для потоков: в Android Bionic libc отсутствует полноценная реализация `pthread_cancel`, поэтому принудительное завершение рабочих потоков эмулируется через безопасную обработку сигналов и размотку стека. В настройки добавлен переключатель `pthreadCancelEmulationEnabled`.
+- **Компенсация отсутствия RTLD_DEEPBIND в Android (RTLD_DEEPBIND Workaround — #57)**:
+  - В `sitecustomize.py` (сниппет 46) через `sys.setdlopenflags(os.RTLD_NOW | os.RTLD_LOCAL)` установлены локальные флаги динамической загрузки библиотек: это предотвращает коллизии глобальных символов при одновременной загрузке нативных модулей C/C++ (например, numpy, cv2, cryptography) в окружении Bionic libc. В настройки добавлен переключатель `rtldDeepbindWorkaroundEnabled`.
+- **Резервный переход на файловые блокировки вместо POSIX семафоров (POSIX Semaphore Fallback — #73)**:
+  - В `sitecustomize.py` (сниппет 47) подготовлен защитный слой импорта `multiprocessing.synchronize`: при ошибках вызова `sem_open` (в unprivileged Android-контейнерах каталог `/dev/shm` заблокирован) семафоры и блокировки безопасно перенаправляются на файловые блокировки `fcntl.flock`. В настройки добавлен переключатель `posixSemaphoreFallbackEnabled`.
+- **Изоляция кэша pycache и валидация байткода по хешам (Bytecode Hash Validation Cache — #97)**:
+  - В `BionicPaths.buildEnv` добавлена настройка `PYTHONPYCACHEPREFIX`: байткод компилируется в изолированную директорию `.cache/pycache` проекта с хеш-валидацией, исключая сброс и повреждение скомпилированных файлов `.pyc` при расхождении системного времени смартфона. В настройки добавлен переключатель `bytecodeHashValidationEnabled`.
+- **Сторожевой таймер прерывания нативных вызовов CFFI/Ctypes (Native Signal Watchdog — #100)**:
+  - В `sitecustomize.py` (сниппет 48) восстановлен базовый обработчик `signal.SIGINT` (`signal.default_int_handler`), гарантирующий прерывание блокирующих нативных C-расширений и внешних DLL/so при нажатии кнопки остановки или получении сигналов. В настройки добавлен переключатель `nativeSignalWatchdogEnabled`.
+- **Строгая изоляция и уничтожение процессов при перезапуске (Strict Process Isolation on Restart — #113)**:
+  - В `RunnerForegroundService.restartProjectWorker` реализовано гарантированное уничтожение старого процесса через `Os.kill(pid, 9)` после ожидания `ProcessTreeKiller.killProcessTree`, исключая наложение зомби-потоков или блокировку сокетов при быстром перезапуске бота. В настройки добавлен переключатель `strictProcessIsolationRestartEnabled`.
+- **Детектор экранов авторизации Captive Portal в публичных Wi-Fi (Captive Portal Network Detection — #366)**:
+  - В `RunnerForegroundService.registerNetworkMonitor` через `onCapabilitiesChanged` добавлен опрос `NET_CAPABILITY_CAPTIVE_PORTAL`: при обнаружении требования веб-авторизации Wi-Fi ботам направляется системное предупреждение `[CAPTIVE_PORTAL]`, а исходящие запросы временно удерживаются для предотвращения аварийных сбоев парсинга страниц входа вместо JSON/API. В настройки добавлен переключатель `captivePortalDetectionEnabled`.
+- **Сброс устаревших пулов сетевых соединений при смене интерфейса (Stale Connection Pool Network Handover — #405)**:
+  - В `RunnerForegroundService.registerNetworkMonitor` при переключении типа сети (Wi-Fi ↔ Cellular) инкрементируется системная эпоха `PYBIONIC_NET_EPOCH`, а в лог выводится уведомление `[CONN_POOL]`, обеспечивая принудительный сброс зависших пулов TCP-сокетов HTTP-клиентов. В настройки добавлен переключатель `staleConnectionFlushEnabled`.
+- **Увеличение размера очереди listen backlog сокета сервера (Increased ServerSocket Listen Backlog — #413)**:
+  - В `WebDashboardServer` размер очереди входящих TCP-соединений `ServerSocket(port, backlog)` увеличен со стандартных 50 до 512, исключая отказ в обслуживании (`ECONNREFUSED`) при интенсивных пиках входящих вебхуков от Telegram и внешних сервисов. В настройки добавлен переключатель `serverSocketBacklogIncreased`.
+- **Модульная архитектура настроек Compose (BionicRuntimeAndNetworkResilienceCard)**:
+  - Создан независимый компонент `BionicRuntimeAndNetworkResilienceCard.kt` со всеми 10 переключателями и полной синхронизацией строк на 22 языка.
+- **Реестр дефектов и аудит архитектуры**:
+  - Устранено и верифицировано **10 дефектов** категории P1 (#12, #25, #57, #73, #97, #100, #113, #366, #405, #413). Общее число устраненных дефектов достигло **228** (осталось **817** | P0: 0, P1: 274, P2: 543).
+
+---
+
 ## 🛡️ Что нового в версии 2.1.24 (SemVer Patch Release — Process Tree Tracking, Logcat Isolation, SIGBUS Guard, Zero-Buffer & TCP Zero-Window Shield)
 
 - **Изоляция системного лога logcat от ботов (Logcat Process Isolation Guard — #49)**:
