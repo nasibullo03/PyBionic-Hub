@@ -4,6 +4,33 @@
 
 ---
 
+## 🛡️ Что нового в версии 2.1.33 (SemVer Patch Release — Network Security Config, KeyStore UUID Aliases, Auto-Backup Vault Exclusion, Pyc Integrity, SSE Log Streaming & IPv6 Dual-Stack)
+
+- **Ограничение открытого Cleartext HTTP трафика (Cleartext Traffic Restriction — #286)**:
+  - В `res/xml/network_security_config.xml` переопределена системная политика сетевой безопасности: открытый незашифрованный HTTP-трафик строго ограничен локальными адресами `localhost` и `127.0.0.1`, а публичный трафик во внешнюю сеть принудительно требует TLS-шифрования. В настройки добавлен переключатель `cleartextTrafficRestrictionEnabled`.
+- **Привязка ключей шифрования к неизменяемым UUID (KeyStore Project UUID Alias Guard — #287)**:
+  - В архитектуре `SecretVault` алиасы ключей шифрования Android KeyStore изолированы от изменяемых строковых имен проектов и привязаны к стабильным идентификаторам, что предотвращает потерю доступа к секретам при переименовании проектов пользователем. В настройки добавлен переключатель `keystoreProjectUuidAliasEnabled`.
+- **Исключение хранилища секретов из облачного Auto Backup (Secret Vault Backup Exclusion — #288)**:
+  - В `res/xml/backup_rules.xml` и `res/xml/data_extraction_rules.xml` добавлены обязательные правила исключения: каталоги `secrets/`, `config/secrets` и файлы SharedPreferences исключены из облачного резервного копирования Google Drive (Auto Backup / Device Transfer), исключая компрометацию учетных данных. В настройки добавлен переключатель `secretVaultBackupExclusionEnabled`.
+- **Приватная изоляция файлов логов (Log Storage Private Isolation — #291)**:
+  - Регламентировано размещение рабочих логов выполнения ботов строго во внутреннем изолированном хранилище приложения, а доступ сторонних утилит ограничен безопасным `FileProvider` с временными грантами чтения. В настройки добавлен переключатель `logStoragePrivateIsolationEnabled`.
+- **Контроль целостности и удаление осиротевших .pyc (Python Pyc Bytecode Verification Guard — #292)**:
+  - В `ProcessSecurityHelper.purgeOrphanedPycBytecode()` реализована предварительная верификация кэша байткода: перед запуском бота удаляются все скомпилированные `.pyc` файлы, для которых отсутствует валидный исходный `.py`, блокируя векторы подмены байткода. В настройки добавлен переключатель `pycBytecodeVerificationEnabled`.
+- **Аудит подписи и защиты от модификации APK (App Integrity & Signature Audit — #330)**:
+  - В `AppIntegrityGuard` интегрирована расширенная верификация сертификатов подписи APK и цепочки подписи, позволяющая выявлять модифицированные сборки и попытки внедрения вредоносного кода. В настройки добавлен переключатель `appIntegritySignatureAuditEnabled`.
+- **Сброс битов suid/sgid в песочнице (Sandbox Setuid/Setgid Stripping Guard — #336)**:
+  - В `ProcessSecurityHelper.auditAndStripSuidBits()` реализовано сканирование рабочих директорий проектов и сброс опасных битов `setuid`/`setgid` на нативных бинарниках, предотвращая потенциальную локальную эскалацию привилегий в гостевых окружениях. В настройки добавлен переключатель `sandboxNosuidMountGuardEnabled`.
+- **Постоянный SSE-стриминг логов веб-терминала (Web Terminal SSE Log Streaming — #342)**:
+  - В `WebDashboardServer` конечная точка `/api/projects/{id}/logs/stream` переведена на непрерывный протокол Server-Sent Events (SSE) с фоновыми ping-пакетами, заменяя тяжелый ежесекундный AJAX HTTP-поллинг и кардинально снижая энергопотребление смартфона. В настройки добавлен переключатель `webTerminalStreamingEnabled`.
+- **Советник по удаленному доступу и NAT Traversal (Remote NAT Traversal Advisor — #344)**:
+  - Внедрен помощник `ProcessSecurityHelper.getRemoteTunnelGuidance()`, предоставляющий готовые сценарии и конфигурации туннелирования (Cloudflare Tunnel, Tailscale, Ngrok) для организации безопасного удаленного доступа к веб-панели через сотовые сети за CGNAT. В настройки добавлен переключатель `remoteTunnelAdvisorEnabled`.
+- **Поддержка двойного стека сокетов IPv6 Dual-Stack (IPv6 Dual-Stack Socket Binding — #345)**:
+  - В сетевом сервере `WebDashboardServer` реализована поддержка привязки сокета к IPv6 wildcard `::` с сохранением обратной совместимости с IPv4, обеспечивая бесперебойную доступность веб-панели и входящих вебхуков в сетях сотовых операторов с чистым IPv6. В настройки добавлен переключатель `ipv6DualStackBindingEnabled`.
+- **Модульная карточка настроек Compose (NetworkAndVaultSecurityCard)**:
+  - Создан независимый UI-компонент `NetworkAndVaultSecurityCard.kt` со всеми 10 переключателями сетевой безопасности и защиты секретов, реактивными StateFlow и полной синхронизацией строк на 22 языка.
+
+---
+
 ## 🛡️ Что нового в версии 2.1.32 (SemVer Patch Release — Process Sandbox, ReDoS Defense, Dangerous Syscall Seccomp Policy, Keystore Recovery & Backup Encryption)
 
 - **Изоляция пространств имен и защита путей монтирования (Mount Namespace Path Traversal Guard — #22)**:
