@@ -1,9 +1,9 @@
 # ⚡ PyBionic Runner — 24/7 Python 3.14 on Android
 
-[![Release](https://img.shields.io/badge/Release-v2.1.17-00E5FF.svg?style=for-the-badge&logo=android&logoColor=black)](https://github.com/nasibullo03/PyBionic-Hub/releases/latest)
+[![Release](https://img.shields.io/badge/Release-v2.1.18-00E5FF.svg?style=for-the-badge&logo=android&logoColor=black)](https://github.com/nasibullo03/PyBionic/releases/latest)
 [![Python](https://img.shields.io/badge/Python-3.14.10_Bionic-FFD700.svg?style=for-the-badge&logo=python&logoColor=black)](https://python.org)
 [![Platform](https://img.shields.io/badge/Platform-Android_8.0+-3DDC84.svg?style=for-the-badge&logo=android&logoColor=white)](https://android.com)
-[![License](https://img.shields.io/badge/License-AGPL_v3-blue.svg?style=for-the-badge)](LICENSE)
+[![License](https://img.shields.io/badge/License-Proprietary-red.svg?style=for-the-badge)](LICENSE)
 
 ---
 
@@ -17,8 +17,8 @@
 ---
 
 <p align="center">
-  <a href="https://github.com/nasibullo03/PyBionic-Hub/releases/latest">
-    <img src="https://img.shields.io/badge/🚀_DOWNLOAD_PYBIONIC_APK-v2.1.17-00E5FF?style=for-the-badge&logo=android&logoColor=black" alt="Download APK" height="50">
+  <a href="https://github.com/nasibullo03/PyBionic/releases/latest">
+    <img src="https://img.shields.io/badge/🚀_DOWNLOAD_PYBIONIC_APK-v2.1.18-00E5FF?style=for-the-badge&logo=android&logoColor=black" alt="Download APK" height="50">
   </a>
 </p>
 
@@ -29,7 +29,7 @@
 
 **PyBionic Runner** is an autonomous high-performance execution runtime for Android that brings native **Python 3.14 (aarch64 Bionic libc)** to your smartphone. It turns any spare or daily Android device into a dedicated, silent, energy-efficient 24/7 server for Telegram bots, web APIs, Discord bots, AI assistants, and background automations.
 
-Built upon native ARM64 Termux Bionic packages without requiring Termux app installation or PRoot translation overhead, PyBionic executes system calls directly against Android's native **Bionic libc**. It launches instantly, operates smoothly and energy-efficiently, prevents background task kills via native **WakeLock & Doze exemptions**, and offers both a modern **Jetpack Compose UI** and a browser-based **Web Dashboard** accessible over local Wi-Fi.
+Unlike heavy chroot or Linux emulators (Termux, PRoot, UserLAnd), PyBionic is compiled directly against Android's native **Bionic libc**. It launches instantly, consumes under **45 MB RAM**, prevents background task kills via native **WakeLock & Doze exemptions**, and offers both a modern **Jetpack Compose UI** and a browser-based **Web Dashboard** accessible over local Wi-Fi.
 
 ---
 
@@ -39,22 +39,22 @@ Built upon native ARM64 Termux Bionic packages without requiring Termux app inst
 - 🔋 **24/7 Uninterrupted Hosting:** Industrial-grade foreground service with CPU WakeLock, battery temperature watchdog, and Doze Mode bypass.
 - 🛡️ **Intelligent Watchdog & Crash Recovery:** Configurable restart backoff policies (`Always`, `On Crash`, `Never`), auto-restart limits, and process-tree cleanup.
 - 🌐 **Remote Web Dashboard (PC Control):** Secure browser interface with PIN authentication to manage bots, view real-time logs, and edit code from your computer.
-- 📦 **BotHub Ecosystem:** 26+ built-in ready-to-run bot templates (Telegram bots, Discord automation, Media tools, Stickers, OSINT & Python Sandbox Runners).
+- 📦 **BotHub Ecosystem:** 26+ built-in ready-to-run bot templates (Aiogram 3, Telebot, FastAPI + Uvicorn, Flask, Web Scrapers, AI assistants).
 - 🗄️ **Integrated SQLite Browser:** Monolithic synchronous data viewer to inspect bot databases directly without exporting `.db` files.
 - 🔍 **Real-Time Telemetry:** Live cellular/Wi-Fi speed graphs, per-bot bandwidth breakdown, RAM/CPU metrics, and battery thermals.
 - 🌍 **24 Languages Supported:** Fully localized interface in 24 languages with RTL support.
-- 🔒 **Security & Isolation:** Android Keystore hardware-encrypted vault for bot credentials, memory-safe log sanitization, and hardware biometric app lock.
+- 🔒 **Security & Isolation:** Secret vault for `.env` credentials, memory-safe log sanitization, and hardware biometric app lock.
 
 ---
 
 ## 🚀 Quick Start
 
-1. **Download APK:** Get the latest release from [GitHub Releases](https://github.com/nasibullo03/PyBionic-Hub/releases/latest).
+1. **Download APK:** Get the latest release from [GitHub Releases](https://github.com/nasibullo03/PyBionic/releases/latest).
 2. **Install:** Install `PyBionic-Runner-v2.1.1-arm64.apk` on your Android device (Android 8.0+ / arm64-v8a).
 3. **Launch & Permissions:** Allow Notification permission and accept the prompt to **Disable Battery Optimizations** for uninterrupted 24/7 background operation.
 4. **Run a Bot:**
    - Tap **BotHub** at the bottom.
-   - Choose a bot (e.g., `Round Video Master`, `Motivator Pro`, or `OSINT Recon Warden`).
+   - Choose a bot (e.g., `Simple Telebot` or `FastAPI Web Server`).
    - Tap **Install Bot** ➔ Enter your Bot Token or Settings ➔ Tap **▶ Run**.
 5. **Control from PC:**
    - Go to **Settings** ➔ Tap **PC Web Dashboard**.
@@ -80,5 +80,5 @@ PyBionic is fully optimized for programmatic inspection and autonomous bot deplo
 
 ## 📄 License & Credits
 
-- Licensed under **GNU Affero General Public License v3.0 (AGPL-3.0)**.
+- Copyright (c) 2026 Nasibullo Khalilov. All Rights Reserved. Proprietary software.
 - Developed by **Nasibullo Khalilov** ([@nasibullo03](https://github.com/nasibullo03)).
