@@ -4,6 +4,35 @@
 
 ---
 
+## 🛡️ Что нового в версии 2.1.29 (SemVer Patch Release — OEM Background Resilience, Thermal Fast-Charge, Multi-Bot RAM Guard, Standby Shield & QuickBoot Recovery)
+
+- **Безопасная очистка сетевых сокетов, пайпов и потоков при остановке службы (Service Stop Graceful Cleanup — #187)**:
+  - В `RunnerForegroundService.onDestroy()` и методах останова внедрена процедура принудительного закрытия незавершенных сетевых сокетов, файловых дескрипторов и потоков вывода дочерних процессов, полностью исключающая появление зомби-процессов и утечек ресурсов ОС при перезапуске службы. В настройки добавлен переключатель `serviceStopGracefulCleanupEnabled`.
+- **Мониторинг корзины ожидания Standby Bucket и защита от ограничений (Standby Bucket Shield — #197)**:
+  - В `OemPowerHelper` и `RunnerForegroundService` реализовано отслеживание изменений корзины активности приложения (`UsageStatsManager.getAppStandbyBucket()`): если система Android или вендор переводит PyBionic в категорию `STANDBY_BUCKET_RARE` или `RESTRICTED`, служба автоматически запрашивает временный приоритет и выводит диагностическое уведомление разработчику, предотвращая задержки выполнения таймеров и сетевых соединений. В настройки добавлен переключатель `standbyBucketMonitorEnabled`.
+- **Защита от 10-минутного таймаута Android JobScheduler (JobScheduler Timeout Safety — #198)**:
+  - В `AppPreferences` добавлен защитный переключатель, жестко гарантирующий выполнение долгоживущих сценариев через надежный Foreground Service с `PARTIAL_WAKE_LOCK` вместо нестабильного системного `JobScheduler`, прерывающего выполнение через 10 минут. В настройки добавлен переключатель `jobSchedulerTimeoutSafetyEnabled`.
+- **Советник по режимам энергосбережения Sony Xperia STAMINA (Sony STAMINA Advisor — #203)**:
+  - В `OemPowerHelper` добавлено обнаружение смартфонов Sony Xperia и поддержка прямого перехода в системные параметры Sony Power Management для отключения автоматического закрытия фоновых процессов в режиме STAMINA. В настройки добавлен переключатель `sonyStaminaAdvisorEnabled`.
+- **Асинхронная неблокирующая обработка вызовов Binder IPC (Async Binder IPC Dispatcher — #204)**:
+  - В сервисном слое добавлен защитный переключатель управления асинхронными корутинными диспетчерами для вызовов межпроцессного взаимодействия (IPC) через Android Binder, предотвращающий кратковременные блокировки основного потока приложения при частых запросах статуса ботов. В настройки добавлен переключатель `asyncBinderIpcEnabled`.
+- **Советник по глубокой оптимизации OnePlus OxygenOS / ColorOS (OnePlus Deep Optimization Advisor — #207)**:
+  - В `OemPowerHelper` внедрена диагностика глубокой оптимизации батареи на смартфонах OnePlus с прямым переходом в настройки OxygenOS для исключения PyBionic из списков агрессивного усыпления фоновых демонов. В настройки добавлен переключатель `oxygenOsDeepOptimizationAdvisorEnabled`.
+- **Автоматический запуск ботов после быстрой перезагрузки (QuickBoot / FastBoot Auto-Launch — #209)**:
+  - В `BootReceiver` расширен спектр перехватываемых системных широковещательных намерений (включая `android.intent.action.QUICKBOOT_POWERON`, `com.htc.intent.action.QUICKBOOT_POWERON` и `android.intent.action.MY_PACKAGE_REPLACED`), обеспечивая бесшовный автоматический подъем ботов не только при холодном старте, но и при быстрых перезагрузках и фоновых обновлениях пакета. В настройки добавлен переключатель `fastBootAutoLaunchEnabled`.
+- **Термальный троттлинг и понижение приоритета при быстрой зарядке (Fast-Charge Thermal Safety — #214)**:
+  - В `RunnerForegroundService` интегрирован динамический тепловой мониторинг: при обнаружении быстрой зарядки аккумулятора и нагреве свыше 43°C приоритет дочерних процессов ботов автоматически понижается (`Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND)`), предотвращая критический перегрев устройства и аварийное отключение питания. В настройки добавлен переключатель `fastChargeThermalThrottleEnabled`.
+- **Советник по безопасности фоновой работы Meizu Flyme OS (Meizu Flyme Advisor — #216)**:
+  - В `OemPowerHelper` добавлена поддержка смартфонов Meizu: реализовано обнаружение прошивки Flyme OS и предоставлен прямой переход в «Диспетчер безопасности» (Flyme Security Center) для включения разрешения «Разрешить работу в фоновом режиме» и выдачи автозапуска. В настройки добавлен переключатель `meizuFlymeAdvisorEnabled`.
+- **Бюджетный RAM-страж для устройств с объемом памяти <= 3 ГБ (Low-RAM Device Multi-Bot Guard — #222)**:
+  - В `OemPowerHelper.isLowRamDevice()` и процедуру старта ботов в `RunnerForegroundService` внедрен защитный предохранитель: на бюджетных смартфонах с объемом оперативной памяти <= 3 ГБ служба предупреждает пользователя о превышении безопасного лимита параллельно запущенных ботов, защищая систему от вылета по Low Memory Killer (LMK). В настройки добавлен переключатель `lowRamDeviceMultiBotGuardEnabled`.
+- **Модульная архитектура настроек Compose (OemBackgroundAndThermalGuardCard)**:
+  - Создан независимый UI-компонент `OemBackgroundAndThermalGuardCard.kt` со всеми 10 переключателями, реактивными StateFlow и полной синхронизацией строк на 22 языка.
+- **Реестр дефектов и аудит архитектуры**:
+  - Устранено и верифицировано **10 дефектов** категории P1 (#187, #197, #198, #203, #204, #207, #209, #214, #216, #222). Общее число устраненных дефектов достигло **268** (осталось **777** | P0: 0, P1: 234, P2: 543).
+
+---
+
 ## 🛡️ Что нового в версии 2.1.28 (SemVer Patch Release — Bionic Named Semaphores Fallback, Ctypes ARM64 Alignment, Weakref Safety, Adaptive WakeLock, OEM Samsung/Vivo/Oppo Advisors & LMK Watchdog)
 
 - **Резервные анонимные семафоры для Multiprocessing (Bionic Named Semaphores Fallback — #153)**:
