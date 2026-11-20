@@ -4,6 +4,35 @@
 
 ---
 
+## 🛡️ Что нового в версии 2.1.24 (SemVer Patch Release — Process Tree Tracking, Logcat Isolation, SIGBUS Guard, Zero-Buffer & TCP Zero-Window Shield)
+
+- **Изоляция системного лога logcat от ботов (Logcat Process Isolation Guard — #49)**:
+  - В `sitecustomize.py` (сниппет 40) перехвачены вызовы запуска подпроцессов (`subprocess.Popen`): выполнение команды `logcat` дочерними процессами ботов блокируется с выбросом `PermissionError` и предупреждением `[LOGCAT_GUARD]`, предотвращая утечку отладочной информации и токенов других приложений Android. В настройки добавлен переключатель `logcatProcessIsolationEnabled`.
+- **Перехватчик ошибок шины SIGBUS при работе с mmap (SIGBUS Bus Error Handler — #59)**:
+  - В `sitecustomize.py` (сниппет 41) зарегистрирован обработчик сигнала `signal.SIGBUS`: при случайном усечении memory-mapped файлов SQLite или внешних разделов процесс не падает с неустранимым аварийным сбоем, а логирует предупреждение `[SIGBUS_GUARD]` и безопасно завершает операции. В настройки добавлен переключатель `sigbusGuardEnabled`.
+- **Глубокое отслеживание дерева процессов и зачистка отсоединенных PGID (Process Tree Tracking — #82)**:
+  - В `ProcessTreeKiller` реализовано сканирование всей иерархии процессов `/proc` по PPID в дополнение к `CONFIG_PROC_CHILDREN`. При остановке проектов сигналы SIGTERM/SIGKILL направляются не только прямому потомку, но и отсоединенным группам процессов (`sendProcessGroupSignalSafe`), исключая выживание фоновых демонов, вызвавших `setpgid(0, 0)`. В настройки добавлен переключатель `processTreeTrackingEnabled`.
+- **Принудительное обнуление буферов памяти CFFI/Ctypes (CFFI Zero-Buffer Guard — #304)**:
+  - В `sitecustomize.py` (сниппет 42) перехвачен метод `ctypes.create_string_buffer`: выделяемая нативная память принудительно обнуляется через `ctypes.memset`, гарантируя отсутствие утечек остаточных байт из кучи процесса. В настройки добавлен переключатель `cffiZeroBufferGuardEnabled`.
+- **Безопасная очистка учетных данных в оперативной памяти (Credential Memory Scrubbing — #339)**:
+  - В `ProjectRepository` и `companion object` добавлен метод `scrubSecretMemory`: после инициализации переменных окружения и выполнения задач чувствительные карты секретов в JVM-памяти затираются пустыми строками и очищаются, предотвращая сохранение открытых паролей в Heap. В настройки добавлен переключатель `credentialMemoryScrubbingEnabled`.
+- **Защита веб-сервера от атак зависания TCP Zero-Window (TCP Zero-Window DoS Shield — #368)**:
+  - В `WebDashboardServer` для клиентских сокетов включен режим `tcpNoDelay = true`, выставлен буфер отправки 64 КБ и строгие таймауты записи, предотвращая зависание рабочих потоков сервера, если клиент выставляет нулевое окно TCP. В настройки добавлен переключатель `tcpZeroWindowProtectionEnabled`.
+- **Поддержание активности Server-Sent Events соединений (SSE Keep-Alive Heartbeat — #378)**:
+  - В `WebDashboardServer` добавлен стриминг логов через SSE (`/api/project/{id}/logs/stream`, `events`) с периодической отправкой комментариев `: ping\n\n` каждые 15 секунд, защищая соединения от разрыва промежуточными прокси-серверами и NAT-роутерами. В настройки добавлен переключатель `sseKeepAliveEnabled`.
+- **Автономность ресурсов и строгая политика безопасности CSP (Subresource Integrity & Strict CSP — #395)**:
+  - Проведен аудит `web_dashboard.html`: подтверждено полное отсутствие внешних сторонних CDN-скриптов. В заголовках HTTP-ответов сервера ужесточена политика `Content-Security-Policy` с явным запретом сторонних источников скриптов и стилей. В настройки добавлен переключатель `subresourceIntegrityEnforced`.
+- **Автоматическая обработка паузы HTTP 429 Retry-After (HTTP 429 Retry-After Interceptor — #402)**:
+  - В `sitecustomize.py` (сниппет 43) перехвачен `urllib.request.urlopen`: при получении HTTP 429 Too Many Requests клиент автоматически извлекает заголовок `Retry-After`, выдерживает необходимую паузу и логирует `[HTTP_429_GUARD]`, предотвращая длительную блокировку ботов в Telegram API. В настройки добавлен переключатель `http429RetryAfterGuardEnabled`.
+- **Таймаут SSL/TLS рукопожатия (SSL Handshake Timeout Enforcer — #404)**:
+  - В `sitecustomize.py` (сниппет 44) перехвачен `ssl.SSLContext.wrap_socket`: для клиентских сокетов выставляется жесткий лимит времени TLS-рукопожатия (10 секунд), исключая бесконечное зависание сетевых воркеров при сбоях удаленных серверов. В настройки добавлен переключатель `sslHandshakeTimeoutEnabled`.
+- **Модульная архитектура настроек Compose (ProcessIsolationAndProtocolHardeningCard)**:
+  - Новые 10 переключателей вынесены в отдельный независимый модуль `ProcessIsolationAndProtocolHardeningCard.kt` с локализацией на все 22 языка, предотвращая ошибки размера байткода Java (`MethodTooLargeException`).
+- **Реестр дефектов и аудит архитектуры**:
+  - Устранено и верифицировано **10 дефектов** категории P1 (#49, #59, #82, #304, #339, #368, #378, #395, #402, #404). Общее число устраненных дефектов достигло **218** (осталось **827** | P0: 0, P1: 284, P2: 543).
+
+---
+
 ## 🛡️ Что нового в версии 2.1.23 (SemVer Patch Release — SSRF Metadata Shield, Debug Routes Guard, Pickle State Audit, Pip Pinning & Network Hardening)
 
 - **Защита от SSRF и блокировка запросов к link-local метаданным (SSRF Metadata Shield — #308)**:
