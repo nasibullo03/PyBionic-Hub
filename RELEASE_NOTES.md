@@ -4,6 +4,33 @@
 
 ---
 
+## 🛡️ Что нового в версии 2.1.32 (SemVer Patch Release — Process Sandbox, ReDoS Defense, Dangerous Syscall Seccomp Policy, Keystore Recovery & Backup Encryption)
+
+- **Изоляция пространств имен и защита путей монтирования (Mount Namespace Path Traversal Guard — #22)**:
+  - В `RunnerForegroundService` интегрирована проверка `ProcessSecurityHelper.isPathTraversalAttempt()`: блокируются любые попытки выхода за пределы рабочей директории проекта через относительные компоненты (`..`) или внешние симлинки, предохраняя системные файлы PyBionic и внутренние базы данных Android от случайного повреждения или удаления. В настройки добавлен переключатель `mountNamespaceIsolationGuardEnabled`.
+- **Изоляция IPC и каталогов разделяемой памяти (IPC Namespace & Shared Memory Isolation — #23)**:
+  - Для каждого проекта создаются индивидуальные изолированные директории временных файлов и рантайма (`.tmp/<project_id>`), пробрасываемые в переменные окружения `TMPDIR`, `TEMP`, `TMP`, `XDG_RUNTIME_DIR`, а также уникальный префикс `PYBIONIC_IPC_PREFIX`, исключающий коллизии сокетов и несанкционированный перехват сегментов разделяемой памяти между соседними ботами. В настройки добавлен переключатель `ipcNamespaceIsolationEnabled`.
+- **Аудит опасных системных вызовов и политика Seccomp (Dangerous Syscall Policy Filter — #33)**:
+  - Внедрен анализатор `ProcessSecurityHelper.auditDangerousSyscalls()`: при подготовке к запуску ботов инспектируются вызовы нативных функций и чувствительных системных вызовов (`ptrace`, `bpf`, `process_vm_writev`), выводя предупреждения в системный журнал и защищая окружение от потенциальной эксплуатации низкоуровневых уязвимостей ядра Linux. В настройки добавлен переключатель `seccompSyscallFilterEnabled`.
+- **Оптимизация прямого запуска процессов (POSIX Spawn & Direct Exec Optimization — #58)**:
+  - В `ProcessSecurityHelper.buildOptimizedExecArgs()` оптимизировано формирование аргументов исполнения: устранены лишние форки промежуточных оболочек при запуске Python-бинарников, что снижает оверхед дублирования страниц виртуальной памяти Android Runtime (ART) при старте воркеров. В настройки добавлен переключатель `posixSpawnExecOptimizationEnabled`.
+- **Советник по User Namespaces и эмуляции PRoot (CLONE_NEWUSER & PRoot Advisor — #68)**:
+  - Добавлена диагностика поддержки непривилегированных пользовательских пространств имен ядра Android (`/proc/sys/kernel/unprivileged_userns_clone`), формирующая рекомендации по безопасному использованию PRoot-эмуляции для изоляции гостевых окружений и запуска root-подобных утилит без реального Root. В настройки добавлен переключатель `userNamespaceProotAdvisorEnabled`.
+- **Статический сканер ReDoS уязвимостей в регулярных выражениях (Python ReDoS Pattern Scanner — #122)**:
+  - В `ProcessSecurityHelper.scanRedosVulnerabilities()` реализован статический анализатор регулярных выражений, инспектирующий код скриптов бота на наличие вложенных квантификаторов с экспоненциальным бэктрекингом (`(a+)+`, `([a-zA-Z0-9]+)+`, `(x*)*`) перед запуском, предохраняя процессы от катастрофического зависания при спаме. В настройки добавлен переключатель `redosPatternGuardEnabled`.
+- **Таймаут выполнения Regex и рекомендация Google RE2 (Regex Timeout Enforcer — #166)**:
+  - В окружение процесса инжектируются параметры дедлайна выполнения регулярных выражений (`PYTHON_REGEX_TIMEOUT_MS=1000`, `PYBIONIC_REDOS_GUARD=1`) и рекомендации по использованию движка с линейной вычислительной сложностью `google-re2`. В настройки добавлен переключатель `regexTimeoutEnforcerEnabled`.
+- **Восстановление ключей Android Keystore после смены пароля экрана (Keystore Invalidated Key Recovery — #265)**:
+  - В `SecretVault` реализован перехват исключения `KeyPermanentlyInvalidatedException`: при изменении системного PIN-кода или графического ключа хранилище предотвращает аварийный краш приложения, безопасно удаляет инвалидированный ключ и инициирует процедуру восстановления. В настройки добавлен переключатель `keystoreRecoveryHandlerEnabled`.
+- **Аутентификация UID на локальных сокетах IPC (Local Socket IPC Peer UID Guard — #270)**:
+  - В сетевом сервере `WebDashboardServer` и подсистеме межпроцессного взаимодействия активирована верификация прав локальных соединений через сопоставление UID процесса, предотвращающая несанкционированное подключение сторонних приложений с устройства к портам управления ботами. В настройки добавлен переключатель `localSocketPeerUidAuthEnabled`.
+- **Защита и шифрование при экспорте бэкапов в ZIP (Backup Export ZIP Protection — #275)**:
+  - В `ProjectRepository.exportProjectZipToStream()` внедрен механизм защиты архивов: исключение приватных ключей (`.key`, `.pem`, `.keystore`) и зашифрованных кэшей vault из незашифрованных экспортов, а также автоматическое встраивание манифеста безопасности `.pybionic_backup_metadata.json`. В настройки добавлен переключатель `backupZipEncryptionEnabled`.
+- **Модульная карточка настроек Compose (ProcessSandboxAndSecurityCard)**:
+  - Создан независимый UI-компонент `ProcessSandboxAndSecurityCard.kt` со всеми 10 переключателями безопасности, реактивными StateFlow и полной синхронизацией строк на 22 языка.
+
+---
+
 ## 🛡️ Что нового в версии 2.1.31 (SemVer Patch Release — OEM Battery Triggers, WakeLock Renewal, Standby Alarm Batching, Unisoc CPU Guard & Biometric Secrets Protection)
 
 - **Предупреждение об отключении радиомодема в Oppo ColorOS (Oppo O-Reserve Threshold Guard — #235)**:
