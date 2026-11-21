@@ -4,6 +4,33 @@
 
 ---
 
+## 📝 Что нового в версии 2.1.41 (SemVer Patch Release — BotHub Templates Hardening: Dynamic WebUI Ports, Audio Filters Pre-Check, Tesseract OCR Language Pack, Web3 RPC Fallback, AntiRaid Captcha TTL, Streaming Audiobooks, Humanized Jitter Delay, Discord Permissions Auditor, Datamosh Codec Guard & OSINT API Failover)
+
+- **Динамическое выделение WebUI портов (Dynamic WebUI Port Allocation — #609)**:
+  - В `BotHubTemplatesHardeningHelper.resolveBotPort()` и `PyBionicViewModel` реализовано авторазрешение конфликтов портов: если порт (например, 8000) уже занят другим ботом со встроенной веб-панелью, процесс автоматически получает следующий свободный порт из диапазона 8000–65535 через переменную `PORT`. В настройки добавлен переключатель `botWebUiDynamicPortAllocationEnabled` с модальным окном справки «Что это?».
+- **Валидатор аудиофильтров FFmpeg (FFmpeg Audio Filter Validator — #610)**:
+  - В `BotHubTemplatesHardeningHelper.validateFFmpegFilters()` реализована проверка наличия критических фильтров обработки звука (`atempo`, `equalizer`, `compand`, `loudnorm`) перед запуском голосовых шаблонов, предотвращающая краши `No such filter`. В настройки добавлен переключатель `ffmpegFilterValidatorGuardEnabled` с модальным окном справки «Что это?».
+- **Контроль языковых пакетов Tesseract OCR (OCR Language Pack Checker — #611)**:
+  - В `BotHubTemplatesHardeningHelper.checkTessdataAvailability()` внедрен аудит файлов языковых моделей (`rus.traineddata`, `eng.traineddata`) в каталоге `tessdata` для сканеров документов, исключающий фатальные падения `TesseractError`. В настройки добавлен переключатель `ocrLanguagePackAutoDownloadEnabled` с модальным окном справки «Что это?».
+- **Ротация и отказоустойчивость Web3 RPC (Web3 Public RPC Failover & Rotator — #613)**:
+  - В `BotHubTemplatesHardeningHelper.selectActiveWeb3RpcNode()` реализован пул резервных публичных EVM RPC нод (Cloudflare, Ankr, LlamaRPC) с автоматической ротацией при исчерпании лимитов запросов в крипто-трекерах. В настройки добавлен переключатель `web3RpcRotationFallbackEnabled` с модальным окном справки «Что это?».
+- **Таймаут и очистка сессий капчи AntiRaid (Anti-Raid Captcha Timeout Enforcer — #615)**:
+  - В `BotHubTemplatesHardeningHelper.purgeExpiredCaptchaSessions()` реализовано автоудаление зависших сессий капчи с TTL 180 секунд, предотвращающее утечки памяти и раздувание таблиц SQLite при спам-атаках. В настройки добавлен переключатель `antiRaidCaptchaTimeoutEnforcerEnabled` с модальным окном справки «Что это?».
+- **Потоковая сегментация аудиокниг (Audiobook Stream-Copy Optimizer — #616)**:
+  - В `BotHubTemplatesHardeningHelper.buildAudioSegmentationCommand()` реализовано разбиение многочасовых аудиокниг через потоковое копирование FFmpeg (`-c copy`), исключающее загрузку гигабайтных файлов в память и выгрузку процесса демона Android LMK. В настройки добавлен переключатель `audiobookStreamCopyOptimizationEnabled` с модальным окном справки «Что это?».
+- **Рандомизация задержек автопостинга (Social Auto-Posting Jitter Guard — #617)**:
+  - В `BotHubTemplatesHardeningHelper.calculateHumanizedJitterDelay()` реализована рандомизация интервалов публикации контента (Humanized Jitter +/- 35%), минимизирующая риски антиспам-блокировок в соцсетях. В настройки добавлен переключатель `socialAutoPostingJitterGuardEnabled` с модальным окном справки «Что это?».
+- **Аудитор прав модерации Discord (Discord Guardian Permission Auditor — #618)**:
+  - В `BotHubTemplatesHardeningHelper.auditDiscordGuardianPermissions()` реализован предстартовый аудит прав бота (`ban_members`, `kick_members`, `manage_messages`) с предупреждением администратора при нехватке полномочий роли на сервере Discord. В настройки добавлен переключатель `discordRolePermissionAuditorEnabled` с модальным окном справки «Что это?».
+- **Предкодирование кодеков Datamosh (Datamosh Codec Pre-Transcode Guard — #620)**:
+  - В `BotHubTemplatesHardeningHelper.buildDatamoshPreTranscodeCommand()` реализовано предварительное транскодирование современных форматов AV1/HEVC в поток MPEG-4 с I-кадрами, устраняющее сбои энкодера и пустые видео при наложении глитч-эффектов. В настройки добавлен переключатель `datamoshCodecTranscodeGuardEnabled` с модальным окном справки «Что это?».
+- **Отказоустойчивость OSINT API (OSINT API Multi-Engine Failover — #625)**:
+  - В `BotHubTemplatesHardeningHelper.resolveOsintApiFallback()` внедрена многоуровневая маршрутизация поисковых запросов разведки утечек с переключением на резервные шлюзы при изменении схемы первичного API. В настройки добавлен переключатель `osintApiFailoverRouterEnabled` с модальным окном справки «Что это?».
+- **Модульная Compose-карточка и справки «Что это?» (Rule 5 Compliance)**:
+  - Разработан компонент `BotHubTemplatesHardeningCard.kt` с 10 реактивными переключателями и модальными окнами помощи (Определение, При включении, При отключении) со 100% переводом на все 22 языка.
+
+---
+
 ## 📝 Что нового в версии 2.1.40 (SemVer Patch Release — Bot Lifecycle, Templates & Hardening: UV Rust Engine, BotHub Offline Deployment, Strict Dependency Pinning, Webhook Tunnel Helper, DB Migration Hooks, Token Health Pre-Check, Default Secret Traps, yt-dlp Auto-Updater, Flood Guard & Discord Intents)
 
 - **Интеграция скоростного пакетного менеджера UV на Rust (UV Rust Package Manager Backend — #526)**:
