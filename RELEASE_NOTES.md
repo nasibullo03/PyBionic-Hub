@@ -4,6 +4,33 @@
 
 ---
 
+## 📝 Что нового в версии 2.1.46 (SemVer Patch Release — UI Adaptation, Responsive Layout & Accessibility: Stalled Bot Alert, Flash Wear IOPS Tracker, Tablet & Foldable Master-Detail, Samsung DeX Desktop Mode, Landscape Dialog Adaptation, TalkBack Semantic Labels, Edge-to-Edge Navigation Insets, Font Scaling Guard, Swipe-to-Delete Confirmation & Orientation State Preservation)
+
+- **Детектор «замерзших» ботов (Stalled Bot Silent Freeze Detector — #797)**:
+  - В `UiAdaptationAndAccessibilityHelper.evaluateBotSilentFreeze()` реализовано выявление скрытых зависаний (Silent Freeze), когда процесс бота жив, но не обрабатывает входящие события и не выводит логи более 30 минут, с предупреждением о зависшем сокете или блокировке. В настройки добавлен переключатель `stalledBotSilentFreezeDetectorEnabled` с модальным окном справки «Что это?».
+- **Монитор IOPS и износа флеш-памяти (Disk IOPS & Flash Wear Tracker — #813)**:
+  - В `UiAdaptationAndAccessibilityHelper.evaluateDiskIoWriteRate()` внедрен аудит интенсивности записи в дисковую подсистему (`/proc/[pid]/io`) с порогом тревоги при превышении 200 IOPS или 5 МБ/с, защищающий чипы UFS/eMMC памяти смартфона от ускоренного аппаратного износа. В настройки добавлен переключатель `diskIoRateLimiterTrackerEnabled` с модальным окном справки «Что это?».
+- **Двухколоночный режим для планшетов (Adaptive Tablet & Foldable Layout — #816)**:
+  - В `UiAdaptationAndAccessibilityHelper.resolveScreenLayoutStrategy()` реализована поддержка двухколоночного интерфейса Master-Detail (список проектов слева и терминал/детали справа) на планшетах и складных устройствах с шириной экрана более 600 dp. В настройки добавлен переключатель `adaptiveTwoPaneFoldableLayoutEnabled` с модальным окном справки «Что это?».
+- **Оптимизация для рабочего стола и Samsung DeX (Desktop Mode & DeX Optimizer — #817)**:
+  - В `UiAdaptationAndAccessibilityHelper.evaluateDesktopEnvironment()` внедрена поддержка свободного ресайза окон, контекстных меню правой кнопки мыши и хоткеев при работе на внешних мониторах через Samsung DeX и Motorola Ready For. В настройки добавлен переключатель `desktopEnvironmentOptimizationEnabled` с модальным окном справки «Что это?».
+- **Адаптация диалогов в альбомном режиме (Landscape Dialog & Screen Adaptation — #819)**:
+  - В `UiAdaptationAndAccessibilityHelper.calculateLandscapeDialogLayout()` реализовано автоматическое оборачивание диалогов в скроллируемые двухколоночные контейнеры при горизонтальном положении экрана, гарантирующее полную доступность кнопок подтверждения и отмены. В настройки добавлен переключатель `landscapeOrientationAdaptiveDialogsEnabled` с модальным окном справки «Что это?».
+- **Семантические метки для TalkBack (Accessibility & TalkBack Semantic Labels — #820)**:
+  - В `UiAdaptationAndAccessibilityHelper.resolveSemanticContentDescription()` внедрены локализованные информативные атрибуты `contentDescription` для всех кнопок и иконок действий, обеспечивающие полноценное управление приложением для незрячих и слабовидящих пользователей. В настройки добавлен переключатель `accessibilityTalkBackSemanticLabelsEnabled` с модальным окном справки «Что это?».
+- **Учет отступов системных панелей Edge-to-Edge (Edge-to-Edge System Bar Insets Enforcer — #821)**:
+  - В `UiAdaptationAndAccessibilityHelper.computeSafeInsetsPadding()` реализован строгий расчет отступов системных панелей (`WindowInsets.safeDrawing`), устраняющий наложение контента и кнопок нижней панели на системные кнопки навигации (3-Button Navigation). В настройки добавлен переключатель `systemBarsEdgeToEdgeInsetsEnforcerEnabled` с модальным окном справки «Что это?».
+- **Адаптация верстки к крупному шрифту (Font Scaling Accessibility Layout Guard — #827)**:
+  - В `UiAdaptationAndAccessibilityHelper.adjustLayoutForFontScale()` реализована защита верстки от поломки при включении крупного системного шрифта (>130% Font Scale) с разрешением вертикального роста карточек и автоэллипсисом. В настройки добавлен переключатель `fontScaleAccessibilityGuardEnabled` с модальным окном справки «Что это?».
+- **Подтверждение удаления свайпом (Swipe-to-Delete Confirmation Guard — #831)**:
+  - В `UiAdaptationAndAccessibilityHelper.evaluateSwipeDeletePolicy()` внедрено обязательное требование диалога подтверждения и возможность мгновенной отмены (Undo Snackbar) при смахивании карточки проекта, исключающее фатальную потерю кода из-за случайных жестов. В настройки добавлен переключатель `swipeToDeleteConfirmationGuardEnabled` с модальным окном справки «Что это?».
+- **Сохранение ввода при повороте экрана (Orientation Change State Preservation — #844)**:
+  - В `UiAdaptationAndAccessibilityHelper.resolveFormStatePreservationPolicy()` внедрено сохранение несохраненного текста полей ввода и параметров при повороте экрана и сменах конфигурации Activity через `rememberSaveable`. В настройки добавлен переключатель `orientationChangeStatePreservationGuardEnabled` с модальным окном справки «Что это?».
+- **Модульная Compose-карточка и справки «Что это?» (Rule 5 Compliance)**:
+  - Разработан компонент `UiAdaptationAndAccessibilityCard.kt` с 10 реактивными переключателями и модальными окнами помощи (Определение, При включении, При отключении) со 100% переводом на все 22 языка.
+
+---
+
 ## 📝 Что нового в версии 2.1.45 (SemVer Patch Release — Telemetry, Logging & Diagnostics Safety: Battery Thermal Alert, Thread Leak Monitor, Log Buffer Hard Limit, Signal Logger, Busy-Loop Detector, Scroll Throttler, Proactive Disk Alerts, Mega-Line Truncation, Nested JSON Secret Masking & File Descriptor Alarm)
 
 - **Предупреждение о перегреве аккумулятора (Battery Thermal Overheating Alert — #756)**:
