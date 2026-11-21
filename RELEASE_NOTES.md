@@ -4,6 +4,33 @@
 
 ---
 
+## 📝 Что нового в версии 2.1.44 (SemVer Patch Release — Database Safety, SSH Tunnels & Telemetry Hardening: SQLite Read-Only Mode, Remote DB SSH Tunneling, Table Rename Trigger Guard, WAL Monitor & Auto-Checkpoint, Reserved Word Identifier Escaping, SQLite VACUUM Space Pre-Check, Atomic Commit Batching, Sentry DSN Validation, Adaptive Telemetry Polling & Memory Leak Linear Trend Detector)
+
+- **Безопасный режим просмотра SQLite (SQLite Read-Only Inspection Mode — #717)**:
+  - В `DatabaseAndTelemetryHardeningHelper.buildReadOnlyConnectionUri()` реализовано принудительное открытие базы данных в режиме `SQLITE_OPEN_READONLY` (`file:...?mode=ro`) при исследовании таблиц и данных в SQLite Viewer, гарантирующее защиту боевых баз данных от случайной перезаписи или удаления записей. В настройки добавлен переключатель `sqliteReadOnlySafetyModeEnabled` с модальным окном справки «Что это?».
+- **SSH-туннелирование удаленных СУБД (Remote Database SSH Tunnel Bridge — #720)**:
+  - В `DatabaseAndTelemetryHardeningHelper.buildSshTunnelConfig()` внедрен генератор параметров и команд безопасного локального проброса портов (`ssh -N -L`) через бастион-серверы для изолированных СУБД PostgreSQL и MySQL, защищенных корпоративными файрволами. В настройки добавлен переключатель `remoteDbSshTunnelBridgeEnabled` с модальным окном справки «Что это?».
+- **Контроль целостности при переименовании таблиц (Table Rename Integrity & Trigger Auditor — #727)**:
+  - В `DatabaseAndTelemetryHardeningHelper.validateTableRenameSafety()` реализован аудит внешних ключей и триггеров перед выполнением `ALTER TABLE RENAME`, предотвращающий скрытые сбои выполнения триггеров и повреждение связей в БД (так как SQLite не обновляет тела триггеров автоматически). В настройки добавлен переключатель `tableRenameIntegrityGuardEnabled` с модальным окном справки «Что это?».
+- **Авто-чекпоинт разрастания WAL (WAL File Size Auto-Checkpoint Guard — #730)**:
+  - В `DatabaseAndTelemetryHardeningHelper.evaluateWalCheckpointNeed()` внедрен мониторинг размера файла журнала упреждающей записи (`-wal`) и генерация директивы `PRAGMA wal_checkpoint(TRUNCATE)` при превышении порога в 20 МБ, предотвращающий раздувание журнала до сотен мегабайт и экономящий память на диске. В настройки добавлен переключатель `walAutoCheckpointThresholdGuardEnabled` с модальным окном справки «Что это?».
+- **Экранирование зарезервированных слов SQL (SQL Reserved Word Column Escaping — #737)**:
+  - В `DatabaseAndTelemetryHardeningHelper.escapeIdentifier()` и `buildSafeSelectQuery()` реализовано обязательное оборачивание идентификаторов колонок и таблиц в двойные кавычки (`"order"`, `"group"`, `"key"`), устраняющее фатальные ошибки `syntax error near token` при автогенерации запросов. В настройки добавлен переключатель `sqlReservedWordColumnEscapingEnabled` с модальным окном справки «Что это?».
+- **Проверка свободного места перед VACUUM (SQLite VACUUM Disk Space Pre-Check — #738)**:
+  - В `DatabaseAndTelemetryHardeningHelper.verifyVacuumDiskHeadroom()` внедрен предварительный расчет необходимого свободного места (>220% от размера БД) перед запуском команды дефрагментации `VACUUM`, создающей полную временную копию базы, что защищает от критического сбоя `disk is full` и повреждения файлов. В настройки добавлен переключатель `sqliteVacuumDiskSpacePreCheckEnabled` с модальным окном справки «Что это?».
+- **Пакетная фиксация транзакций (Atomic Commit Batching Strategy — #739)**:
+  - В `DatabaseAndTelemetryHardeningHelper.calculateCommitInterval()` реализована стратегия адаптивной группировки фиксации транзакций по количеству (50) или временному окну (<2 с), ограничивающая потерю несохраненных данных при аварийном завершении процесса бота. В настройки добавлен переключатель `atomicCommitBatchingGuardEnabled` с модальным окном справки «Что это?».
+- **Централизованный сбор ошибок (Centralized Error Reporting Sentry / GlitchTip — #744)**:
+  - В `DatabaseAndTelemetryHardeningHelper.validateAndMaskSentryDsn()` внедрен синтаксический анализ и валидация DSN-адресов Sentry/GlitchTip с маскированием ключей аутентификации, позволяющий перехватывать и отправлять трассировки исключений бота в реальном времени. В настройки добавлен переключатель `centralizedErrorReportingSentryEnabled` с модальным окном справки «Что это?».
+- **Адаптивный опрос системной телеметрии (Adaptive Telemetry Polling Overhead Guard — #745)**:
+  - В `DatabaseAndTelemetryHardeningHelper.resolveTelemetryPollingIntervalMs()` реализована динамическая регулировка частоты опроса `/proc/stat` (1 с при активном открытом графике, 10 с на главном экране и 30 с в фоне или режиме энергосбережения), снижающая пробуждения ядер CPU и сохраняющая заряд батареи смартфона. В настройки добавлен переключатель `adaptiveTelemetryPollingOverheadGuardEnabled` с модальным окном справки «Что это?».
+- **Детектор тренда утечек памяти (Memory Leak Linear Trend Detector — #749)**:
+  - В `DatabaseAndTelemetryHardeningHelper.analyzeMemoryGrowthTrend()` внедрен алгоритм линейной регрессии по выборкам RSS, рассчитывающий скорость утечки оперативной памяти (>25 МБ/ч) и заблаговременно предупреждающий пользователя за часы до принудительного уничтожения процесса бота службой Android Low Memory Killer (LMK). В настройки добавлен переключатель `memoryLeakLinearTrendDetectorEnabled` с модальным окном справки «Что это?».
+- **Модульная Compose-карточка и справки «Что это?» (Rule 5 Compliance)**:
+  - Разработан компонент `DatabaseAndTelemetryHardeningCard.kt` с 10 реактивными переключателями и модальными окнами помощи (Определение, При включении, При отключении) со 100% переводом на все 22 языка.
+
+---
+
 ## 📝 Что нового в версии 2.1.43 (SemVer Patch Release — SQLite & Database Hardening: Arbitrary SQL Console, Remote DB Connectors, JSON1 Support, Atomic Migration Transactions, SQLCipher Encryption, SAF External Staging, Migration Dry-Run, Large SQL Dump Chunking, FTS5 Search & Connection Pooling)
 
 - **Консоль произвольных SQL-запросов (Arbitrary SQL Console Executor — #668)**:
