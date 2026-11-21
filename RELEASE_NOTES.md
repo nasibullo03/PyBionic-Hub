@@ -4,6 +4,33 @@
 
 ---
 
+## 📝 Что нового в версии 2.1.35 (SemVer Patch Release — Code Editor & IDE Hardening, Zero-Byte Read EOF, LSP Advisor, Git Diff, Binary Guard, Persistent Undo, IME Insets, Tab-to-Spaces, Large File Streaming & Windows-1251 Encoding)
+
+- **Защита от нулевого чтения сокета (Non-blocking Zero-Byte Read EOF Guard — #418)**:
+  - В `CodeEditorHelper.readWithZeroByteGuard()` и `WebDashboardServer.BufferedInputStream.readNBytesCompat()` реализован контроль неблокирующего чтения: последовательные возвраты 0 байт интерпретируются как EOF, предотвращая 100% загрузку процессорных ядер в цикле busy-spin. В настройки добавлен переключатель `zeroByteReadEofGuardEnabled`.
+- **LSP-советник и автодополнение (Lightweight LSP & Syntax Advisor — #428)**:
+  - В `CodeEditorHelper.LspAdvisor` интегрирован легковесный анализатор Python: автодополнение встроенных функций (`print`, `len`, `enumerate`, `range`), подсказки синтаксиса и проверка пропущенных двоеточий в операторах без необходимости запуска тяжелых внешних LSP-процессов. В настройки добавлен переключатель `lspIntegrationAdvisorEnabled`.
+- **Визуальный просмотрщик Git Diff (Visual Git Diff Viewer — #431)**:
+  - В редактор кода встроен визуальный просмотрщик изменений: `CodeEditorHelper.computeUnifiedDiff()` построчно сопоставляет исходный файл на диске с текущим буфером редактора, подсвечивая добавленные (+) и удаленные (-) строки в диалоге Diff. В настройки добавлен переключатель `gitDiffViewerEnabled`.
+- **Блокировка открытия бинарных файлов (Binary Files Opening Guard — #432)**:
+  - В `CodeEditorHelper.isBinaryFile()` реализовано распознавание бинарных форматов (SQLite, PNG, JPEG, MP3, ELF, ZIP, PDF) по расширениям и сигнатурам magic bytes. Редактор блокирует попытку декодирования бинарников в UTF-8 текст, предотвращая зависание и OOM. В настройки добавлен переключатель `binaryFileDetectionGuardEnabled`.
+- **Персистентная история отмены правок (Persistent Undo / Redo Stack — #435)**:
+  - Внедрен менеджер истории `CodeEditorHelper.PersistentUndoRedoManager`: стек отмены и повтора правок сохраняется при переключении между вкладками файлов и сворачивании приложения, исключая потерю внесенных изменений. В настройки добавлен переключатель `persistentUndoRedoStackEnabled`.
+- **Подгонка под экранную клавиатуру (Virtual Keyboard IME Insets Adjustment — #436)**:
+  - В редакторе кода `ProjectDetailScreen.kt` интегрирован модификатор `.imePadding()` и расчет смещения `calculateEditorImeScrollOffset()`, благодаря чему строка с активным курсором автоматически сдвигается вверх и не перекрывается экранной клавиатурой Android. В настройки добавлен переключатель `keyboardImeAdjustmentGuardEnabled`.
+- **Замена табуляций на 4 пробела при вставке (Tab to Spaces Normalization — #440)**:
+  - В `CodeEditorHelper.convertTabsToSpaces()` реализована автоматическая нормализация отступов: символы табуляции `\t` при вставке кода из буфера обмена заменяются на 4 пробела, защищая Python-скрипты от критических ошибок `TabError: inconsistent use of tabs and spaces`. В настройки добавлен переключатель `tabToSpacesConverterEnabled`.
+- **Потоковое чтение больших файлов (Large File Streaming Threshold — #443)**:
+  - Реализован защитный порог размера файлов (2 МБ): `CodeEditorHelper.isLargeFile()` и `readLogTail()` предотвращают вычитывание гигантских логов и дампов целиком в оперативную память, предлагая хвостовое постраничное чтение. В настройки добавлен переключатель `largeFileStreamingThresholdEnabled`.
+- **Автоопределение кодировок Windows-1251 и UTF-8 (Auto Encoding Detector — #444)**:
+  - В `CodeEditorHelper.detectEncoding()` и `detectEncodingAndReadText()` реализовано распознавание BOM и эвристический анализ кодировок Windows-1251 (CP1251), UTF-16 и UTF-8, обеспечивая корректное отображение русских текстов без повреждения кракозябрами. В настройки добавлен переключатель `autoEncodingDetectorEnabled`.
+- **Поддержка стандартных горячих клавиш (Hardware Keyboard Shortcuts — #450)**:
+  - На уровне редактора реализована обработка физических клавиатур и режима Samsung DeX: сочетания клавиш `Ctrl+S` (сохранить), `Ctrl+Z` (отмена), `Ctrl+Y` / `Ctrl+Shift+Z` (повтор), `Ctrl+F` (поиск) и `Ctrl+/` (комментирование строки). В настройки добавлен переключатель `hardwareKeyboardShortcutsEnabled`.
+- **Модульная карточка настроек Compose (CodeEditorAndIDEHardeningCard)**:
+  - Создан специализированный UI-компонент `CodeEditorAndIDEHardeningCard.kt` со всеми 10 переключателями редактора и IDE, реактивными StateFlow и полной локализацией на 22 языка.
+
+---
+
 ## 🌐 Что нового в версии 2.1.34 (SemVer Patch Release — Webhook Reverse Proxy, Outbound Proxy Support, Heartbeat Drop Detection, DoH, Terminal Persistence, Backpressure Queue & Flapping Auto-Recovery)
 
 - **Реверс-прокси шлюз входящих вебхуков (Webhook Reverse Proxy Gateway — #350)**:
