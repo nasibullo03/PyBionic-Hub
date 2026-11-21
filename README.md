@@ -1,6 +1,6 @@
 # ⚡ PyBionic Runner — 24/7 Python 3.14 on Android
 
-[![Release](https://img.shields.io/badge/Release-v2.1.54-00E5FF.svg?style=for-the-badge&logo=android&logoColor=black)](https://github.com/nasibullo03/PyBionic/releases/latest)
+[![Release](https://img.shields.io/badge/Release-v2.1.55-00E5FF.svg?style=for-the-badge&logo=android&logoColor=black)](https://github.com/nasibullo03/PyBionic/releases/latest)
 [![Python](https://img.shields.io/badge/Python-3.14.10_Bionic-FFD700.svg?style=for-the-badge&logo=python&logoColor=black)](https://python.org)
 [![Platform](https://img.shields.io/badge/Platform-Android_8.0+-3DDC84.svg?style=for-the-badge&logo=android&logoColor=white)](https://android.com)
 [![License](https://img.shields.io/badge/License-Proprietary-red.svg?style=for-the-badge)](LICENSE)
@@ -18,7 +18,7 @@
 
 <p align="center">
   <a href="https://github.com/nasibullo03/PyBionic/releases/latest">
-    <img src="https://img.shields.io/badge/🚀_DOWNLOAD_PYBIONIC_APK-v2.1.43-00E5FF?style=for-the-badge&logo=android&logoColor=black" alt="Download APK" height="50">
+    <img src="https://img.shields.io/badge/🚀_DOWNLOAD_PYBIONIC_APK-v2.1.33-00E5FF?style=for-the-badge&logo=android&logoColor=black" alt="Download APK" height="50">
   </a>
 </p>
 
@@ -50,7 +50,7 @@ Unlike heavy chroot or Linux emulators (Termux, PRoot, UserLAnd), PyBionic is co
 ## 🚀 Quick Start
 
 1. **Download APK:** Get the latest release from [GitHub Releases](https://github.com/nasibullo03/PyBionic/releases/latest).
-2. **Install:** Install `PyBionic-Runner-v2.1.43-arm64.apk` on your Android device (Android 8.0+ / arm64-v8a).
+2. **Install:** Install `PyBionic-Runner-v2.1.1-arm64.apk` on your Android device (Android 8.0+ / arm64-v8a).
 3. **Launch & Permissions:** Allow Notification permission and accept the prompt to **Disable Battery Optimizations** for uninterrupted 24/7 background operation.
 4. **Run a Bot:**
    - Tap **BotHub** at the bottom.

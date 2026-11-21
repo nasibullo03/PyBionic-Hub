@@ -4,6 +4,33 @@
 
 ---
 
+## 📝 Что нового в версии 2.1.55 (SemVer Patch Release — Android Platform Features & Device Defenses: Wireless ADB Auto-Recovery, BLE Beacon Power, Battery Float Overcharge, Notch Insets, USB OTG Advisor, PAN IP, Haptic Resonance, Screen Keep-Awake, AOD Minimal Glyphs & Enterprise Work Profiles)
+
+- **Автоматическое переключение на Wireless ADB при отключении кабеля (Wireless ADB Auto-Recovery — #968)**:
+  - В `AndroidPlatformFeaturesAndDeviceGuardsHelper.evaluateWirelessAdbPolicy()` внедрен автоматический переход на беспроводную отладку по TCP/IP через Wi-Fi на порту 5555 при непредвиденном физическом разрыве USB-подключения, сохраняющий сессии терминала и проброс портов. В настройки добавлен переключатель `wirelessAdbAutoRecoveryGuardEnabled` с модальным окном справки «Что это?».
+- **Защита энергопотребления BLE-маяков при выключенном экране (BLE Beacon Power Guard — #976)**:
+  - В `AndroidPlatformFeaturesAndDeviceGuardsHelper.evaluateBleAdvertisingPolicy()` реализован перевод трансляции Bluetooth LE в сбалансированный режим пониженного энергопотребления с удержанием частичного Bluetooth WakeLock при выключении дисплея, предотвращающий разрыв обнаружения периферийных ботов. В настройки добавлен переключатель `bluetoothLeAdvertisingPowerGuardEnabled` с модальным окном справки «Что это?».
+- **Предотвращение буферного перезаряда аккумулятора (Battery Float Overcharge Alert — #982)**:
+  - В `AndroidPlatformFeaturesAndDeviceGuardsHelper.evaluateBatteryOverchargeRisk()` внедрен контроль продолжительности непрерывной зарядки устройства на 100% емкости: при превышении 12 часов формируется предупреждение о риске вздутия литиевого аккумулятора с рекомендацией включить режим обходной зарядки («Защита аккумулятора» / 80% лимит). В настройки добавлен переключатель `batteryFloatOverchargeAlertGuardEnabled` с модальным окном справки «Что это?».
+- **Защита редактора кода от вырезов и отверстий камеры (Display Cutout & Notch Inset Shield — #985)**:
+  - В `AndroidPlatformFeaturesAndDeviceGuardsHelper.evaluateDisplayCutoutInsets()` реализован расчет безопасных отступов DisplayCutout в альбомной ориентации, компенсирующий вырезы и отверстия фронтальных камер и исключающий перекрытие первых символов кода и номеров строк. В настройки добавлен переключатель `displayCutoutNotchInsetGuardEnabled` с модальным окном справки «Что это?».
+- **Советник надежности хранилища USB OTG (USB OTG Storage Advisor — #988)**:
+  - В `AndroidPlatformFeaturesAndDeviceGuardsHelper.evaluateOtgStorageSafety()` внедрен аудит путей размещения проектов бота с выдачей строгого предупреждения при попытке запуска SQLite-баз данных с ненадежных съемных флеш-накопителей FAT32/exFAT во избежание повреждения файлов при случайном извлечении. В настройки добавлен переключатель `usbOtgStorageReliabilityAdvisoryGuardEnabled` с модальным окном справки «Что это?».
+- **Определение IP-адресов Bluetooth PAN и USB RNDIS (Bluetooth PAN IP Resolver — #991)**:
+  - В `AndroidPlatformFeaturesAndDeviceGuardsHelper.evaluateNetworkInterfacesForPan()` реализовано сканирование сетевых интерфейсов `bt-pan`, `bnep` и `rndis` для автоматического определения IP-адреса шлюза и формирования прямых ссылок на веб-панель управления бота при подключении через Bluetooth-модем. В настройки добавлен переключатель `bluetoothTetheringIpResolverGuardEnabled` с модальным окном справки «Что это?».
+- **Демпфирование резонанса вибромотора на бюджетных устройствах (Haptic Resonance Dampener — #996)**:
+  - В `AndroidPlatformFeaturesAndDeviceGuardsHelper.evaluateVibrationDamping()` внедрено автоматическое ограничение длительности импульсов вибрации до 12 мс на устройствах с эксцентриковыми моторами (ERM), устраняющее дребезг пластикового корпуса и громкий треск на твердых поверхностях. В настройки добавлен переключатель `vibrationMotorResonanceDampenerGuardEnabled` с модальным окном справки «Что это?».
+- **Удержание экрана включенным при потоковом выводе логов (Terminal Screen Keep-Awake — #1002)**:
+  - В `AndroidPlatformFeaturesAndDeviceGuardsHelper.evaluateKeepScreenAwakePolicy()` реализовано динамическое удержание флага `FLAG_KEEP_SCREEN_ON` во время непрерывного вывода логов в консоль терминала с автоматическим сбросом флага при падении заряда батареи ниже 20% для экономии энергии. В настройки добавлен переключатель `screenTimeoutKeepAwakeGuardEnabled` с модальным окном справки «Что это?».
+- **Энергоэффективные 1-битные глифы для Always-On Display (AOD Minimal Status Glyphs — #1003)**:
+  - В `AndroidPlatformFeaturesAndDeviceGuardsHelper.evaluateAodStatusDisplay()` внедрена генерация контрастных монохромных глифов статуса для экрана Ambient Display / AOD с защитой от выгорания OLED-панелей и расходом энергии менее 1% в час при настольном мониторинге ботов. В настройки добавлен переключатель `alwaysOnDisplayMinimalStatusGuardEnabled` с модальным окном справки «Что это?».
+- **Изоляция и корпоративный значок в рабочем профиле (Work Profile Enterprise Badge — #1025)**:
+  - В `AndroidPlatformFeaturesAndDeviceGuardsHelper.evaluateWorkProfileEnvironment()` реализовано определение сред Android Enterprise Managed Profile с отображением индикатора корпоративного портфеля и гарантированной изоляцией токенов и файлов бота в закрытом пользовательском пространстве (`/data/user/<id>/`). В настройки добавлен переключатель `workProfileCorporateBadgeGuardEnabled` с модальным окном справки «Что это?».
+- **Модульная Compose-карточка и справки «Что это?» (Rule 5 Compliance)**:
+  - Разработан компонент `AndroidPlatformFeaturesAndDeviceGuardsCard.kt` с 10 реактивными переключателями и модальными окнами помощи (Определение, При включении, При отключении) со 100% переводом на все 22 языка.
+
+---
+
 ## 📝 Что нового в версии 2.1.54 (SemVer Patch Release — Android System Interaction, Media & Accessibility Defenses: Wi-Fi Throttling, SSID Privacy, Audio Focus, High Contrast Theme, PiP Video, Low Battery Audio, Force Dark Shield, Cellular Quotas, S-Pen & Android 13 Per-App Language)
 
 - **Контроль троттлинга сканирования сетей Wi-Fi (Wi-Fi Scan Throttle Advisor — #1008)**:
