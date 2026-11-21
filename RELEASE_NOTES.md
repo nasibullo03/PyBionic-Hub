@@ -4,6 +4,33 @@
 
 ---
 
+## 📝 Что нового в версии 2.1.38 (SemVer Patch Release — Pip Advanced Hardening: Shared Lib Conflicts, Runtime Cache Invalidation, RECORD Auto-Repair, Path Sanitization, Network Retry, Safe Cancellation Rollback, PEP 668 Handling, Git Submodules, Disk Pre-Check & Native Dependency Audit)
+
+- **Детектор конфликтов shared-библиотек (Shared Library Conflicts Detection — #537)**:
+  - В `PipAdvancedHardeningHelper.detectSharedLibraryConflicts()` и `PyBionicViewModel` реализовано сканирование установленных нативных модулей на предмет дублирующихся или разнородных версий shared library (`.so`), предотвращающее коллизии символов и фатальные сбои `SIGSEGV` в общем адресном пространстве процесса. В настройки добавлен переключатель `sharedLibraryConflictGuardEnabled` с поясняющим диалогом «Что это?».
+- **Инвалидация кэша колес при обновлении рантайма (Wheel Cache Invalidation on Runtime Update — #540)**:
+  - В `PipAdvancedHardeningHelper.checkAndInvalidateWheelCache()` реализован контроль соответствия метки сборки рантайма `.runtime_tag`. При обновлении версии PyBionic или Python устаревшие бинарные wheels автоматически удаляются из локального кэша, гарантируя сборку под актуальный Bionic ABI. В настройки добавлен переключатель `pipCacheInvalidationOnRuntimeUpdateEnabled` с поясняющим диалогом «Что это?».
+- **Автовосстановление поврежденных файлов RECORD (Corrupted RECORD Files Auto-Repair — #550)**:
+  - В `PipAdvancedHardeningHelper.checkAndRepairDistInfoRecords()` реализована автоматическая реконструкция отсутствующих или поврежденных файлов `.dist-info/RECORD` при наличии валидного `METADATA`. Устраняет краши команд `pip list`, `pip inspect` и `pip uninstall`. В настройки добавлен переключатель `corruptedDistInfoRecordGuardEnabled` с поясняющим диалогом «Что это?».
+- **Экранирование путей с пробелами и спецсимволами (Project Path with Spaces Sanitization — #551)**:
+  - В `PipAdvancedHardeningHelper.sanitizePathForShell()`, `validateProjectPathSafe()` и `ProjectRepository` реализовано строгое экранирование и валидация путей проектов, содержащих пробелы, скобки и амперсанды, исключая ошибки парсинга командной оболочки. В настройки добавлен переключатель `pathWithSpacesSanitizationEnabled` с поясняющим диалогом «Что это?».
+- **Автоматические повторы сети и тайм-аут pip (Network Retry & Backoff Configuration — #552)**:
+  - В `PipAdvancedHardeningHelper.buildNetworkRetryArgs()` реализована автоматическая передача параметров `--retries 5` и `--timeout 30` при скачивании колес и тарболов, обеспечивая устойчивость к кратковременным обрывам мобильного интернета и переключениям базовых станций. В настройки добавлен переключатель `networkRetryBackoffEnabled` с поясняющим диалогом «Что это?».
+- **Безопасный откат при отмене установки (Safe Install Cancellation Transaction Rollback — #553)**:
+  - В `PipAdvancedHardeningHelper.snapshotSitePackages()` и `rollbackSitePackages()` реализована транзакционная безопасность: создание моментального снимка `site-packages` перед стартом установки и гарантированная зачистка незавершенных папок при прерывании или отмене процесса пользователем. В настройки добавлен переключатель `safeInstallCancellationGuardEnabled` с поясняющим диалогом «Что это?».
+- **Обработка управляемой среды (PEP 668 Managed Environment Handling — #554)**:
+  - В `PipAdvancedHardeningHelper.buildExternalManagedArgs()` реализовано корректное управление маркером `EXTERNALLY-MANAGED` с передачей флага `--break-system-packages` исключительно в изолированных виртуальных окружениях ботов. В настройки добавлен переключатель `externalManagedEnvOverrideEnabled` с поясняющим диалогом «Что это?».
+- **Поддержка рекурсивных Git-подмодулей (Git Submodules Recursive Support — #559)**:
+  - В `PipAdvancedHardeningHelper.buildGitSubmoduleArgs()` и `getGitSubmoduleEnvironment()` реализована инъекция настроек `GIT_CONFIG_PARAMETERS="'submodule.recurse=true'"` и `--config-settings=--build-option=--recursive` для сборки пакетов с вложенными репозиториями C/C++. В настройки добавлен переключатель `gitSubmodulesSupportEnabled` с поясняющим диалогом «Что это?».
+- **Проверка свободного места перед установкой (Disk Space Pre-check — #563)**:
+  - В `PipAdvancedHardeningHelper.checkDiskSpaceAvailable()` внедрен обязательный барьер свободного места (минимум 300 МБ) на внутреннем накопителе перед запуском скачивания и распаковки колес, защищающий устройство от блокировки I/O. В настройки добавлен переключатель `pipDiskSpacePreCheckEnabled` с поясняющим диалогом «Что это?».
+- **Аудит нативных зависимостей (Shared Library Dependency Checker — #566)**:
+  - В `PipAdvancedHardeningHelper.scanMissingNativeDependencies()` и `extractDtNeededEntries()` реализован разбор ELF заголовков `DT_NEEDED` скомпилированных `.so` библиотек и проверка их наличия в системе с выводом превентивных предупреждений до запуска скрипта. В настройки добавлен переключатель `sharedLibraryDependencyCheckerEnabled` с поясняющим диалогом «Что это?».
+- **Модульная Compose-карточка и справки «Что это?» (Rule 5 Compliance)**:
+  - Разработан компонент `PipAdvancedHardeningCard.kt` с 10 реактивными переключателями и модальными окнами помощи (Определение, При включении, При отключении) со 100% переводом на все 22 языка.
+
+---
+
 ## 📝 Что нового в версии 2.1.37 (SemVer Patch Release — Pip & Environment Hardening: Offline Wheel Cache, Git Dependencies, Wheel Tag Spoofing Guard, Distutils Shim, Pip Temp Redirect, Wheel ABI Compatibility, Setuptools Isolation, Conflict Checker, Hash Verification & Isolated Site-Packages)
 
 - **Автономная установка из локального кэша wheel (Offline Wheel Cache Install — #515)**:
