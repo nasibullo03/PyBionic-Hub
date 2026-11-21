@@ -4,6 +4,33 @@
 
 ---
 
+## 📝 Что нового в версии 2.1.37 (SemVer Patch Release — Pip & Environment Hardening: Offline Wheel Cache, Git Dependencies, Wheel Tag Spoofing Guard, Distutils Shim, Pip Temp Redirect, Wheel ABI Compatibility, Setuptools Isolation, Conflict Checker, Hash Verification & Isolated Site-Packages)
+
+- **Автономная установка из локального кэша wheel (Offline Wheel Cache Install — #515)**:
+  - В `PipAndEnvironmentHelper.buildOfflineWheelFlags()` и `PyBionicViewModel` реализована поддержка установки pip в автономном режиме без подключения к интернету (`--no-index --find-links=$CACHE_DIR`). Если режим включён и в кэше колес есть готовые архивы, pip собирает пакеты локально без сетевых запросов. В настройки добавлен переключатель `offlineWheelCacheInstallEnabled` с поясняющим диалогом «Что это?».
+- **Инъекция путей для Git-зависимостей pip (Git Dependencies Support — #516)**:
+  - В `PipAndEnvironmentHelper.injectGitEnvironment()` реализована автоматическая проверка и инъекция директорий `git` и `curl` в переменную среды `PATH` при установке пакетов через `git+https://...` или `git+ssh://...`, предотвращая ошибку «git executable not found». В настройки добавлен переключатель `gitDependenciesSupportEnabled` с поясняющим диалогом «Что это?».
+- **Защита от подмены тегов wheel (Wheel Tag Spoofing Guard — #517)**:
+  - В `PipAndEnvironmentHelper.isWheelCompatibleWithBionic()` реализована инспекция загружаемых wheel-пакетов на наличие несовместимых glibc-бинарников (`manylinux`, `musllinux`), блокирующая установку чужеродных нативных библиотек на Android Bionic libc и защищающая от падений процесса `SIGSEGV`. В настройки добавлен переключатель `wheelTagSpoofingGuardEnabled` с поясняющим диалогом «Что это?».
+- **Прослойка совместимости с distutils для Python 3.12+ (Distutils Shim Compatibility — #522)**:
+  - В `PipAndEnvironmentHelper.getDistutilsShimEnvironment()` добавлена переменная окружения `SETUPTOOLS_USE_DISTUTILS=stdlib` при вызове pip и setup.py, обеспечивающая сборку устаревших модулей, зависящих от `distutils`, удалённого в стандартной библиотеке Python 3.12+. В настройки добавлен переключатель `distutilsShimCompatibilityEnabled` с поясняющим диалогом «Что это?».
+- **Перенаправление временного хранилища pip (Pip Temp Space Redirect — #523)**:
+  - В `PipAndEnvironmentHelper.getPipTempDirEnvironment()` реализовано перенаправление переменной `TMPDIR` во внутренний кэш приложения (`context.cacheDir/pip_tmp`), предотвращающее переполнение системного корневого раздела `/data` при распаковке тяжелых архивов. В настройки добавлен переключатель `pipTempSpaceRedirectEnabled` с поясняющим диалогом «Что это?».
+- **Проверка ABI совместимости с Android NDK API (Wheel ABI Compatibility Guard — #524)**:
+  - В `PipAndEnvironmentHelper.isWheelApiLevelCompatible()` внедрен контроль совместимости: wheels, скомпилированные под API level выше текущей версии Android на устройстве (например, `android_34` на устройстве с API 30), отсекаются с информативным предупреждением вместо сбоя при линковке symbol lookup. В настройки добавлен переключатель `wheelAbiCompatibilityGuardEnabled` с поясняющим диалогом «Что это?».
+- **Оптимизация изолированной сборки setuptools (Setuptools Build Isolation Optimization — #528)**:
+  - В `PipAndEnvironmentHelper.buildNoBuildIsolationFlags()` реализована оптимизация `--no-build-isolation`: если в системном окружении Bionic уже предустановлены `setuptools` и `wheel`, pip не скачивает и не собирает временные build-env виртуальные среды повторно, ускоряя сборку пакетов в 3-5 раз. В настройки добавлен переключатель `setuptoolsBuildIsolationOptimizationEnabled` с поясняющим диалогом «Что это?».
+- **Предварительный анализатор конфликтов зависимостей (Sub-dependencies Conflict Checker — #530)**:
+  - В `PipAndEnvironmentHelper.checkDependencyConflicts()` реализован статический валидатор версий в requirements.txt: обнаружение взаимно исключающих требований (например, `urllib3<2.0.0` и `requests>=2.31.0 requiring urllib3>=2.0.0`) до запуска pip с отображением предупреждения. В настройки добавлен переключатель `subDependenciesConflictCheckerEnabled` с поясняющим диалогом «Что это?».
+- **Строгая проверка хэш-сумм пакетов (Hash Verification Mode — #533)**:
+  - В `PipAndEnvironmentHelper.buildHashVerificationFlags()` реализована автоматическая инъекция флага `--require-hashes`, если в `requirements.txt` обнаружены директивы `--hash=sha256:...`, гарантируя защиту от MITM-подмены пакетов и несанкционированных изменений в репозиториях. В настройки добавлен переключатель `hashVerificationGuardEnabled` с поясняющим диалогом «Что это?».
+- **Изоляция глобальных пакетов venv (Isolated Venv Site-Packages Guard — #534)**:
+  - В `PipAndEnvironmentHelper.sanitizePyvenvCfg()` реализована проверка и принудительная фиксация директивы `include-system-site-packages = false` в `pyvenv.cfg` виртуальных окружений ботов, исключающая загрязнение проекта системными библиотеками. В настройки добавлен переключатель `isolatedVenvSitePackagesGuardEnabled` с поясняющим диалогом «Что это?».
+- **Универсальные переключатели и модальные справки «Что это?» (Rule 5 Compliance)**:
+  - Создан Compose-компонент `PipAndEnvironmentHardeningCard.kt`, все 10 переключателей снабжены кнопками вызова диалогов «Что это?» с подробным описанием: определение механизма, эффекты при включении и риски при отключении. Выполнена 100% синхронизация переводов на все 22 поддерживаемых языка.
+
+---
+
 ## 📝 Что нового в версии 2.1.36 (SemVer Patch Release — Project Files, Venv Symlinks & Pip Hardening: Conflict Detection, Terminal-Editor Split, Clean Zip Exclusions, Filename Validation, Scroll Lock, Trash Bin Undo, Symlinks Venv, Pip Rollback, Modern Lockfiles & Pip Resolver Guard)
 
 - **Контроль внешних изменений файла на диске (File Conflict on Disk Detection — #455)**:

@@ -38,12 +38,19 @@ To maximize agent speed, autonomy, and reduce repetitive manual cycles:
   - Develop custom AST validators, template checkers, or quick runners to test components without waiting for heavyweight builds when not needed.
 - **Host Safety Constraint:** All automation scripts must remain strictly isolated to the project directory, execute safely, and never harm the user's host OS or external systems.
 
-## 5. Configurable Guards & User Control Policy
-- Never introduce hardcoded limits, guardrails, circuit breakers, or throttling policies without providing user-facing configuration toggles.
-- Every architectural safety mechanism (e.g., Crash Loop Circuit Breaker, Fork Bomb / process limits, OOM thresholds, log sanitization, thermal cutoffs, auto-restarts) must have:
-  1. A corresponding reactive preference in `AppPreferences` / `ProjectConfig`.
-  2. Sensible safe default values out-of-the-box (e.g. enabled by default).
-  3. A toggle / parameter in the UI settings allowing developers and advanced power users to adjust thresholds or disable the guard completely when needed for high-concurrency workloads.
+## 5. Configurable Guards, Universal Toggles & User Control Policy
+- **Universal Toggleability & User Control:**
+  - Never introduce hardcoded limits, guardrails, circuit breakers, new behavior changes, or optimizations without providing user-facing configuration toggles (Switch / parameter) in Settings (`AppPreferences` + `PyBionicViewModel`).
+  - Every architectural safety mechanism, optimization, and new feature that could affect application behavior, performance, or workflow must have a dedicated toggle so users can easily enable or disable it if not needed for their workloads.
+- **Mandatory Safe Defaults:**
+  - Provide sensible, safe default values out-of-the-box (e.g. enabled by default for protection guards, disabled if experimental).
+- **Mandatory 22-Language Localization:**
+  - Every setting title, subtitle description, and explanation text must be fully translated into all 22 supported languages via `tools/sync_strings.py`.
+- **"What is this?" ("Что это?") Explanation Dialog:**
+  - Alongside or under each toggle, provide a "What is this?" / Info button (`FieldHelpLink` / `IconButton`) opening a clear explanation dialog detailing:
+    1. **What it is:** Clear definition of the feature and the problem it solves.
+    2. **When Enabled:** What benefits and protections the active mode provides.
+    3. **When Disabled:** Exact implications, potential side-effects, and risks of turning it off (e.g., potential resource leaks, conflicts, or data overwrites).
 
 ## 6. Android Device & Build Guidelines
 - DO NOT execute `assembleRelease` without explicit user permission.
