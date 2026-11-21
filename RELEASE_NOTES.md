@@ -4,6 +4,33 @@
 
 ---
 
+## 📝 Что нового в версии 2.1.40 (SemVer Patch Release — Bot Lifecycle, Templates & Hardening: UV Rust Engine, BotHub Offline Deployment, Strict Dependency Pinning, Webhook Tunnel Helper, DB Migration Hooks, Token Health Pre-Check, Default Secret Traps, yt-dlp Auto-Updater, Flood Guard & Discord Intents)
+
+- **Интеграция скоростного пакетного менеджера UV на Rust (UV Rust Package Manager Backend — #526)**:
+  - В `BotLifecycleAndTemplatesHelper.resolvePipOrUvCommand()` и `PyBionicViewModel.pipInstall()` реализована поддержка сверхбыстрого установщика `uv pip install` при наличии бинарника `uv` в окружении, ускоряющая установку зависимостей в 10–100 раз с прозрачным фолбэком на классический `pip`. В настройки добавлен переключатель `uvPackageManagerBackendEnabled` с модальным окном справки «Что это?».
+- **Офлайн-развертывание шаблонов BotHub (BotHub Offline Availability Fallback — #590)**:
+  - В `BotLifecycleAndTemplatesHelper.resolveBotHubAssetSource()` внедрена поддержка 100% автономной установки шаблонов из локальных ассетов APK (`assets://bothub/`) без необходимости подключения к интернету. В настройки добавлен переключатель `bothubOfflineInstallFallbackEnabled` с модальным окном справки «Что это?».
+- **Строгая фиксация версий зависимостей (Strict Template Dependency Pinning — #591)**:
+  - В `BotLifecycleAndTemplatesHelper.enforceStrictDependencyPinning()` и `PyBionicViewModel.pipInstallRequirements()` реализована автоматическая нормализация открытых диапазонов `>=` (например `aiogram>=3.13.0`) в безопасные диапазоны с ограничением мажорной версии (`<4.0.0`), предотвращающая поломки ботов при выходе ломающих обновлений библиотек. В настройки добавлен переключатель `templateDependencyPinningStrictEnabled` с модальным окном справки «Что это?».
+- **Автоконфигурация вебхук-туннелей (Webhook Tunnel Auto-Configuration Helper — #592)**:
+  - В `BotLifecycleAndTemplatesHelper.detectWebhookTemplateAndGenerateConfig()` реализовано автоматическое распознавание ботов на вебхуках (FastAPI, aiohttp, Flask), генерация параметров туннеля и предварительная настройка переменных окружения без ручного проброса портов. В настройки добавлен переключатель `webhookTunnelAutoConfigEnabled` с модальным окном справки «Что это?».
+- **Хуки автоматических миграций баз данных (Pre-Run DB Migration Hooks — #594)**:
+  - В `BotLifecycleAndTemplatesHelper.detectAndGenerateDbMigrationCommands()` реализован детектор миграций (Alembic или скрипты `migrations/*.sql`) и генерация предстартовых команд миграции структуры SQLite, исключающая ошибки `no such column`. В настройки добавлен переключатель `databaseMigrationHooksEnabled` с модальным окном справки «Что это?».
+- **Проверка валидности токенов перед запуском (Bot Startup Token Health Check — #595)**:
+  - В `BotLifecycleAndTemplatesHelper.validateBotTokenPreflight()` и `PyBionicViewModel.startProject()` реализована структурная валидация токенов Telegram и Discord и диагностический эндпоинт проверки доступности API до старта процесса воркера. В настройки добавлен переключатель `botStartupTokenHealthCheckEnabled` с модальным окном справки «Что это?».
+- **Защита от шаблонных ID администраторов и секретов (Default Admin ID & Secret Trap Guard — #597)**:
+  - В `BotLifecycleAndTemplatesHelper.checkDefaultSecretsAndAdminTrap()` и `PyBionicViewModel.startProject()` внедрен аудит `.env` на наличие опасных шаблонных заглушек (`ADMIN_ID=123456789`, `your_token_here`, `changeme`), блокирующий ошибочный запуск с дефолтными правами. В настройки добавлен переключатель `defaultAdminIdTrapGuardEnabled` с модальным окном справки «Что это?».
+- **Автоматический контроль свежести yt-dlp (Media Downloader yt-dlp Auto-Updater — #600)**:
+  - В `BotLifecycleAndTemplatesHelper.checkYtdlpFreshness()` реализован мониторинг возраста пакета `yt-dlp` в ботах загрузки медиа: при устаревании свыше 7 дней выдается рекомендация обновления во избежание сбоев парсинга видеопотоков. В настройки добавлен переключатель `mediaDownloaderYtdlpAutoUpdateEnabled` с модальным окном справки «Что это?».
+- **Защита от спама и флуд-контроль (Telegram Flood Control Guard — #601)**:
+  - В `BotLifecycleAndTemplatesHelper.auditTelegramFloodProtection()` реализован аудит кода на наличие механизмов троттлинга запросов и генерация надежной middleware на базе Token Bucket, защищающей ботов от банов 429 Too Many Requests (FloodWait). В настройки добавлен переключатель `telegramFloodControlGuardEnabled` с модальным окном справки «Что это?».
+- **Детектор привилегированных интентов Discord (Discord Privileged Intents Trap Detector — #602)**:
+  - В `BotLifecycleAndTemplatesHelper.detectDiscordIntentsTrap()` реализован статический анализ кода Discord-ботов на использование `Message Content` и `Server Members` интентов с выводом предупреждений и прямых ссылок на Discord Developer Portal, исключающий краши `PrivilegedIntentsRequired`. В настройки добавлен переключатель `discordIntentsTrapDetectorEnabled` с модальным окном справки «Что это?».
+- **Модульная Compose-карточка и справки «Что это?» (Rule 5 Compliance)**:
+  - Разработан компонент `BotLifecycleAndTemplatesHardeningCard.kt` с 10 реактивными переключателями и модальными окнами помощи (Определение, При включении, При отключении) со 100% переводом на все 22 языка.
+
+---
+
 ## 📝 Что нового в версии 2.1.39 (SemVer Patch Release — BotHub & Pip Packaging Hardening: 32-bit Architecture Trap, Non-ASCII Wheel Names, Extended Socket Timeout, Stale Lock Cleanup, Cache Permissions, RPATH Audit, Pip Self-Update Guard, CRC-32 Download Integrity, Template Manifest & Pre-Flight Validation)
 
 - **Защита от 32-битных ловушек архитектуры (32-bit Architecture Trap Guard — #568)**:
