@@ -4,6 +4,33 @@
 
 ---
 
+## 📝 Что нового в версии 2.1.45 (SemVer Patch Release — Telemetry, Logging & Diagnostics Safety: Battery Thermal Alert, Thread Leak Monitor, Log Buffer Hard Limit, Signal Logger, Busy-Loop Detector, Scroll Throttler, Proactive Disk Alerts, Mega-Line Truncation, Nested JSON Secret Masking & File Descriptor Alarm)
+
+- **Предупреждение о перегреве аккумулятора (Battery Thermal Overheating Alert — #756)**:
+  - В `TelemetryLoggingDiagnosticsHelper.evaluateBatteryTemperature()` реализован непрерывный мониторинг температуры батареи с выдачей высокоприоритетного предупреждения при достижении опасного порога 43.0°C, предотвращающий термическую деградацию и вздутие аккумулятора при быстрой зарядке под нагрузкой. В настройки добавлен переключатель `batteryTemperatureAlertThresholdGuardEnabled` с модальным окном справки «Что это?».
+- **Мониторинг утечек системных потоков (Thread Count Leak Monitor — #759)**:
+  - В `TelemetryLoggingDiagnosticsHelper.evaluateThreadCount()` внедрен аудит количества активных потоков ОС (`/proc/[pid]/status`) с порогом тревоги при превышении 100 потоков, защищающий от исчерпания системных ресурсов и фатального сбоя `RuntimeError: can't start new thread`. В настройки добавлен переключатель `threadCountMonitorLeakGuardEnabled` с модальным окном справки «Что это?».
+- **Жесткий лимит памяти буфера логов (Log Buffer Memory Hard Limit Guard — #762)**:
+  - В `TelemetryLoggingDiagnosticsHelper.evaluateLogBufferCapacity()` реализовано жесткое ограничение размера очереди логов в RAM до 10 МБ с автоматическим пакетным вытеснением устаревших строк при лавинообразном выводе (до 10 000 строк/с), гарантирующее защиту службы от `OutOfMemoryError`. В настройки добавлен переключатель `logBufferMemoryHardLimitGuardEnabled` с модальным окном справки «Что это?».
+- **Логирование сигналов завершения ОС (System Signal & Termination Logger — #767)**:
+  - В `TelemetryLoggingDiagnosticsHelper.decodeProcessTerminationSignal()` внедрен декодер системных сигналов ядра (SIGTERM, SIGKILL, SIGSEGV, SIGINT, SIGHUP) с понятным объяснением причины остановки (пользователь, Low Memory Killer или падение в нативном коде), исключающий внезапный обрыв логов без следов. В настройки добавлен переключатель `systemSignalLoggerEnabled` с модальным окном справки «Что это?».
+- **Детектор холостых циклов CPU (Busy-Wait Loop & CPU Spike Detector — #768)**:
+  - В `TelemetryLoggingDiagnosticsHelper.detectBusyWaitLoop()` реализован анализ зависших пустых циклов (`while True: pass`), потребляющих более 95% ядра CPU при нулевой сетевой и дисковой активности, предотвращающий бессмысленный перегрев процессора и разряд батареи. В настройки добавлен переключатель `contextSwitchSpikeDetectorEnabled` с модальным окном справки «Что это?».
+- **Демпфирование автоскролла логов (Log Auto-Scroll Batch Throttler — #773)**:
+  - В `TelemetryLoggingDiagnosticsHelper.evaluateScrollDispatchThrottle()` реализована пакетная диспетчеризация вывода логов с окном квантования 100 мс (или при накоплении 50 строк), исключающая дергание скролла (Jank) и непрерывные рекомпозиции LazyColumn в Compose. В настройки добавлен переключатель `logAutoScrollThrottlerEnabled` с модальным окном справки «Что это?».
+- **Проактивное оповещение о нехватке памяти (Proactive Low Storage Alert — #775)**:
+  - В `TelemetryLoggingDiagnosticsHelper.checkProactiveDiskSpace()` внедрен ранний порог предупреждения о снижении свободного места на накопителе ниже 500 МБ (с критическим уровнем <100 МБ), дающий запас времени на очистку логов до того, как Android начнет экстренно сбрасывать БД и убивать процессы. В настройки добавлен переключатель `diskSpaceLowProactiveAlertEnabled` с модальным окном справки «Что это?».
+- **Усечение сверхдлинных строк логов (Mega-String Sanitizer Truncation — #779)**:
+  - В `TelemetryLoggingDiagnosticsHelper.truncateMegaLineForSanitization()` реализовано безопасное усечение строк логов длиннее 4096 символов (например, дампов Base64 картинок) перед передачей в регулярные выражения санитизации, устраняющее падения службы по OOM и зависания ReDoS. В настройки добавлен переключатель `megaStringSanitizerTruncatorEnabled` с модальным окном справки «Что это?».
+- **Маскирование токенов во вложенных JSON (Nested JSON Token & Secret Masking — #789)**:
+  - В `TelemetryLoggingDiagnosticsHelper.maskNestedJsonSecrets()` внедрен рекурсивный поиск и маскирование чувствительных ключей (`token`, `bot_token`, `password`, `secret`, `jwt`, `api_key`) внутри вложенных JSON-объектов в логах, предотвращающий утечку учетных данных в открытом виде. В настройки добавлен переключатель `nestedJsonTokenMaskingGuardEnabled` с модальным окном справки «Что это?».
+- **Контроль утечек файловых дескрипторов (File Descriptor Leak Alarm — #796)**:
+  - В `TelemetryLoggingDiagnosticsHelper.evaluateFileDescriptorUsage()` реализован мониторинг количества открытых дескрипторов процесса (`/proc/[pid]/fd`) с предупреждением при достижении 80% от системного лимита (1024), заблаговременно сигнализирующий об утечках сокетов и файлов до падения с ошибкой `Too many open files`. В настройки добавлен переключатель `fileDescriptorLeakAlarmEnabled` с модальным окном справки «Что это?».
+- **Модульная Compose-карточка и справки «Что это?» (Rule 5 Compliance)**:
+  - Разработан компонент `TelemetryLoggingDiagnosticsCard.kt` с 10 реактивными переключателями и модальными окнами помощи (Определение, При включении, При отключении) со 100% переводом на все 22 языка.
+
+---
+
 ## 📝 Что нового в версии 2.1.44 (SemVer Patch Release — Database Safety, SSH Tunnels & Telemetry Hardening: SQLite Read-Only Mode, Remote DB SSH Tunneling, Table Rename Trigger Guard, WAL Monitor & Auto-Checkpoint, Reserved Word Identifier Escaping, SQLite VACUUM Space Pre-Check, Atomic Commit Batching, Sentry DSN Validation, Adaptive Telemetry Polling & Memory Leak Linear Trend Detector)
 
 - **Безопасный режим просмотра SQLite (SQLite Read-Only Inspection Mode — #717)**:
