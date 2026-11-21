@@ -4,6 +4,33 @@
 
 ---
 
+## 📝 Что нового в версии 2.1.50 (SemVer Patch Release — Android OS Platform Hardening, Hardware Constraints & Core Services: Qualcomm Socket Keep-Alive, Headless Camera2 Capture, Background Mic Policy, SD Eject Safety, App Standby Buckets, Direct Intent Trampolines, System Clock Drift Skew, SIM Hot-Swap Network Recovery, Split APK Native Libs & Android 14 Exact Alarms)
+
+- **Оптимизация сокетов для чипсетов Qualcomm (Qualcomm Keep-Alive Optimizer — #973)**:
+  - В `AndroidPlatformAndHardwareHardeningHelper.evaluateQualcommKeepAlivePolicy()` реализован агрессивный 45-секундный интервал ping для TCP-сокетов при обнаружении платформы Qualcomm/Snapdragon, предотвращающий засыпание спящих сокетов Telegram и WebSocket из-за драйвера Qualcomm Core Control. В настройки добавлен переключатель `qualcommCoreControlKeepAliveGuardEnabled` с модальным окном справки «Что это?».
+- **Захват кадров Camera2 без экрана (Headless Camera2 Support — #974)**:
+  - В `AndroidPlatformAndHardwareHardeningHelper.evaluateHeadlessCameraCapture()` внедрена конфигурация конвейера ImageReader для прямого захвата кадров камеры YUV_420_888 в фоновых ботах компьютерного зрения и видеонаблюдения без необходимости привязки SurfaceView/TextureView. В настройки добавлен переключатель `headlessCamera2FrameCaptureSupportEnabled` с модальным окном справки «Что это?».
+- **Контроль разрешений микрофона в фоновой службе (Background Mic Service Policy — #975)**:
+  - В `AndroidPlatformAndHardwareHardeningHelper.evaluateBackgroundMicrophonePolicy()` реализован аудит ограничений Android 11+ (API 30+) с проверкой наличия `foregroundServiceType="microphone"` в манифесте, предотвращающий принудительное глушение аудиосигнала системой. В настройки добавлен переключатель `backgroundMicrophonePermissionGuardEnabled` с модальным окном справки «Что это?».
+- **Защита баз данных при внезапном извлечении SD (SD Eject Database Protection — #977)**:
+  - В `AndroidPlatformAndHardwareHardeningHelper.evaluateStorageUnmountEvent()` внедрен перехват системного события `ACTION_MEDIA_EJECT` с немедленным закрытием соединений SQLite и эвакуацией критических операций во внутреннюю флеш-память устройства во избежание порчи WAL-журналов. В настройки добавлен переключатель `storageVolumeUnmountSafetyGuardEnabled` с модальным окном справки «Что это?».
+- **Мониторинг квот режима ожидания App Standby (App Standby Bucket Watcher — #978)**:
+  - В `AndroidPlatformAndHardwareHardeningHelper.evaluateStandbyBucket()` реализован мониторинг корзин режима ожидания Android (`UsageStatsManager`) с адаптивным снижением частоты сетевых задач и предупреждением пользователя о попадании приложения в корзину `RARE` или `RESTRICTED`. В настройки добавлен переключатель `appStandbyBucketMitigationGuardEnabled` с модальным окном справки «Что это?».
+- **Устранение трамплинов уведомлений для Android 12+ (Direct Notification Intent Enforcer — #979)**:
+  - В `AndroidPlatformAndHardwareHardeningHelper.resolveNotificationPendingIntent()` внедрено прямое использование `PendingIntent.getActivity()`, исключающее запуск активности через промежуточные ресиверы или сервисы-трамплины и предотвращающее сбои и системные блокировки на Android 12+. В настройки добавлен переключатель `notificationTrampolineBypassGuardEnabled` с модальным окном справки «Что это?».
+- **Компенсация рассинхронизации системных часов (Clock Drift & Skew Compensator — #980)**:
+  - В `AndroidPlatformAndHardwareHardeningHelper.evaluateClockSkew()` реализовано выявление дрифта локального времени смартфона относительно заголовка `Date` сервера с динамической компенсацией дельты во временных метках авторизации Telegram и OAuth/JWT. В настройки добавлен переключатель `systemClockDriftCompensatorGuardEnabled` с модальным окном справки «Что это?».
+- **Восстановление сети при горячей смене SIM-карты (SIM Hot-Swap Recovery Listener — #981)**:
+  - В `AndroidPlatformAndHardwareHardeningHelper.evaluateSimCardTransition()` внедрено отслеживание смены оператора сотовой связи с автоматическим сбросом устаревших маршрутов и повторным разрешением DNS-имен, обеспечивающее непрерывную работу ботов при замене SIM или переключении Dual-SIM. В настройки добавлен переключатель `simCardHotSwapNetworkRecoveryGuardEnabled` с модальным окном справки «Что это?».
+- **Поиск нативных C-библиотек в сплит-пакетах (Split APK Native Lib Loader — #983)**:
+  - В `AndroidPlatformAndHardwareHardeningHelper.resolveSplitApkNativeLib()` реализован алгоритм поиска нативных `.so` файлов в каталогах динамических фич Split APK / Android App Bundle, предотвращающий критические сбои `UnsatisfiedLinkError` при загрузке скомпилированных C-модулей Python (numpy, cryptography). В настройки добавлен переключатель `splitApkNativeLibraryLoaderGuardEnabled` с модальным окном справки «Что это?».
+- **Фоллбэк точных будильников на Android 14+ (Android 14 Exact Alarm Fallback — #984)**:
+  - В `AndroidPlatformAndHardwareHardeningHelper.resolveAlarmSchedulingStrategy()` внедрен автоматический переход на таймеры с плавающим 15-секундным окном при отсутствии разрешения `SCHEDULE_EXACT_ALARM` на Android 14+ (API 34+), предотвращающий фатальные падения с `SecurityException`. В настройки добавлен переключатель `android14ExactAlarmFallbackGuardEnabled` с модальным окном справки «Что это?».
+- **Модульная Compose-карточка и справки «Что это?» (Rule 5 Compliance)**:
+  - Разработан компонент `AndroidPlatformAndHardwareHardeningCard.kt` с 10 реактивными переключателями и модальными окнами помощи (Определение, При включении, При отключении) со 100% переводом на все 22 языка.
+
+---
+
 ## 📝 Что нового в версии 2.1.49 (SemVer Patch Release — Android OS Hardening, Hardware Constraints & Git Safety: Git Reset Hard Confirmation, Git LFS Quota Fallback, Point-in-Time Recovery, Shallow Clone Unshallow, LMK Memory Trimming, App Ops Auto-Revoke Protection, CPU Thermal Duty-Cycling, Continuous Battery Health, Headless MediaCodec & Airplane Mode Recovery)
 
 - **Подтверждение разрушительного git reset --hard (Git Reset Hard Confirmation Guard — #940)**:
