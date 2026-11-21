@@ -4,6 +4,33 @@
 
 ---
 
+## 📝 Что нового в версии 2.1.36 (SemVer Patch Release — Project Files, Venv Symlinks & Pip Hardening: Conflict Detection, Terminal-Editor Split, Clean Zip Exclusions, Filename Validation, Scroll Lock, Trash Bin Undo, Symlinks Venv, Pip Rollback, Modern Lockfiles & Pip Resolver Guard)
+
+- **Контроль внешних изменений файла на диске (File Conflict on Disk Detection — #455)**:
+  - В `ProjectFilesHelper.isFileModifiedExternally()` и редакторе `ProjectDetailScreen.kt` реализован трекинг времени модификации (`mtime`). Если файл был изменён внешним процессом или синхронизатором после открытия, редактор предупреждает пользователя диалогом подтверждения перезаписи, предотвращая случайную потерю правок. В настройки добавлен переключатель `fileConflictOnDiskGuardEnabled`.
+- **Разделенный экран редактора и терминала (Terminal-Editor Split View — #456)**:
+  - В редактор кода добавлена кнопка «Split», разделяющая экран пополам: сверху отображается редактируемый исходный код, а снизу — живая консоль выполнения с логами в реальном времени, позволяя отлаживать ботов без постоянного переключения между вкладками. В настройки добавлен переключатель `terminalEditorSplitViewEnabled`.
+- **Чистый экспорт zip-архивов проекта (Clean Project ZIP Export Exclusions — #466)**:
+  - В `ProjectFilesHelper.isExcludedFromCleanZip()` и `ProjectRepository.exportProjectZipToStream()` внедрена фильтрация: из экспортируемых архивов автоматически исключаются директории виртуальных окружений (`venv`, `.venv`), репозитории (`.git`), локальная корзина (`.trash`), скомпилированные байткоды (`__pycache__`, `.pyc`, `.pyo`) и кэши тестеров (`.pytest_cache`, `.ruff_cache`, `.mypy_cache`). В настройки добавлен переключатель `cleanProjectZipExportEnabled`.
+- **Валидация имен файлов и системных устройств (File Creation Validation Guard — #472)**:
+  - В `ProjectFilesHelper.isValidFileName()`, `getFileNameValidationError()` и диалоге создания файлов `ProjectDetailScreen.kt` реализована проверка запрещенных символов файловой системы (`/`, `\`, `:`, `*`, `?`, `"`, `<`, `>`, `|`) и системных зарезервированных имен устройств Windows/DOS (`CON`, `PRN`, `AUX`, `NUL`, `COM1-9`, `LPT1-9`). В настройки добавлен переключатель `filenameValidationGuardEnabled`.
+- **Интеллектуальная фиксация автопрокрутки терминала (Terminal Auto-Scroll Lock — #495)**:
+  - В консоли `ConsoleTab` реализована пауза автопрокрутки при скролле вверх: пока пользователь изучает историю логов или стек-трейсы, автопрокрутка блокируется, предотвращая рывки экрана. При возврате в самый низ или нажатии плавающей кнопки автопрокрутка мгновенно возобновляется. В настройки добавлен переключатель `terminalAutoScrollLockEnabled`.
+- **Корзина удаленных файлов с восстановлением (File Deletion Trash Bin — #503)**:
+  - В `ProjectFilesHelper.moveToTrash()`, `restoreFromTrash()`, `listTrashFiles()`, `emptyTrash()` и `ProjectRepository.deleteProjectFile()` реализовано мягкое удаление: удаленные файлы перемещаются в изолированную скрытую директорию проекта `.trash/` с временными метками для быстрого восстановления вместо безвозвратного удаления. В настройки добавлен переключатель `fileTrashBinEnabled`.
+- **Оптимизация виртуальных окружений через symlink (Virtualenv Symlinks Optimization — #507)**:
+  - В `ProjectFilesHelper.buildVenvCreationArgs()` и `ProjectRepository.ensureProjectVenv()` при создании виртуальных окружений внедрен флаг `--symlinks`, экономящий около 60 МБ дискового пространства на каждого бота за счет создания ссылок на системные библиотеки Python 3.14 Bionic libc. В настройки добавлен переключатель `venvSymlinksOptimizationEnabled`.
+- **Откат неудачной установки pip-пакетов (Pip Installation Rollback on Failure — #508)**:
+  - В `ProjectFilesHelper.snapshotInstalledPackages()`, `rollbackInstalledPackages()` и `PyBionicViewModel.pipInstall()` реализовано создание контрольного снимка каталога `site-packages` перед запуском pip. В случае ошибки установки или падения сети частично распакованные мусорные каталоги автоматически удаляются, сохраняя чистоту окружения. В настройки добавлен переключатель `pipInstallRollbackEnabled`.
+- **Парсер современных lock-файлов (Modern Lockfiles Parser — #510)**:
+  - В `ProjectFilesHelper.parseLockfile()` и `PyBionicViewModel.pipInstallRequirements()` добавлена прямая поддержка форматов `poetry.lock`, `uv.lock`, `Pipfile.lock` и секций `[project.dependencies]` / `[tool.poetry.dependencies]` в `pyproject.toml`, позволяя разворачивать проекты из современных пакетных менеджеров без ручной конвертации в requirements.txt. В настройки добавлен переключатель `modernLockfileParserEnabled`.
+- **Защита от зацикливания резолвера зависимостей pip (Pip Backtracking Loop Guard — #513)**:
+  - В `ProjectFilesHelper.isPipBacktrackingDetected()`, `applyPipConflictResolutionFlags()` и `PyBionicViewModel` реализовано обнаружение бесконечных циклов backtracking в resolver pip с автоматической инъекцией таймаута `--timeout 30` и флага отката к стабильному резолверу `--use-deprecated=legacy-resolver`. В настройки добавлен переключатель `pipBacktrackingLoopGuardEnabled`.
+- **Модульная карточка настроек Compose (ProjectFilesAndVenvHardeningCard)**:
+  - Создан специализированный UI-компонент `ProjectFilesAndVenvHardeningCard.kt` со всеми 10 переключателями файлов, venv и pip, реактивными StateFlow и полной локализацией на 22 языка.
+
+---
+
 ## 📝 Что нового в версии 2.1.35 (SemVer Patch Release — Code Editor & IDE Hardening, Zero-Byte Read EOF, LSP Advisor, Git Diff, Binary Guard, Persistent Undo, IME Insets, Tab-to-Spaces, Large File Streaming & Windows-1251 Encoding)
 
 - **Защита от нулевого чтения сокета (Non-blocking Zero-Byte Read EOF Guard — #418)**:
