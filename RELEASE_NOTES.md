@@ -4,6 +4,33 @@
 
 ---
 
+## 📝 Что нового в версии 2.1.42 (SemVer Patch Release — Advanced Bot Lifecycle, Process Supervisor & SQLite Browser: Whisper Lag Optimizer, Stego Capacity Pre-Check, Template Rollback Snapshots, Granular Restart Policy, Multi-Process Procfile Supervisor, Pre-Upgrade DB Backup Hook, Download Stalling Resilience, Port Conflict Detector, Template File Diff Inspector & SQLite In-App Record Editor)
+
+- **Оптимизатор задержки модели Whisper (Smart Karaoke Subber Whisper Lag Optimizer — #629)**:
+  - В `BotHubAdvancedLifecycleHelper.optimizeWhisperExecutionPlan()` и `PyBionicViewModel` реализован интеллектуальный планировщик выполнения задач распознавания речи: при нехватке оперативной памяти (<1500 МБ) или длительности трека >300 секунд автоматически рекомендуется вызов квантованного движка `whisper-tiny-int8` / `whisper.cpp-q5_1` либо облачного STT API. Это предотвращает 20-минутные зависания CPU и перегрев смартфона. В настройки добавлен переключатель `whisperModelLagOptimizerEnabled` с модальным окном справки «Что это?».
+- **Контроль емкости стего-контейнера (Stego Vault Carrier Capacity Pre-Flight Guard — #631)**:
+  - В `BotHubAdvancedLifecycleHelper.checkCarrierCapacity()` внедрен предстартовый расчет физической вместимости LSB-контейнера изображения перед сокрытием полезной нагрузки. Защищает от переполнения бит, искажения цветовой палитры и безвозвратной порчи скрываемых данных. В настройки добавлен переключатель `stegoVaultCarrierCapacityGuardEnabled` с модальным окном справки «Что это?».
+- **Снапшоты и откат версий шаблонов (BotHub Template Rollback & Version Snapshots — #636)**:
+  - В `BotHubAdvancedLifecycleHelper.createVersionSnapshot()` и `rollbackToSnapshot()` реализовано автоматическое сохранение снимков рабочей версии проекта в директорию `.snapshots/` перед применением обновлений шаблона, обеспечивая возможность мгновенного отката при возникновении регрессий в коде. В настройки добавлен переключатель `templateRollbackVersionSnapshotEnabled` с модальным окном справки «Что это?».
+- **Гибкая политика перезапуска процессов ботов (Configurable Bot Process Restart Policy Supervisor — #639)**:
+  - В `BotHubAdvancedLifecycleHelper.evaluateRestartDecision()` реализована поддержка дифференцированных политик перезапуска (`ALWAYS`, `ON_FAILURE`, `UNLESS_STOPPED`, `NEVER`) с экспоненциальным backoff (до 30 секунд) и защитой от бесконечных циклов аварийных падений (Crash Loop Breaker). В настройки добавлен переключатель `botConfigurableRestartPolicyEnabled` с модальным окном справки «Что это?».
+- **Супервизор многопроцессных ботов (Multi-Process Bot Worker Supervisor — #643)**:
+  - В `BotHubAdvancedLifecycleHelper.parseProcfile()` внедрен парсер манифестов `Procfile`, позволяющий супервизору одновременно и изолированно запускать связанные процессы одного проекта (например, веб-сервер FastAPI и фоновый воркер Celery/Redis). В настройки добавлен переключатель `multiProcessBotWorkerSupervisorEnabled` с модальным окном справки «Что это?».
+- **Автобэкап базы данных перед обновлением шаблона (Pre-Upgrade Database Backup Hook — #651)**:
+  - В `BotHubAdvancedLifecycleHelper.executePreUpgradeDatabaseBackup()` реализован хук автоматического сканирования и создания резервных копий SQLite баз данных (`*.sqlite`, `*.db`) с временными метками перед выполнением миграций схемы или обновлением файлов шаблона. В настройки добавлен переключатель `preUpgradeDatabaseBackupHookEnabled` с модальным окном справки «Что это?».
+- **Отказоустойчивость скачивания шаблонов BotHub (BotHub Download Resilience & Socket Stalling Detector — #655)**:
+  - В `BotHubAdvancedLifecycleHelper.checkDownloadProgress()` внедрен трекер скорости передачи данных с таймаутом чтения сокета (15 секунд) и поддержкой докачки через HTTP-заголовки диапазонов (`Range: bytes=X-`), исключающий бесконечное зависание UI на 99% загрузки. В настройки добавлен переключатель `bothubDownloadResilienceTimeoutEnabled` с модальным окном справки «Что это?».
+- **Предварительная проверка конфликтов сетевых портов (Bot Port Conflict Pre-Check — #658)**:
+  - В `BotHubAdvancedLifecycleHelper.detectPortConflicts()` реализован аудит портов перед запуском или установкой бота, предупреждающий о конфликтах с уже работающими процессами и автоматически предлагающий следующий свободный порт для предотвращения ошибок `EADDRINUSE`. В настройки добавлен переключатель `botPortConflictPreCheckEnabled` с модальным окном справки «Что это?».
+- **Инспектор различий файлов шаблона (Template File Difference Inspector — #662)**:
+  - В `BotHubAdvancedLifecycleHelper.computeFileDiffSummary()` реализован модуль построчного сравнения локальных файлов бота с версией из обновления шаблона, предотвращающий затирание уникальных доработок и кастомизаций пользователя в `main.py`. В настройки добавлен переключатель `templateFileDiffInspectorEnabled` с модальным окном справки «Что это?».
+- **Встроенный редактор записей SQLite Viewer (SQLite Browser In-App Record Editor — #667)**:
+  - В `BotHubAdvancedLifecycleHelper.generateUpdateStatement()`, `generateDeleteStatement()` и `generateInsertStatement()` реализован генератор безопасных параметризованных SQL-запросов с экранированием идентификаторов и защитой от инъекций, позволяющий редактировать, добавлять и удалять строки прямо из таблицы просмотрщика баз данных в UI. В настройки добавлен переключатель `sqliteBrowserRecordEditorEnabled` с модальным окном справки «Что это?».
+- **Модульная Compose-карточка и справки «Что это?» (Rule 5 Compliance)**:
+  - Разработан компонент `BotHubAdvancedLifecycleHardeningCard.kt` с 10 реактивными переключателями и модальными окнами помощи (Определение, При включении, При отключении) со 100% переводом на все 22 языка.
+
+---
+
 ## 📝 Что нового в версии 2.1.41 (SemVer Patch Release — BotHub Templates Hardening: Dynamic WebUI Ports, Audio Filters Pre-Check, Tesseract OCR Language Pack, Web3 RPC Fallback, AntiRaid Captcha TTL, Streaming Audiobooks, Humanized Jitter Delay, Discord Permissions Auditor, Datamosh Codec Guard & OSINT API Failover)
 
 - **Динамическое выделение WebUI портов (Dynamic WebUI Port Allocation — #609)**:
