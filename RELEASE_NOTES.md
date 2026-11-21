@@ -4,6 +4,33 @@
 
 ---
 
+## 📝 Что нового в версии 2.1.47 (SemVer Patch Release — App Lifecycle, Safety Confirmations & GitOps Hardening: Startup Async Precheck, Stop All Confirmation, Factory Reset Safety, SSH Key Generator, Git Conflict Resolver, Push-to-Deploy Webhook, Staging Auditor, Git LFS Stubs, Rollback Snapshots & Submodule Credentials)
+
+- **Асинхронная проверка среды при запуске (App Startup Async Precheck Guard — #860)**:
+  - В `AppLifecycleAndGitOpsHelper.resolveStartupValidationStrategy()` реализован перенос тяжелой валидации файлов и пакетов bootstrap в фоновые корутины во время холодного старта, устраняющий зависание сплэш-экрана на 3–5 секунд и мгновенно отображающий скелетон домашнего экрана. В настройки добавлен переключатель `appStartupAsyncPrecheckGuardEnabled` с модальным окном справки «Что это?».
+- **Подтверждение остановки всех ботов (Stop All Running Bots Confirmation Guard — #864)**:
+  - В `AppLifecycleAndGitOpsHelper.evaluateStopAllConfirmation()` внедрен диалог подтверждения перед одновременной остановкой всех запущенных ботов, отображающий точное количество активных процессов и защищающий от случайного падения прод-сервисов из-за случайного касания. В настройки добавлен переключатель `stopAllBotsConfirmationGuardEnabled` с модальным окном справки «Что это?».
+- **Защита сброса настроек к заводским (Settings Factory Reset Confirmation Guard — #879)**:
+  - В `AppLifecycleAndGitOpsHelper.evaluateFactoryResetConfirmation()` добавлено модальное окно подтверждения перед сбросом настроек к значениям по умолчанию, защищающее сохраненные токены API, порты веб-интерфейса и пользовательские гарды от непреднамеренного сброса. В настройки добавлен переключатель `settingsFactoryResetConfirmationGuardEnabled` с модальным окном справки «Что это?».
+- **Генератор и форматировщик SSH-ключей Git (In-App Git SSH Key Generator — #891)**:
+  - В `AppLifecycleAndGitOpsHelper.formatOrGenerateSshKey()` реализована встроенная генерация и форматирование пар ключей Ed25519/RSA с отпечатком SHA-256 для беспарольного доступа к репозиториям GitHub/GitLab без небезопасных персональных токенов доступа (PAT). В настройки добавлен переключатель `gitSshKeyGeneratorSupportEnabled` с модальным окном справки «Что это?».
+- **Мастер разрешения конфликтов слияния Git (Git Merge Conflict Marker Resolver — #892)**:
+  - В `AppLifecycleAndGitOpsHelper.detectAndResolveConflictMarkers()` внедрен детектор маркеров слияния Git (`<<<<<<<`, `=======`, `>>>>>>>`) и механизм авторазрешения (ACCEPT_OURS, ACCEPT_THEIRS, KEEP_BOTH_LABELED), исключающий синтаксические ошибки Python при запуске скриптов после неудачного merge. В настройки добавлен переключатель `gitMergeConflictResolverHelperEnabled` с модальным окном справки «Что это?».
+- **Защита вебхука Git Push-to-Deploy (Push-to-Deploy Webhook Signature Validator — #894)**:
+  - В `AppLifecycleAndGitOpsHelper.validateGitPushWebhook()` добавлена валидация HMAC-секрета входящего запроса и соответствия целевой релизной ветки (например, `refs/heads/main`) перед автоматическим пулом и перезапуском процессов бота. В настройки добавлен переключатель `gitPushToDeployWebhookGuardEnabled` с модальным окном справки «Что это?».
+- **Аудитор индекса коммита и Conventional Commits (Git Staging & Conventional Commits Auditor — #896)**:
+  - В `AppLifecycleAndGitOpsHelper.auditCommitPreparation()` реализован аудит готовности коммита: проверка наличия индексированных файлов и валидация префиксов Conventional Commits (`feat`, `fix`, `docs`, `refactor`, `test`, `chore`, `perf`), предотвращающий создание пустых коммитов. В настройки добавлен переключатель `gitStagingCommitUiHelperEnabled` с модальным окном справки «Что это?».
+- **Защита от нескачанных заглушек Git LFS (Git LFS Stub Pointer Safety Detector — #897)**:
+  - В `AppLifecycleAndGitOpsHelper.checkGitLfsPointer()` внедрено обнаружение текстовых заглушек Git LFS (`version https://git-lfs.github.com/spec/v1`), своевременно предупреждающее о необходимости выполнения `git lfs pull` для весов нейросетей и медиафайлов до падения Python-скрипта. В настройки добавлен переключатель `gitLfsPointersSafetyGuardEnabled` с модальным окном справки «Что это?».
+- **Снимки проекта перед опасными операциями (Safe Project Rollback Checkpoint Snapshot — #898)**:
+  - В `AppLifecycleAndGitOpsHelper.createProjectRollbackSnapshot()` реализовано автоматическое создание изолированных снимков рабочей директории проекта перед операциями `git pull` и `pip install` для мгновенного отката в один клик при конфликтах или поломке зависимостей. В настройки добавлен переключатель `projectRollbackCheckpointGuardEnabled` с модальным окном справки «Что это?».
+- **Аудитор приватных сабмодулей Git (Git Submodule Configuration & Credential Auditor — #899)**:
+  - В `AppLifecycleAndGitOpsHelper.auditGitmodules()` реализован разбор `.gitmodules`, выявление приватных SSH-сабмодулей и предупреждение о необходимости настройки SSH-ключей для исключения сбоев `Host key verification failed`. В настройки добавлен переключатель `gitSubmoduleCloneSafetyGuardEnabled` с модальным окном справки «Что это?».
+- **Модульная Compose-карточка и справки «Что это?» (Rule 5 Compliance)**:
+  - Разработан компонент `AppLifecycleAndGitOpsCard.kt` с 10 реактивными переключателями и модальными окнами помощи (Определение, При включении, При отключении) со 100% переводом на все 22 языка.
+
+---
+
 ## 📝 Что нового в версии 2.1.46 (SemVer Patch Release — UI Adaptation, Responsive Layout & Accessibility: Stalled Bot Alert, Flash Wear IOPS Tracker, Tablet & Foldable Master-Detail, Samsung DeX Desktop Mode, Landscape Dialog Adaptation, TalkBack Semantic Labels, Edge-to-Edge Navigation Insets, Font Scaling Guard, Swipe-to-Delete Confirmation & Orientation State Preservation)
 
 - **Детектор «замерзших» ботов (Stalled Bot Silent Freeze Detector — #797)**:
