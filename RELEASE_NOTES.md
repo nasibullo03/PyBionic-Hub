@@ -4,6 +4,33 @@
 
 ---
 
+## 📝 Что нового в версии 2.1.52 (SemVer Patch Release — Android System Stability, Hardware Fault Resilience, Network Validation & StrongBox Fallback: Private DNS/DoT, Android 14 Fullscreen Intent, SAF Advisory, Captive Portal Validation, Play Protect Integrity, Biometric Lockout PIN, Predictive Back Cancellation, Battery Voltage Sag Throttling & Software Rendering)
+
+- **Устойчивость к сбоям Private DNS / DoT (Private DNS / DoT Failure Fallback — #1006)**:
+  - В `AndroidSystemStabilityAndHardwareHelper.evaluatePrivateDnsPolicy()` реализовано обнаружение зависания DNS-over-TLS (DoT) при включенном Private DNS с автоматическим переходом на стандартный системный DNS-резолвер для предотвращения полной потери сетевой связности ботов. В настройки добавлен переключатель `privateDnsDoTFailureFallbackGuardEnabled` с модальным окном справки «Что это?».
+- **Запасной вариант для полноэкранных интентов в Android 14 (Android 14 Fullscreen Intent Fallback — #1007)**:
+  - В `AndroidSystemStabilityAndHardwareHelper.evaluateFullscreenIntentPolicy()` внедрена проверка разрешения `USE_FULL_SCREEN_INTENT` на Android 14+ (API 34+) с безопасным откатом к всплывающему Heads-up уведомлению с приоритетным звуковым сигналом и кнопкой «Открыть настройки» при отсутствии прав. В настройки добавлен переключатель `android14FullscreenIntentFallbackGuardEnabled` с модальным окном справки «Что это?».
+- **Резервирование криптохранилища StrongBox Keymaster (StrongBox Keystore Fallback — #1013)**:
+  - В `AndroidSystemStabilityAndHardwareHelper.evaluateStrongBoxKeystorePolicy()` реализован перехват ошибок инициализации аппаратного модуля `StrongBox` с автоматическим откатом к доверенной среде исполнения TEE (`Keymaster`), что предотвращает сбои шифрования конфиденциальных токенов на OEM-прошивках с дефектным чипом StrongBox. В настройки добавлен переключатель `hardwareStrongBoxKeystoreFallbackGuardEnabled` с модальным окном справки «Что это?».
+- **Рекомендации по производительности Storage Access Framework (SAF Performance Advisor — #1017)**:
+  - В `AndroidSystemStabilityAndHardwareHelper.evaluateSafStoragePerformance()` внедрен мониторинг производительности операций ввода-вывода SAF при подключении внешних директорий с выдачей рекомендации переноса проектов во внутреннюю память приложения при скорости ниже 5 МБ/с. В настройки добавлен переключатель `safStoragePerformanceAdvisoryGuardEnabled` с модальным окном справки «Что это?».
+- **Валидация интернет-доступа и защита от captive portal (Network Capability Validated Guard — #1018)**:
+  - В `AndroidSystemStabilityAndHardwareHelper.evaluateNetworkCapabilityPolicy()` реализована проверка флага `NET_CAPABILITY_VALIDATED` перед выполнением сетевых запросов, блокирующая сетевой спам и зависания ботов в сетях Wi-Fi с неоткрытым экраном авторизации Captive Portal. В настройки добавлен переключатель `networkCapabilityValidatedGuardEnabled` с модальным окном справки «Что это?».
+- **Защита целостности бинарных файлов и ложные срабатывания Play Protect (Play Protect Binary Integrity Guard — #1020)**:
+  - В `AndroidSystemStabilityAndHardwareHelper.evaluatePlayProtectIntegrityPolicy()` внедрен расчет SHA-256 хэшей встроенных бинарных библиотек Python и сверка с манифестом для оперативного выявления ложных срабатываний Google Play Protect или порчи файлов при очистке диска. В настройки добавлен переключатель `playProtectBinaryIntegrityGuardEnabled` с модальным окном справки «Что это?».
+- **Запасной вариант авторизации при блокировке биометрии (Biometric Lockout Fallback Enforcer — #1021)**:
+  - В `AndroidSystemStabilityAndHardwareHelper.evaluateBiometricLockoutPolicy()` реализовано автоматическое включение кнопки авторизации по PIN-коду или мастер-паролю при получении ошибки `BIOMETRIC_ERROR_LOCKOUT` (слишком много неудачных попыток), исключающее блокировку пользователя в приложении. В настройки добавлен переключатель `biometricLockoutFallbackEnforcerGuardEnabled` с модальным окном справки «Что это?».
+- **Безопасность прерывания жеста «Назад» в Android 14 (Predictive Back Cancellation Guard — #1023)**:
+  - В `AndroidSystemStabilityAndHardwareHelper.evaluatePredictiveBackPolicy()` внедрена защита черновика кода и состояния UI при свайпе «Назад» с возможностью отмены жеста (Back Gesture Progress), предотвращающая случайную потерю несохраненного ввода. В настройки добавлен переключатель `predictiveBackCancellationSafetyGuardEnabled` с модальным окном справки «Что это?».
+- **Защита от просадки напряжения батареи (Battery Voltage Sag & CPU Throttling Guard — #1026)**:
+  - В `AndroidSystemStabilityAndHardwareHelper.evaluateBatteryVoltageSagPolicy()` реализован мониторинг напряжения аккумулятора с автоматическим снижением параллельных вычислительных потоков бота при падении напряжения ниже 3.4 В во избежание внезапного отключения смартфона (Brownout Shutdown). В настройки добавлен переключатель `batteryVoltageSagCpuThrottlingGuardEnabled` с модальным окном справки «Что это?».
+- **Откат на программный рендеринг при сбое GPU (Legacy GPU Software Rendering Fallback — #1031)**:
+  - В `AndroidSystemStabilityAndHardwareHelper.evaluateGpuRenderingPolicy()` внедрено обнаружение проблемных старых видеочипов (Mali-400/450, Adreno 30x) с возможностью переключения на программный конвейер Compose/Skia во избежание черного экрана и артефактов интерфейса. В настройки добавлен переключатель `legacyGpuSoftwareRenderingFallbackGuardEnabled` с модальным окном справки «Что это?».
+- **Модульная Compose-карточка и справки «Что это?» (Rule 5 Compliance)**:
+  - Разработан компонент `AndroidSystemStabilityAndHardwareCard.kt` с 10 реактивными переключателями и модальными окнами помощи (Определение, При включении, При отключении) со 100% переводом на все 22 языка.
+
+---
+
 ## 📝 Что нового в версии 2.1.51 (SemVer Patch Release — Android OEM Hardening, Dual App Isolation, Edge-to-Edge Insets, Storage Encryption, MIUI Background Popups, TalkBack Navigation, Work Profiles, TLS 1.3 Patching, Ambient Thermal Trimming & Foldables)
 
 - **Изоляция путей для клонов приложений (Dual App & Cloned Path Isolation — #986)**:
