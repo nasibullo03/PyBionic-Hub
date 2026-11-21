@@ -4,6 +4,33 @@
 
 ---
 
+## 📝 Что нового в версии 2.1.39 (SemVer Patch Release — BotHub & Pip Packaging Hardening: 32-bit Architecture Trap, Non-ASCII Wheel Names, Extended Socket Timeout, Stale Lock Cleanup, Cache Permissions, RPATH Audit, Pip Self-Update Guard, CRC-32 Download Integrity, Template Manifest & Pre-Flight Validation)
+
+- **Защита от 32-битных ловушек архитектуры (32-bit Architecture Trap Guard — #568)**:
+  - В `BotHubAndPipPackagingHelper.is32BitWheel()` и `PyBionicViewModel` реализована фильтрация платформ: блокируется ошибочная загрузка 32-битных бинарных колес (`armv7l`, `armeabi-v7a`, `i686`) на 64-битный рантайм `aarch64`, предотвращая краш `wrong ELF class: ELFCLASS32`. В настройки добавлен переключатель `architectureTrap32BitGuardEnabled` с поясняющим диалогом «Что это?».
+- **Санитизация не-ASCII имен файлов в колесах (Non-ASCII Wheel Filename Sanitizer — #572)**:
+  - В `BotHubAndPipPackagingHelper.sanitizeZipEntryName()` реализовано принудительное UTF-8 декодирование и очистка некорректных символов в путях архива колес, исключая падения `UnicodeDecodeError` при распаковке документации с кириллицей или восточноазиатскими шрифтами. В настройки добавлен переключатель `nonAsciiWheelFilenamesSanitizerEnabled` с поясняющим диалогом «Что это?».
+- **Расширенный таймаут сокета pip (Extended Pip Socket Timeout — #575)**:
+  - В `BotHubAndPipPackagingHelper.buildSocketTimeoutArgs()` реализована автоматическая передача параметра `--default-timeout 60` (вместо 15 сек по умолчанию), обеспечивающая надежное скачивание крупных пакетов на высоконагруженных или нестабильных сетях 3G/Edge. В настройки добавлен переключатель `pipSocketTimeoutExtendedEnabled` с поясняющим диалогом «Что это?».
+- **Автоочистка зависших блокировок pip (Stale Pip Lock Files Auto-Clean — #576)**:
+  - В `BotHubAndPipPackagingHelper.cleanStalePipLocks()` реализован автоматический клинер зависших файлов блокировок (`pip.lock`, `.lock`, `pip-install-*.lock`), оставшихся после аварийного закрытия приложения или выгрузки процесса системой, снимающий блокировку с последующих установок. В настройки добавлен переключатель `pipStaleLockAutoCleanEnabled` с поясняющим диалогом «Что это?».
+- **Восстановление прав доступа к кэшу pip (Pip Cache Directory Permissions Fixer — #580)**:
+  - В `BotHubAndPipPackagingHelper.ensureCachePermissions()` внедрен контроль прав доступа к директории `~/.cache/pip`: принудительное назначение прав чтения, записи и выполнения (`rwx`), предотвращающее ошибки `PermissionDenied` после восстановления приложения из бэкапа. В настройки добавлен переключатель `pipCachePermissionsFixerEnabled` с поясняющим диалогом «Что это?».
+- **Аудит и исправление путей поиска библиотек (Native Wheel Rpath Audit & Resolution — #581)**:
+  - В `BotHubAndPipPackagingHelper.inspectRpathNeed()` и `buildRpathSearchPaths()` реализован аудит путей `$ORIGIN` и `$ORIGIN/../lib` для скомпилированных динамических библиотек, гарантирующий корректное обнаружение встроенных зависимостей линковщиком Android. В настройки добавлен переключатель `wheelRpathAutoRepairEnabled` с поясняющим диалогом «Что это?».
+- **Защита от перезаписи системного pip (Pip Self-Update Protection Guard — #583)**:
+  - В `BotHubAndPipPackagingHelper.isPipSelfUpgradeCommand()` реализован перехват команд `pip install --upgrade pip` с выводом предупреждения о защищенном Bionic-рантайме, защищая специфичные для мобильной платформы патчи от затирания ванильным pip из PyPI. В настройки добавлен переключатель `pipSelfUpdateBlockGuardEnabled` с поясняющим диалогом «Что это?».
+- **Проверка целостности загрузок по CRC-32 (Download Integrity Verification — #584)**:
+  - В `BotHubAndPipPackagingHelper.verifyZipArchiveIntegrity()` внедрена валидация zip-структуры и поточная сверка контрольных сумм CRC-32 перед передачей колеса установщику, отсекающая поврежденные и недокачанные файлы. В настройки добавлен переключатель `pipDownloadIntegrityVerificationEnabled` с поясняющим диалогом «Что это?».
+- **Генератор манифестов BotHub и экспорт шаблонов (BotHub Template Manifest Generator — #587)**:
+  - В `BotHubAndPipPackagingHelper.generateTemplateManifest()`, `validateTemplateManifest()` и `PyBionicViewModel.exportProjectAsBotHubTemplate()` реализован экспорт пользовательских ботов в виде стандартизированных шаблонов BotHub с манифестом `template.json`. В настройки добавлен переключатель `bothubCustomRegistryExportEnabled` с поясняющим диалогом «Что это?».
+- **Предстартовая валидация скрипта и токенов (Pre-Flight Syntax & Token Validator — #588)**:
+  - В `BotHubAndPipPackagingHelper.validateBotPreFlight()` и `PyBionicViewModel.startProject()` реализован статический контроль кода (баланс скобок) и валидация формата API-токенов Telegram/Discord по регулярным выражениям перед запуском воркера, предотвращающая циклы падений процесса. В настройки добавлен переключатель `botPreFlightValidationGuardEnabled` с поясняющим диалогом «Что это?».
+- **Модульная Compose-карточка и справки «Что это?» (Rule 5 Compliance)**:
+  - Разработан компонент `BotHubAndPipPackagingHardeningCard.kt` с 10 реактивными переключателями и модальными окнами помощи (Определение, При включении, При отключении) со 100% переводом на все 22 языка.
+
+---
+
 ## 📝 Что нового в версии 2.1.38 (SemVer Patch Release — Pip Advanced Hardening: Shared Lib Conflicts, Runtime Cache Invalidation, RECORD Auto-Repair, Path Sanitization, Network Retry, Safe Cancellation Rollback, PEP 668 Handling, Git Submodules, Disk Pre-Check & Native Dependency Audit)
 
 - **Детектор конфликтов shared-библиотек (Shared Library Conflicts Detection — #537)**:
