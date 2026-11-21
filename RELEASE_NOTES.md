@@ -4,6 +4,33 @@
 
 ---
 
+## 📝 Что нового в версии 2.1.56 (SemVer Patch Release — Android Hardware Controls, Waterfall Displays, Headset Kill-Switch & Git Safety Defenses: SECTION 13 100% COMPLETED)
+
+- **Плавное переключение аудиовыхода (Audio Output Switch Protector — #1028)**:
+  - В `AndroidHardwareAndGitDefensesHelper.evaluateAudioDeviceSwitch()` внедрен 50 мс кроссфейд при смене устройства воспроизведения (динамик, Bluetooth A2DP, проводные наушники), исключающий громкие цифровые щелчки и опустошение звукового буфера. В настройки добавлен переключатель `audioOutputDeviceSwitchGuardEnabled` с модальным окном справки «Что это?».
+- **Защита частоты 120 Гц в экранах со встроенным WebView (120Hz WebView Refresh Guard — #1029)**:
+  - В `AndroidHardwareAndGitDefensesHelper.evaluateRefreshRatePolicy()` реализовано принудительное удержание частоты 120 Гц / 90 Гц при отображении встроенных веб-дашбордов и консолей, предотвращающее сброс частоты SurfaceFlinger до 60 Гц и устраняющее рывки прокрутки. В настройки добавлен переключатель `displayRefreshRateDropPreventionGuardEnabled` с модальным окном справки «Что это?».
+- **Адаптация контраста синтаксиса в ночном режиме (Night Light Syntax Contrast — #1030)**:
+  - В `AndroidHardwareAndGitDefensesHelper.evaluateNightLightContrastAdaptation()` внедрено динамическое повышение яркости холодных токенов подсветки кода (голубой, синий, фиолетовый) на +30% при включении системного режима чтения (Night Light), сохраняющее четкую читаемость кода под желтыми фильтрами. В настройки добавлен переключатель `nightLightColorPreservationGuardEnabled` с модальным окном справки «Что это?».
+- **Фоновое управление светодиодом вспышки (Headless Torch Controller — #1036)**:
+  - В `AndroidHardwareAndGitDefensesHelper.evaluateTorchControl()` реализован безопасный программный интерфейс включения вспышки (фонарика) через CameraManager без создания Activity камеры с обязательным автоматическим отключением через 60 секунд для защиты оптики от перегрева. В настройки добавлен переключатель `cameraFlashlightHeadlessGuardEnabled` с модальным окном справки «Что это?».
+- **Снижение электромагнитных наводок процессора (RF / EM Interference Shield — #1041)**:
+  - В `AndroidHardwareAndGitDefensesHelper.evaluateCpuEmInterferencePolicy()` внедрено сглаживание пиков частоты процессора и ограничение тяжелых параллельных потоков до 2 при работе чувствительных радиочипов (FM-радио, SDR) или аналоговых датчиков для предотвращения ВЧ-помех. В настройки добавлен переключатель `cpuEmInterferenceReductionGuardEnabled` с модальным окном справки «Что это?».
+- **Компенсирующие отступы для экранов-водопадов (Waterfall Edge Curve Padding — #1042)**:
+  - В `AndroidHardwareAndGitDefensesHelper.evaluateWaterfallDisplayInsets()` реализован расчет защитных горизонтальных полей (+24px) на смартфонах с изогнутыми гранями стекла (80°+), удерживающий редактор кода и кнопки на плоской части экрана. В настройки добавлен переключатель `waterfallDisplayCornerMaskingGuardEnabled` с модальным окном справки «Что это?».
+- **Аппаратный экстренный стоп кнопкой проводной гарнитуры (Headset Button Hardware Kill-Switch — #1044)**:
+  - В `AndroidHardwareAndGitDefensesHelper.evaluateHeadsetHookEvent()` внедрен перехват тройного клика аппаратной кнопки гарнитуры (`KEYCODE_HEADSETHOOK`) для мгновенного экстренного завершения всех запущенных ботов без необходимости доставать телефон из кармана. В настройки добавлен переключатель `headsetHookEmergencyStopGuardEnabled` с модальным окном справки «Что это?». *(РАЗДЕЛ 13 ПОЛНОСТЬЮ УСТРАНЕН НА 100%)*
+- **Предотвращение ловушки отслеживаемых файлов .gitignore (Git Tracked Ignore Advisor — #951)**:
+  - В `AndroidHardwareAndGitDefensesHelper.evaluateTrackedGitignoreConflicts()` внедрено автоматическое сопоставление правил `.gitignore` с отслеживаемыми файлами репозитория с предупреждением и подсказкой команды `git rm --cached` для защиты секретов (`.env`, `tokens.json`). В настройки добавлен переключатель `gitIgnoreTrackedFilesTrapGuardEnabled` с модальным окном справки «Что это?».
+- **Автоматическое сохранение правок при Git Pull (Git Pull Auto-Stash — #956)**:
+  - В `AndroidHardwareAndGitDefensesHelper.evaluateAutoStashOnPull()` внедрено добавление флага `--autostash` к операциям синхронизации `git pull --rebase`, исключающее аварийный срыв слияния при наличии локальных незакоммиченных изменений. В настройки добавлен переключатель `gitAutoStashOnPullGuardEnabled` с модальным окном справки «Что это?».
+- **Изоляция области настроек Git от глобального профиля (Git Config Scope Isolation — #958)**:
+  - В `AndroidHardwareAndGitDefensesHelper.evaluateGitConfigScope()` реализована принудительная изоляция настроек авторов и параметров репозиториев в область `--local` (`.git/config`), защищающая глобальный файл `~/.gitconfig` от непреднамеренной перезаписи. В настройки добавлен переключатель `gitConfigLocalScopeIsolationGuardEnabled` с модальным окном справки «Что это?».
+- **Модульная Compose-карточка и справки «Что это?» (Rule 5 Compliance)**:
+  - Разработан компонент `AndroidHardwareAndGitDefensesCard.kt` с 10 реактивными переключателями и модальными окнами помощи (Определение, При включении, При отключении) со 100% переводом на все 22 языка.
+
+---
+
 ## 📝 Что нового в версии 2.1.55 (SemVer Patch Release — Android Platform Features & Device Defenses: Wireless ADB Auto-Recovery, BLE Beacon Power, Battery Float Overcharge, Notch Insets, USB OTG Advisor, PAN IP, Haptic Resonance, Screen Keep-Awake, AOD Minimal Glyphs & Enterprise Work Profiles)
 
 - **Автоматическое переключение на Wireless ADB при отключении кабеля (Wireless ADB Auto-Recovery — #968)**:
