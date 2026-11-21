@@ -4,6 +4,33 @@
 
 ---
 
+## 📝 Что нового в версии 2.1.51 (SemVer Patch Release — Android OEM Hardening, Dual App Isolation, Edge-to-Edge Insets, Storage Encryption, MIUI Background Popups, TalkBack Navigation, Work Profiles, TLS 1.3 Patching, Ambient Thermal Trimming & Foldables)
+
+- **Изоляция путей для клонов приложений (Dual App & Cloned Path Isolation — #986)**:
+  - В `AndroidOemAndSystemHardeningHelper.resolveDualAppPath()` реализовано динамическое разрешение изолированных путей хранилища проектов на основе `UserHandle.myUserId()` для поддержки Xiaomi Dual Apps (u999) и Samsung Secure Folder (u150), предотвращающее конфликты прав с пользователем u0. В настройки добавлен переключатель `dualAppCloningPathIsolationGuardEnabled` с модальным окном справки «Что это?».
+- **Защита отступов Edge-to-Edge в Android 15 (Android 15 Edge-to-Edge Insets Guard — #987)**:
+  - В `AndroidOemAndSystemHardeningHelper.evaluateEdgeToEdgeInsets()` внедрено автоматическое применение защитных отступов `WindowInsets` для статус-бара и панели навигации, исключающее наложение системных индикаторов на панели инструментов и редактор кода на Android 15+ (API 35+). В настройки добавлен переключатель `android15EdgeToEdgeWindowInsetsGuardEnabled` с модальным окном справки «Что это?».
+- **Защита баз данных при системной миграции шифрования (Storage Encryption Migration Guard — #990)**:
+  - В `AndroidOemAndSystemHardeningHelper.auditStorageEncryptionState()` реализован аудит типа шифрования диска (FDE vs FBE) и уровня заряда аккумулятора, предупреждающий о рисках повреждения данных при прерывании фонового перешифрования при мажорных обновлениях ОС. В настройки добавлен переключатель `storageEncryptionMigrationSafetyGuardEnabled` с модальным окном справки «Что это?».
+- **Аудит всплывающих окон в фоне на MIUI/HyperOS (MIUI Background Pop-up Auditor — #994)**:
+  - В `AndroidOemAndSystemHardeningHelper.evaluateMiuiBackgroundPopupPolicy()` внедрено обнаружение специфичного разрешения MIUI/HyperOS «Отображение всплывающих окон в фоне» с прямым переходом в настройки разрешений приложения. В настройки добавлен переключатель `miuiBackgroundPopupPermissionGuardEnabled` с модальным окном справки «Что это?».
+- **Доступность TalkBack и предотвращение зацикливания фокуса (TalkBack Accessibility & Traversal — #997)**:
+  - В `AndroidOemAndSystemHardeningHelper.resolveAccessibilityPlan()` реализована оптимизация порядка обхода скринридера и добавление явной кнопки закрытия модальных BottomSheet для предотвращения блокировки незрячих пользователей. В настройки добавлен переключатель `talkbackScreenReaderAccessibilityGuardEnabled` с модальным окном справки «Что это?».
+- **Совместимость с корпоративным рабочим профилем (Work Profile & Multi-User Policy — #998)**:
+  - В `AndroidOemAndSystemHardeningHelper.evaluateUserProfileRestrictions()` внедрен перехват системных ограничений `UserManager` и MDM-политик во вторичных/рабочих профилях Android, исключающий сбои `SecurityException` при вызове закрытых служб. В настройки добавлен переключатель `multiUserProfileStorageResolverGuardEnabled` с модальным окном справки «Что это?».
+- **Защита от глубокого энергосбережения App Standby (App Standby Inactivity Keeper — #999)**:
+  - В `AndroidOemAndSystemHardeningHelper.evaluateInactiveStateRisk()` реализована отправка активных сетевых пингов при отсутствии действий пользователя более 3 дней для сохранения высокого приоритета сетевых очередей фоновой службы. В настройки добавлен переключатель `appStandbyInactiveStateMitigationGuardEnabled` с модальным окном справки «Что это?».
+- **Обновление системного криптопровайдера до TLS 1.3 (TLS 1.3 Security Provider Patcher — #1000)**:
+  - В `AndroidOemAndSystemHardeningHelper.evaluateSecurityProviderStatus()` внедрена проверка поддержки TLS 1.3 и динамическая установка актуального криптопровайдера через GMS `ProviderInstaller` на старых устройствах Android 8-9. В настройки добавлен переключатель `securityProviderPatchingTlsGuardEnabled` с модальным окном справки «Что это?».
+- **Термический сброс памяти при высокой температуре среды (Ambient Heat Memory Throttler — #1001)**:
+  - В `AndroidOemAndSystemHardeningHelper.evaluateAmbientThermalMemoryPlan()` реализовано усечение целевого лимита кучи приложения до 128 МБ и внеочередная сборка мусора при температуре чипсета/батареи выше 38°C на жаре. В настройки добавлен переключатель `ambientThermalMemoryTrimMitigationGuardEnabled` с модальным окном справки «Что это?».
+- **Адаптация под складные смартфоны Fold и Flip (Foldable Hinge Posture Guard — #1004)**:
+  - В `AndroidOemAndSystemHardeningHelper.evaluateFoldablePosture()` внедрена обработка положений шарнира (Tabletop, Flat Expanded, Compact) с сохранением позиции прокрутки консоли логов и курсора редактора при складывании устройства. В настройки добавлен переключатель `foldableHingePostureLayoutGuardEnabled` с модальным окном справки «Что это?».
+- **Модульная Compose-карточка и справки «Что это?» (Rule 5 Compliance)**:
+  - Разработан компонент `AndroidOemAndSystemHardeningCard.kt` с 10 реактивными переключателями и модальными окнами помощи (Определение, При включении, При отключении) со 100% переводом на все 22 языка.
+
+---
+
 ## 📝 Что нового в версии 2.1.50 (SemVer Patch Release — Android OS Platform Hardening, Hardware Constraints & Core Services: Qualcomm Socket Keep-Alive, Headless Camera2 Capture, Background Mic Policy, SD Eject Safety, App Standby Buckets, Direct Intent Trampolines, System Clock Drift Skew, SIM Hot-Swap Network Recovery, Split APK Native Libs & Android 14 Exact Alarms)
 
 - **Оптимизация сокетов для чипсетов Qualcomm (Qualcomm Keep-Alive Optimizer — #973)**:
