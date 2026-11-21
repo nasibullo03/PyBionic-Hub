@@ -4,6 +4,33 @@
 
 ---
 
+## 📝 Что нового в версии 2.1.48 (SemVer Patch Release — DevOps, S3 Cloud Backups & Zero-Downtime Hardening: Cold Standby Failover, Smoke Test Gating, Encrypted .env Sync, Telegram Zip Chunking, Custom SSH Ports, S3 Validation, SHA-256 Backup Verification, Blue/Green Deploy, WAL Differential Backup & Git Push Retry)
+
+- **Холодное резервирование между смартфонами (Disaster Recovery Cold Standby — #901)**:
+  - В `DevOpsAndBackupHardeningHelper.evaluateColdStandbyHeartbeat()` реализован мониторинг периодических сигналов активности (heartbeats) между основным и резервным мобильными узлами с автоповышением резервного смартфона до роли `PROMOTED_PRIMARY` при пропуске 3+ пингов. В настройки добавлен переключатель `disasterRecoveryColdStandbyGuardEnabled` с модальным окном справки «Что это?».
+- **Автоматический прогон смоук-тестов (Automated Smoke Tests Verifier — #903)**:
+  - В `DevOpsAndBackupHardeningHelper.evaluateSmokeTestRun()` внедрен запуск тестов pytest перед активацией обновленного кода бота с блокировкой выкатки при наличии упавших тестов или ненулевом коде возврата. В настройки добавлен переключатель `automatedSmokeTestsVerifierEnabled` с модальным окном справки «Что это?».
+- **Шифрованное резервирование переменных окружения (Encrypted .env Secrets Sync — #904)**:
+  - В `DevOpsAndBackupHardeningHelper.packageSecretsForSync()` реализована упаковка переменных окружения `.env` в защищенный контейнер с шифрованием на базе мастер-пароля для безопасного бэкапа и миграции без утечки секретов в git. В настройки добавлен переключатель `environmentSecretsSyncGuardEnabled` с модальным окном справки «Что это?».
+- **Разделение больших архивов бэкапов для Telegram (Telegram Backup Chunk Splitter — #913)**:
+  - В `DevOpsAndBackupHardeningHelper.calculateBackupChunkingPlan()` внедрено автоматическое разбиение архивов проектов свыше 48 МБ на нумерованные фрагменты (`.part001`, `.part002`), предотвращающее ошибки Telegram 413 Payload Too Large. В настройки добавлен переключатель `telegramBackupChunkSplitterGuardEnabled` с модальным окном справки «Что это?».
+- **Поддержка нестандартных портов SSH в Git (Git Custom SSH Port Support — #918)**:
+  - В `DevOpsAndBackupHardeningHelper.parseSshUrlWithCustomPort()` реализован разбор URL формата `ssh://git@host:port/path` с автогенерацией команды переопределения `ssh -p <port>`, обеспечивающий подключение к корпоративным GitLab/Gitea на нестандартных портах. В настройки добавлен переключатель `gitCustomSshPortSupportEnabled` с модальным окном справки «Что это?».
+- **Валидатор конфигурации облачных бэкапов S3 (S3-Compatible Cloud Backup Validator — #921)**:
+  - В `DevOpsAndBackupHardeningHelper.validateS3BackupConfig()` добавлена предварительная валидация эндпоинтов, имен корзин (3–63 символа) и учетных данных для Cloudflare R2, AWS S3, MinIO и DigitalOcean Spaces. В настройки добавлен переключатель `s3CompatibleBackupValidatorEnabled` с модальным окном справки «Что это?».
+- **Проверка целостности и хешей бэкапов (Backup Integrity Verifier — #922)**:
+  - В `DevOpsAndBackupHardeningHelper.verifyBackupIntegrity()` внедрен аудит созданных архивов: тестирование читаемости zip-контейнера и сверка контрольной суммы SHA-256 с манифестом, гарантирующие 100% восстановимость архива. В настройки добавлен переключатель `backupIntegrityVerificationGuardEnabled` с модальным окном справки «Что это?».
+- **Бесшовное Blue/Green развертывание ботов (Zero-Downtime Blue/Green Deploy — #928)**:
+  - В `DevOpsAndBackupHardeningHelper.planBlueGreenTransition()` реализован менеджер двух слотов выполнения (Blue и Green) со staging-портом для прогрева и проверки здоровья перед атомарным переключением трафика без простоя. В настройки добавлен переключатель `zeroDowntimeBlueGreenDeployEnabled` с модальным окном справки «Что это?».
+- **Дифференциальный бэкап баз данных SQLite (SQLite Differential Backup Guard — #937)**:
+  - В `DevOpsAndBackupHardeningHelper.evaluateDatabaseBackupStrategy()` внедрена стратегия инкрементального сохранения страниц WAL-журнала вместо многогигабайтных полных дампов для баз данных свыше 10 МБ, экономящая до 90% мобильного интернет-трафика. В настройки добавлен переключатель `differentialDatabaseBackupGuardEnabled` с модальным окном справки «Что это?».
+- **Повтор при таймаутах отправки Git Push (Git Push Timeout Recovery Guard — #939)**:
+  - В `DevOpsAndBackupHardeningHelper.evaluatePushTimeoutRetry()` реализован механизм повторных попыток с экспоненциальной задержкой (Exponential Backoff: 2с, 4с) при кратковременных обрывах сотовой сети во время git push. В настройки добавлен переключатель `gitPushTimeoutRecoveryGuardEnabled` с модальным окном справки «Что это?».
+- **Модульная Compose-карточка и справки «Что это?» (Rule 5 Compliance)**:
+  - Разработан компонент `DevOpsAndBackupHardeningCard.kt` с 10 реактивными переключателями и модальными окнами помощи (Определение, При включении, При отключении) со 100% переводом на все 22 языка.
+
+---
+
 ## 📝 Что нового в версии 2.1.47 (SemVer Patch Release — App Lifecycle, Safety Confirmations & GitOps Hardening: Startup Async Precheck, Stop All Confirmation, Factory Reset Safety, SSH Key Generator, Git Conflict Resolver, Push-to-Deploy Webhook, Staging Auditor, Git LFS Stubs, Rollback Snapshots & Submodule Credentials)
 
 - **Асинхронная проверка среды при запуске (App Startup Async Precheck Guard — #860)**:
