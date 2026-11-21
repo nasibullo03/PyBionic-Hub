@@ -4,6 +4,33 @@
 
 ---
 
+## 📝 Что нового в версии 2.1.49 (SemVer Patch Release — Android OS Hardening, Hardware Constraints & Git Safety: Git Reset Hard Confirmation, Git LFS Quota Fallback, Point-in-Time Recovery, Shallow Clone Unshallow, LMK Memory Trimming, App Ops Auto-Revoke Protection, CPU Thermal Duty-Cycling, Continuous Battery Health, Headless MediaCodec & Airplane Mode Recovery)
+
+- **Подтверждение разрушительного git reset --hard (Git Reset Hard Confirmation Guard — #940)**:
+  - В `AndroidHardeningAndGitSafetyHelper.evaluateGitResetHardConfirmation()` внедрен диалог подтверждения перед выполнением команды `git reset --hard` с указанием точного числа неиндексированных файлов, предотвращающий случайную потерю несохраненного кода. В настройки добавлен переключатель `gitResetHardConfirmationGuardEnabled` с модальным окном справки «Что это?».
+- **Обход исчерпания квоты трафика Git LFS (Git LFS Quota Exhaustion Fallback — #943)**:
+  - В `AndroidHardeningAndGitSafetyHelper.evaluateLfsBandwidthStatus()` реализован перехват ошибок исчерпания лимитов LFS (HTTP 402/429) с активацией fallback-стратегии клонирования репозитория без скачивания тяжелых бинарных заглушек. В настройки добавлен переключатель `gitLfsBandwidthExhaustionGuardEnabled` с модальным окном справки «Что это?».
+- **Откат к произвольной временной точке (Point-in-Time Rollback Support — #946)**:
+  - В `AndroidHardeningAndGitSafetyHelper.findBestSnapshotForTimestamp()` реализован поиск и выбор ближайшего корректного снимка базы данных и файлов проекта по заданной временной метке, обеспечивающий прецизионное аварийное восстановление. В настройки добавлен переключатель `pointInTimeRollbackSupportEnabled` с модальным окном справки «Что это?».
+- **Автоматическое углубление поверхностных клонов Git (Git Shallow Clone Unshallow Promotion — #949)**:
+  - В `AndroidHardeningAndGitSafetyHelper.auditShallowRepository()` внедрено автоматическое выявление поверхностных репозиториев (`.git/shallow`) и выполнение `git fetch --unshallow` перед операцией push, исключающее ошибку `shallow update not permitted`. В настройки добавлен переключатель `gitShallowCloneUnshallowGuardEnabled` с модальным окном справки «Что это?».
+- **Защита от выгрузки службы ядром Android (Low Memory Killer LMK Mitigation — #964)**:
+  - В `AndroidHardeningAndGitSafetyHelper.evaluateMemoryTrimLevel()` реализована обработка системных сигналов `onTrimMemory()` с превентивным сбросом кэша pip и усечением буферов логов, предотвращающая аварийное уничтожение службы PyBionic демоном LMK. В настройки добавлен переключатель `lowMemoryKillerMitigationGuardEnabled` с модальным окном справки «Что это?».
+- **Защита от автоматического отзыва прав Android (App Ops Auto-Revoke Protection — #966)**:
+  - В `AndroidHardeningAndGitSafetyHelper.evaluatePermissionRevokeRisk()` внедрен аудит времени с последнего запуска на переднем плане с предупреждением пользователя о необходимости отключения автоотзыва разрешений в настройках ОС для режима 24/7. В настройки добавлен переключатель `appOpsAutoRevokePreventionGuardEnabled` с модальным окном справки «Что это?».
+- **Терморегуляция рабочих циклов процессора (CPU Thermal Duty-Cycle Limiter — #967)**:
+  - В `AndroidHardeningAndGitSafetyHelper.evaluateCpuThermalThrottling()` реализовано динамическое увеличение пауз сна в рабочих циклах ботов при нагреве чипсета выше 60°C, предотвращающее аварийный перегрев и выключение смартфона. В настройки добавлен переключатель `thermalThrottlingFrequencyGuardEnabled` с модальным окном справки «Что это?».
+- **Инспектор здоровья аккумулятора при работе от сети (Continuous Battery Health Guard — #969)**:
+  - В `AndroidHardeningAndGitSafetyHelper.evaluateBatteryHealthProtection()` внедрен мониторинг непрерывной работы от зарядного устройства (>12 ч) с рекомендацией включить лимит 80-85% или Bypass Charging для исключения деградации и вздутия батареи. В настройки добавлен переключатель `batteryProtectionBypassChargingGuardEnabled` с модальным окном справки «Что это?».
+- **Поддержка аппаратного MediaCodec без экрана (Headless MediaCodec HW Support — #970)**:
+  - В `AndroidHardeningAndGitSafetyHelper.probeHeadlessMediaCodec()` реализована проверка наличия аппаратных видеокодеков чипсета (Snapdragon/Exynos), способных кодировать видеокадры через ByteBuffer без SurfaceView в фоновых видео-ботах. В настройки добавлен переключатель `headlessMediaCodecSupportEnabled` с модальным окном справки «Что это?».
+- **Восстановление сетевых адаптеров после режима полета (Airplane Mode Network Recovery — #971)**:
+  - В `AndroidHardeningAndGitSafetyHelper.evaluateAirplaneModeTransition()` внедрен сброс зависших TCP-сокетов Ktor и мгновенный реконнект сетевых адаптеров при выходе устройства из режима «В самолете». В настройки добавлен переключатель `airplaneModeNetworkRecoveryGuardEnabled` с модальным окном справки «Что это?».
+- **Модульная Compose-карточка и справки «Что это?» (Rule 5 Compliance)**:
+  - Разработан компонент `AndroidHardeningAndGitSafetyCard.kt` с 10 реактивными переключателями и модальными окнами помощи (Определение, При включении, При отключении) со 100% переводом на все 22 языка.
+
+---
+
 ## 📝 Что нового в версии 2.1.48 (SemVer Patch Release — DevOps, S3 Cloud Backups & Zero-Downtime Hardening: Cold Standby Failover, Smoke Test Gating, Encrypted .env Sync, Telegram Zip Chunking, Custom SSH Ports, S3 Validation, SHA-256 Backup Verification, Blue/Green Deploy, WAL Differential Backup & Git Push Retry)
 
 - **Холодное резервирование между смартфонами (Disaster Recovery Cold Standby — #901)**:
