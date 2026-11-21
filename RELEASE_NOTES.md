@@ -4,6 +4,33 @@
 
 ---
 
+## 📝 Что нового в версии 2.1.53 (SemVer Patch Release — Android Hardware Sensors, Power Flapping, Proximity, Li-Po Chemistry, Multi-Display DPI, Non-Linear Fonts & SIM Sockets: ALL P1 DEFECTS ELIMINATED)
+
+- **Защита баз данных от системного бэкапа (System Backup Data Leak Guard — #1032)**:
+  - В `AndroidHardwareSensorsAndSystemGuardsHelper.evaluateBackupDataExtractionPolicy()` реализован строгий аудит правил извлечения данных `data_extraction_rules.xml` и `backup_rules.xml` с обязательным исключением всех баз данных SQLite, хранилищ ключей и секретных токенов из системных резервных копий Google One и ADB-бэкапов. В настройки добавлен переключатель `systemBackupDataLeakGuardEnabled` с модальным окном справки «Что это?».
+- **Динамическая адаптация DPI для внешних мониторов (Multi-Display Density DPI Guard — #1033)**:
+  - В `AndroidHardwareSensorsAndSystemGuardsHelper.evaluateMultiDisplayDensityMetrics()` внедрен пересчет коэффициента масштабирования интерфейса и границ типографики при подключении смартфона к внешним экранам (DisplayPort over Type-C, Samsung DeX, Motorola Ready For) во избежание микроскопических или гигантских элементов UI. В настройки добавлен переключатель `multiDisplayDensityDpiGuardEnabled` с модальным окном справки «Что это?».
+- **Защита разметки от нелинейных шрифтов Android 14 (Non-Linear Font Scaling Safety Guard — #1034)**:
+  - В `AndroidHardwareSensorsAndSystemGuardsHelper.evaluateNonLinearFontScaling()` реализована адаптация карточек ботов под нелинейную кривую масштабирования шрифтов Android 14+ (до 200%), гарантирующая запас высоты строк и бейджей статуса без обрезания текста и перекрытия кнопок. В настройки добавлен переключатель `nonLinearFontScalingSafetyGuardEnabled` с модальным окном справки «Что это?».
+- **Фильтрация дребезга разъема питания (Power Connection Flapping Debounce Guard — #1035)**:
+  - В `AndroidHardwareSensorsAndSystemGuardsHelper.evaluatePowerConnectionEvent()` внедрен 3-секундный дебаунс системных событий `ACTION_POWER_CONNECTED` и `ACTION_POWER_DISCONNECTED`, предотвращающий скачки загрузки CPU и зацикливание фоновой службы при плохом контакте поврежденного кабеля Type-C. В настройки добавлен переключатель `powerConnectionFlappingDebounceGuardEnabled` с модальным окном справки «Что это?».
+- **Отключение экрана по датчику приближения в режиме 24/7 (Proximity Sensor Screen-Off Guard — #1037)**:
+  - В `AndroidHardwareSensorsAndSystemGuardsHelper.evaluateProximityScreenOffPolicy()` реализовано принудительное отключение подсветки экрана при размещении смартфона экраном вниз на столе во время непрерывного ночного хостинга ботов (`Sensor.TYPE_PROXIMITY`), снижающее нагрев и износ OLED-матрицы. В настройки добавлен переключатель `proximitySensorScreenOffGuardEnabled` с модальным окном справки «Что это?».
+- **Специализированный профиль защиты Li-Po аккумуляторов (Battery Chemistry Safety Profile — #1038)**:
+  - В `AndroidHardwareSensorsAndSystemGuardsHelper.evaluateBatteryChemistryProfile()` внедрено автоматическое определение химии батареи (Li-Polymer vs Li-Ion) по атрибутам sysfs с установкой более строгого теплового порога (38°C) и защитой от перезаряда на высоком буферном напряжении для исключения вздутия пакетов. В настройки добавлен переключатель `batteryChemistryProfileSafetyGuardEnabled` с модальным окном справки «Что это?».
+- **Ночное автоприглушение яркости до 1 нит (Ambient Light Sensor Auto-Dim — #1039)**:
+  - В `AndroidHardwareSensorsAndSystemGuardsHelper.evaluateAmbientLightAutoDim()` реализовано автоматическое снижение яркости экрана до абсолютного минимума (1 нит) при полной темноте (&lt;5 люкс) в ночное время, исключающее ослепление пользователя и нагрев дисплея. В настройки добавлен переключатель `ambientLightSensorAutoDimGuardEnabled` с модальным окном справки «Что это?».
+- **Плавная тактильная отдача вибромоторов LRA (Vibrator Amplitude Haptic Guard — #1040)**:
+  - В `AndroidHardwareSensorsAndSystemGuardsHelper.resolveVibrationEffectPlan()` внедрено использование тонкой настройки амплитуды (50-120 из 255) на современных линейных вибромоторах (LRA) вместо грубой 100% вибрации, обеспечивающее мягкий клик без дребезга корпуса о стол. В настройки добавлен переключатель `vibratorAmplitudeHapticGuardEnabled` с модальным окном справки «Что это?».
+- **Мгновенный сброс сокетов при извлечении SIM-карты (SIM Hot-Swap Socket Reset Guard — #1043)**:
+  - В `AndroidHardwareSensorsAndSystemGuardsHelper.evaluateSimStateTransition()` реализован перехват события `ACTION_SIM_STATE_CHANGED` с немедленным принудительным закрытием всех сокетов сотовой связи при извлечении лотка SIM во избежание зависания потоков Python на время таймаутов ядра Linux. В настройки добавлен переключатель `simHotSwapSocketResetGuardEnabled` с модальным окном справки «Что это?».
+- **Предупреждение и троттлинг при просадке напряжения батареи (Battery Voltage Sag Alert — #1045)**:
+  - В `AndroidHardwareSensorsAndSystemGuardsHelper.evaluateBatteryVoltageSagAlert()` внедрен мониторинг напряжения ячейки (`EXTRA_VOLTAGE`) с выдачей критического предупреждения и ограничением вычислительных потоков бота при падении ниже 3500 мВ во избежание внезапного аппаратного выключения смартфона (Brownout). В настройки добавлен переключатель `batteryVoltageSagWarningGuardEnabled` с модальным окном справки «Что это?».
+- **Модульная Compose-карточка и справки «Что это?» (Rule 5 Compliance)**:
+  - Разработан компонент `AndroidHardwareSensorsAndSystemGuardsCard.kt` с 10 реактивными переключателями и модальными окнами помощи (Определение, При включении, При отключении) со 100% переводом на все 22 языка.
+
+---
+
 ## 📝 Что нового в версии 2.1.52 (SemVer Patch Release — Android System Stability, Hardware Fault Resilience, Network Validation & StrongBox Fallback: Private DNS/DoT, Android 14 Fullscreen Intent, SAF Advisory, Captive Portal Validation, Play Protect Integrity, Biometric Lockout PIN, Predictive Back Cancellation, Battery Voltage Sag Throttling & Software Rendering)
 
 - **Устойчивость к сбоям Private DNS / DoT (Private DNS / DoT Failure Fallback — #1006)**:
