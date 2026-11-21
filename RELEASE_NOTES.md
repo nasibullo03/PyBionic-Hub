@@ -4,6 +4,33 @@
 
 ---
 
+## 📝 Что нового в версии 2.1.54 (SemVer Patch Release — Android System Interaction, Media & Accessibility Defenses: Wi-Fi Throttling, SSID Privacy, Audio Focus, High Contrast Theme, PiP Video, Low Battery Audio, Force Dark Shield, Cellular Quotas, S-Pen & Android 13 Per-App Language)
+
+- **Контроль троттлинга сканирования сетей Wi-Fi (Wi-Fi Scan Throttle Advisor — #1008)**:
+  - В `AndroidSystemInteractionAndMediaHelper.evaluateWifiScanRateLimit()` внедрен скользящий 120-секундный лимитер частоты сканирования радиоэфира согласно системным ограничениям Android (не более 4 сканирований за 2 минуты), возвращающий кэшированные списки точек доступа во избежание сбоев IoT-ботов. В настройки добавлен переключатель `wifiScanThrottlingAdvisoryGuardEnabled` с модальным окном справки «Что это?».
+- **Конфиденциальность Wi-Fi SSID без запроса геолокации (Wi-Fi SSID Privacy Guard — #1009)**:
+  - В `AndroidSystemInteractionAndMediaHelper.resolveWifiSsidDisplay()` реализовано отображение анонимного и безопасного статуса «Wi-Fi подключен» без навязчивого требования опасного разрешения `ACCESS_FINE_LOCATION`, защищающее приватность пользователя. В настройки добавлен переключатель `wifiSsidLocationPrivacyGuardEnabled` с модальным окном справки «Что это?».
+- **Управление аудиофокусом при звонках и оповещениях (Audio Focus Call Protector — #1010)**:
+  - В `AndroidSystemInteractionAndMediaHelper.evaluateAudioFocusEvent()` внедрена корректная обработка события `AUDIOFOCUS_LOSS_TRANSIENT` с безопасной постановкой на паузу записи и воспроизведения звука голосовыми ботами при входящих звонках и подсказках навигатора. В настройки добавлен переключатель `audioFocusLossManagementGuardEnabled` с модальным окном справки «Что это?».
+- **Адаптация синтаксиса к высококонтрастному тексту (High-Contrast Text Theme Adapter — #1011)**:
+  - В `AndroidSystemInteractionAndMediaHelper.evaluateHighContrastThemeAdaptation()` реализовано автоматическое усиление яркости токенов синтаксиса (+35%) и скрытие тонких рамок при включении системной функции «Высококонтрастный текст», сохраняющее читаемость кода. В настройки добавлен переключатель `highContrastAccessibilityThemeGuardEnabled` с модальным окном справки «Что это?».
+- **Режим «Картинка в картинке» для видеопотоков бота (Picture-in-Picture Video Stream — #1012)**:
+  - В `AndroidSystemInteractionAndMediaHelper.evaluatePictureInPictureEligibility()` реализована поддержка плавающего окна Picture-in-Picture (16:9) для трансляций камер и OpenCV-ботов с добавлением `android:supportsPictureInPicture="true"` в манифест. В настройки добавлен переключатель `pictureInPictureSupportGuardEnabled` с модальным окном справки «Что это?».
+- **Защита аудиозаписи от сигналов разряда батареи (Low Battery Audio Safety — #1014)**:
+  - В `AndroidSystemInteractionAndMediaHelper.evaluateLowBatteryAudioSafety()` внедрен аудит уровня заряда аккумулятора перед запуском длительных аудио-задач с предупреждением о риске наложения системного звукового сигнала 15% разряда на голосовые сообщения. В настройки добавлен переключатель `lowBatteryAudioInterruptionGuardEnabled` с модальным окном справки «Что это?».
+- **Защита от принудительной инверсии тем MIUI и ColorOS (MIUI/ColorOS Force Dark Shield — #1015)**:
+  - В `AndroidSystemInteractionAndMediaHelper.evaluateForceDarkSuppression()` и стилях `Theme.PyBionic` активирован атрибут `android:forceDarkAllowed="false"`, блокирующий искажение фирменных темных тем китайскими оболочками Xiaomi, Realme и OPPO. В настройки добавлен переключатель `forceDarkInversionSuppressionGuardEnabled` с модальным окном справки «Что это?».
+- **Предупреждение о лимите мобильного интернета (Cellular Data Quota Alert — #1019)**:
+  - В `AndroidSystemInteractionAndMediaHelper.evaluateCellularDataQuota()` реализовано заблаговременное предупреждение при приближении к 90% лимита мобильных данных, предотвращающее внезапную заморозку фонового сервиса системными модальными окнами ОС. В настройки добавлен переключатель `cellularDataLimitWarningGuardEnabled` с модальным окном справки «Что это?».
+- **Быстрые действия пера Stylus / Samsung S-Pen (Stylus & S-Pen Quick Switcher — #1022)**:
+  - В `AndroidSystemInteractionAndMediaHelper.resolveStylusButtonAction()` внедрен перехват нажатий кнопки пера S-Pen для мгновенного переключения между терминалом логов и редактором кода без касания экрана на смартфонах Galaxy Ultra и планшетах. В настройки добавлен переключатель `stylusSpEnActionIntegrationGuardEnabled` с модальным окном справки «Что это?».
+- **Поддержка выбора языка в системных настройках Android 13 (Android 13 Per-App Language Guard — #1024)**:
+  - Создан конфигурационный манифест `res/xml/locales_config.xml` со всеми 22 поддерживаемыми языками и привязан через `android:localeConfig` в манифесте, что интегрирует PyBionic в системный селектор «Языки приложений» Android 13+. В настройки добавлен переключатель `android13PerAppLanguageGuardEnabled` с модальным окном справки «Что это?».
+- **Модульная Compose-карточка и справки «Что это?» (Rule 5 Compliance)**:
+  - Разработан компонент `AndroidSystemInteractionAndMediaCard.kt` с 10 реактивными переключателями и модальными окнами помощи (Определение, При включении, При отключении) со 100% переводом на все 22 языка.
+
+---
+
 ## 📝 Что нового в версии 2.1.53 (SemVer Patch Release — Android Hardware Sensors, Power Flapping, Proximity, Li-Po Chemistry, Multi-Display DPI, Non-Linear Fonts & SIM Sockets: ALL P1 DEFECTS ELIMINATED)
 
 - **Защита баз данных от системного бэкапа (System Backup Data Leak Guard — #1032)**:
