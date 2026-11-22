@@ -4,6 +4,54 @@
 
 ---
 
+## 📝 Что нового в версии 2.1.79 (SemVer Patch Release — Section 7: 100% Elimination & Section 8: BotHub Marketplace & Bot Lifecycle — Deprecated Packages Warning, Pip Index Priority Enforcement, Full Build Log Retention, ANSI Escape Color Stripping, Virtualenv Console Prompt, Hot-Reload Dev Mode, Fast Bot Instance Cloning, Template Variable Type Validation, BotHub Multi-Criteria Search Filters, Bot Community Ratings & Badges, Graceful Shutdown Telegram Emergency Alert, Custom BotHub Template Export, Visual Template Previews, SQLite Database Reset with Safety Backup, Local Privacy-First Analytics Dashboard, Safe Localization Fallback, Headless Barcode Ingestion Guidance, Surgical EXIF Privacy Sanitization)
+
+- **Исторический рубеж аудита**: Устранено **843 из 1045 дефектов** (**80.7%** от всего реестра)!
+- **Секция 7 закрыта на 100%**: Устранены последние 5 дефектов Секции 7 (#574, #577, #578, #579, #585) — Секция 7 (Пакетный менеджер pip, Виртуальные окружения и Зависимости) достигла **100% выполнения (80 из 80 дефектов)**!
+- **Секция 8 — Каталог BotHub и Жизненный цикл ботов**: Устранены первые 13 дефектов (#589, #593, #596, #598, #599, #603, #604, #605, #606, #607, #608, #612, #614).
+- **Предупреждения об устаревших библиотеках (Deprecated Packages Warning — #574)**:
+  - В `PipAndBotHubLifecycleHelper.evaluateDeprecatedPackages()` выявляется ввод заброшенных или устаревших пакетов (telebot, optparse, urllib2, pycrypto, distutils) с рекомендацией современных поддерживаемых библиотек. В настройки добавлен переключатель `deprecatedPackagesGuardEnabled` с диалогом «Что это?».
+- **Приоритет поиска в индексах pip (Pip Index Priority Enforcement — #577)**:
+  - В `PipAndBotHubLifecycleHelper.evaluatePipIndexPriority()` обеспечивается детерминированная очередность опроса зеркал с явной передачей `--index-url` и `--extra-index-url`. В настройки добавлен переключатель `pipIndexPriorityGuardEnabled` с диалогом «Что это?».
+- **Сохранение полного лога сборки (Pip Install Full Log Retention — #578)**:
+  - В `PipAndBotHubLifecycleHelper.evaluatePipInstallLogRetention()` полный лог сборки C-модулей сохраняется в файл `pip_install.log` внутри папки проекта без обрезания до 50 строк. В настройки добавлен переключатель `pipInstallLogTruncationGuardEnabled` с диалогом «Что это?».
+- **Очистка ANSI-кодов в диалогах (Pip ANSI Color Code Stripping — #579)**:
+  - В `PipAndBotHubLifecycleHelper.evaluatePipColorCodeStripping()` экранирующие последовательности и ANSI-коды цветов удаляются из сообщений об ошибках перед выводом в нативные диалоги Android. В настройки добавлен переключатель `pipColorCodesGuardEnabled` с диалогом «Что это?».
+- **Имя активного venv в консоли (Virtualenv Console Prompt — #585)**:
+  - В `PipAndBotHubLifecycleHelper.evaluateVirtualenvPrompt()` генерируется строка приглашения PS1 с префиксом активного окружения `(env_name) $ `, предотвращая случайный ввод команд в чужом проекте. В настройки добавлен переключатель `pipVirtualenvPromptGuardEnabled` с диалогом «Что это?».
+- **Горячая перезагрузка (Hot-Reload Dev Mode — #589)**:
+  - В `PipAndBotHubLifecycleHelper.evaluateHotReload()` отслеживается сохранение файлов `.py` проекта с автоматическим безопасным перезапуском процесса бота после дебаунса. В настройки добавлен переключатель `hotReloadCodeGuardEnabled` с диалогом «Что это?».
+- **Быстрое клонирование экземпляра бота (Fast Bot Instance Cloning — #593)**:
+  - В `PipAndBotHubLifecycleHelper.evaluateBotInstanceCloning()` каталог бота клонируется в новую директорию с очисткой токенов и запросом новых учетных данных для раздельного запуска. В настройки добавлен переключатель `botInstanceCloningGuardEnabled` с диалогом «Что это?».
+- **Валидация типов параметров шаблона (Template Variable Type Validation — #596)**:
+  - В `PipAndBotHubLifecycleHelper.evaluateTemplateVariable()` поля конфигурации шаблона BotHub валидируются на целые числа (ADMIN_ID), regex токенов Telegram и протоколы URL до запуска бота. В настройки добавлен переключатель `templateVariableValidationGuardEnabled` с диалогом «Что это?».
+- **Фильтры и нечеткий поиск в BotHub (BotHub Multi-Criteria Search Filters — #598)**:
+  - В `PipAndBotHubLifecycleHelper.evaluateBotHubSearch()` реализована многокритериальная фильтрация каталога по категориям (Утилиты, Медиа, Крипта), библиотекам и ключевым словам. В настройки добавлен переключатель `bothubSearchFiltersGuardEnabled` с диалогом «Что это?».
+- **Рейтинг и проверенные шаблоны (Bot Community Ratings & Badges — #599)**:
+  - В `PipAndBotHubLifecycleHelper.evaluateBotCommunityBadge()` отображаются счетчики установок, средние оценки и статус проверенного шаблона (Verified Template) для качественных решений. В настройки добавлен переключатель `botRatingReviewsGuardEnabled` с диалогом «Что это?».
+- **Экстренное оповещение о падении в Telegram (Emergency Crash Telegram Alert — #603)**:
+  - В `PipAndBotHubLifecycleHelper.evaluateGracefulShutdownHook()` при аварийном завершении процесса бота администратору отправляется экстренное сообщение в Telegram с фрагментом трейсбека ошибки перед выходом. В настройки добавлен переключатель `botGracefulShutdownHookGuardEnabled` с диалогом «Что это?».
+- **Экспорт проекта в шаблон BotHub (Custom BotHub Template Export — #604)**:
+  - В `PipAndBotHubLifecycleHelper.evaluateCustomTemplateExport()` проект упаковывается в готовый для импорта архив `.bothub.zip` с автоматически сгенерированным манифестом. В настройки добавлен переключатель `customTemplateExportGuardEnabled` с диалогом «Что это?».
+- **Скриншоты и диалоги в карточке шаблона (Visual Template Previews — #605)**:
+  - В `PipAndBotHubLifecycleHelper.evaluateTemplateVisualPreview()` карточки BotHub дополняются каруселью скриншотов и примерами диалогов взаимодействия с ботом в чате. В настройки добавлен переключатель `templatePreviewScreenshotsGuardEnabled` с диалогом «Что это?».
+- **Сброс базы данных SQLite с бэкапом (SQLite Database Reset with Safety Backup — #606)**:
+  - В `PipAndBotHubLifecycleHelper.evaluateDatabaseReset()` предоставляется быстрое действие сброса базы данных проекта к начальному состоянию с созданием датированной резервной копии. В настройки добавлен переключатель `databaseResetButtonGuardEnabled` с диалогом «Что это?».
+- **Локальная приватная аналитика бота (Local Privacy-First Analytics Dashboard — #607)**:
+  - В `PipAndBotHubLifecycleHelper.evaluateBotAnalytics()` рассчитывается локальная статистика активности: уникальные пользователи за день (DAU), популярные команды и аптайм без отправки телеметрии наружу. В настройки добавлен переключатель `botAnalyticsDashboardGuardEnabled` с диалогом «Что это?».
+- **Безопасный откат локализации (Safe Localization Fallback — #608)**:
+  - В `PipAndBotHubLifecycleHelper.evaluateBotLocaleResolution()` при отсутствии системного языка Android в `locales.json` выполняется безопасный fallback на английский язык без падений `KeyError`. В настройки добавлен переключатель `botMultiLanguageLocalesGuardEnabled` с диалогом «Что это?».
+- **Подсказка по вводу для headless-ботов (Headless Barcode Ingestion Guidance — #612)**:
+  - В `PipAndBotHubLifecycleHelper.evaluateCameraTrapGuidance()` выводится поясняющий баннер, разъясняющий пользователю, что бот принимает фото и штрихкоды через чат, а не через камеру телефона. В настройки добавлен переключатель `barcodeCameraTrapGuidanceGuardEnabled` с диалогом «Что это?».
+- **Точечная очистка метаданных EXIF (Surgical EXIF Privacy Sanitization — #614)**:
+  - В `PipAndBotHubLifecycleHelper.evaluateGhostLensSanitizer()` удаляются исключительно теги GPS и идентификаторы устройства, сохраняя ICC-профиль и цветопередачу фото. В настройки добавлен переключатель `ghostLensSanitizerGuardEnabled` с диалогом «Что это?».
+- **Интерфейс настроек и локализация**:
+  - В `SettingsScreen` добавлена новая карточка: `PipAndBotHubLifecycleCard` (18 переключателей).
+  - Все 18 переключателей снабжены диалогами «Что это?» (Определение, При включении, При отключении).
+  - Все 92 строковых ресурса переведены на 22 поддерживаемых языка.
+
+---
+
 ## 📝 Что нового в версии 2.1.78 (SemVer Patch Release — Section 7: Pip Package Manager, Virtual Environments & Dependencies — NFS/SMB Cache Routing, CFFI Precompilation, Pip Dry-Run Simulation, Local Wheel Architecture Validation, Frozen Requirements Lock Snapshot, Package License Compliance Checker, Authenticated HTTP Proxy Support, Stale Build Tracker Directory Purge, PyPI Service Outage Diagnostic, Pre-install Setup.py Syntax Verification, Offline Popular Package Autocomplete, Dependency Graph Cycle Detection, Conda Environment Auto-Converter, Safe Batch Upgrade SemVer Boundary, Background Install Notification and Haptics, Download-Only Wheel Bundle Mode, Android Prefix Pip Configuration Scope, Single-Tap Cascade Dependency Cleanup)
 
 - **Исторический рубеж аудита**: Устранено **825 из 1045 дефектов** (**78.9%** от всего реестра)!
