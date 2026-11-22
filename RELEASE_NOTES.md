@@ -4,6 +4,53 @@
 
 ---
 
+## 📝 Что нового в версии 2.1.75 (SemVer Patch Release — Section 6: Code Editor, Syntax, IDE Productivity & File Manager — Git Gutter Indicators, Fullscreen Immersive Mode, Line Sorting, Trim Trailing Whitespace, Final POSIX Newline, Dynamic Tab Size, Code Minimap, Syntax Themes, Custom Fonts, TODO Highlighter, Scratchpad, Read-Only Protection Mode, Case Conversion Tool, Base64 Tool, Cryptographic Hash Generator, Top/Bottom Jump, Clear Terminal Output, Terminal Buffer Search)
+
+- **Исторический рубеж аудита**: Устранено **781 из 1045 дефектов** (**74.7%** от всего реестра)!
+- **Устранены следующие 18 дефектов Секции 6** (#478, #479, #480, #481, #482, #483, #484, #485, #486, #487, #488, #489, #490, #491, #492, #493, #494, #496).
+- **Цветовые индикаторы изменений Git на полях редактора (Git Gutter Indicators — #478)**:
+  - В `CodeEditorDevToolsAndFormattingHelper.evaluateGitGutter()` вычисляются маркеры изменений относительно базовой ветки: зеленый (добавлено), бирюзовый (изменено) и красный (удалено), обеспечивая мгновенную наглядность диффов в процессе набора кода. В настройки добавлен переключатель `gitGutterGuardEnabled` с диалогом «Что это?».
+- **Полноэкранный режим редактора (Fullscreen Immersive Mode — #479)**:
+  - В `CodeEditorDevToolsAndFormattingHelper.evaluateFullscreenEditorMode()` активируется режим погружения Android с автоматическим скрытием системных строк состояния и навигации, освобождая до 25% полезной площади экрана. В настройки добавлен переключатель `fullscreenEditorModeGuardEnabled` с диалогом «Что это?».
+- **Сортировка строк по алфавиту (Alphabetical Line Sorting Action — #480)**:
+  - В `CodeEditorDevToolsAndFormattingHelper.evaluateLineSorting()` выделенные строки кода (списки импортов, конфигурации, requirements.txt) сортируются по алфавиту по возрастанию и убыванию с поддержкой дедупликации. В настройки добавлен переключатель `lineSortingGuardEnabled` с диалогом «Что это?».
+- **Автоматическое удаление хвостовых пробелов (Trim Trailing Whitespace — #481)**:
+  - В `CodeEditorDevToolsAndFormattingHelper.evaluateTrimTrailingWhitespace()` при сохранении файлов автоматически обрезаются лишние пробелы и табуляции на концах строк, предотвращая замечания линтеров flake8 и PEP 8. В настройки добавлен переключатель `trimTrailingWhitespaceGuardEnabled` с диалогом «Что это?».
+- **Гарантия завершающего перевода строки POSIX (Ensure Final POSIX Newline — #482)**:
+  - В `CodeEditorDevToolsAndFormattingHelper.evaluateEnsureFinalNewline()` гарантируется наличие ровно одного завершающего символа перевода строки `\n` в конце каждого сохраняемого файла, исключая предупреждение `No newline at end of file`. В настройки добавлен переключатель `ensureFinalNewlineGuardEnabled` с диалогом «Что это?».
+- **Настройка размера табуляции и отступов (Dynamic Tab Size Setting — #483)**:
+  - В `CodeEditorDevToolsAndFormattingHelper.evaluateTabSizeSetting()` размер отступа автоматически адаптируется к типу файла (2 пробела для YAML, JSON, HTML; 4 пробела для Python) с возможностью ручного переключения. В настройки добавлен переключатель `tabSizeSettingGuardEnabled` с диалогом «Что это?».
+- **Мини-карта кода (Code Minimap Overview — #484)**:
+  - В `CodeEditorDevToolsAndFormattingHelper.evaluateCodeMinimap()` отрисовывается масштабированная мини-карта файла у правого края экрана с визуальным ползунком текущего окна просмотра для быстрой пространственной ориентации. В настройки добавлен переключатель `codeMinimapGuardEnabled` с диалогом «Что это?».
+- **Цветовые темы подсветки синтаксиса (Syntax Color Themes Support — #485)**:
+  - В `CodeEditorDevToolsAndFormattingHelper.evaluateColorThemes()` добавлена поддержка популярных палитр оформления: CyberVoid Neon, Dracula Official, Monokai Pro и Nord Arctic для комфортной работы на OLED-экранах. В настройки добавлен переключатель `colorThemesGuardEnabled` с диалогом «Что это?».
+- **Поддержка пользовательских моноширинных шрифтов (Custom Fonts Support — #486)**:
+  - В `CodeEditorDevToolsAndFormattingHelper.evaluateCustomFonts()` реализована загрузка и валидация типографики в форматах TTF, OTF и WOFF2 (JetBrains Mono, Fira Code, Source Code Pro) для четкого различения похожих символов. В настройки добавлен переключатель `customFontsGuardEnabled` с диалогом «Что это?».
+- **Подсветка меток TODO, FIXME и BUG (TODO/FIXME Syntax Highlighter — #487)**:
+  - В `CodeEditorDevToolsAndFormattingHelper.evaluateTodoHighlighter()` комментарии с метками `TODO:`, `FIXME:`, `BUG:`, `NOTE:` и `HACK:` подсвечиваются яркими бейджами соответствующих приоритетов. В настройки добавлен переключатель `todoHighlighterGuardEnabled` с диалогом «Что это?».
+- **Встроенный блокнот разработчика (Transient Scratchpad — #488)**:
+  - В `CodeEditorDevToolsAndFormattingHelper.evaluateScratchpad()` встроен локальный черновик для быстрых заметок, сниппетов и тестовых токенов с автоматическим сохранением без захламления файлов проекта. В настройки добавлен переключатель `scratchpadGuardEnabled` с диалогом «Что это?».
+- **Режим защиты от изменений (Read-Only Safety Mode — #489)**:
+  - В `CodeEditorDevToolsAndFormattingHelper.evaluateReadOnlyMode()` режим «Только для чтения» блокирует вызов экранной клавиатуры и предотвращает случайное повреждение рабочего кода при просмотре на сенсорном экране. В настройки добавлен переключатель `readOnlyModeGuardEnabled` с диалогом «Что это?».
+- **Быстрая смена регистра (Case Conversion Tool — #490)**:
+  - В `CodeEditorDevToolsAndFormattingHelper.evaluateCaseConversion()` встроено мгновенное преобразование выделенного текста в форматы UPPERCASE, lowercase, snake_case, camelCase и CONSTANT_CASE для ускорения рефакторинга. В настройки добавлен переключатель `caseConversionGuardEnabled` с диалогом «Что это?».
+- **Встроенное кодирование и декодирование Base64 (Base64 Tool — #491)**:
+  - В `CodeEditorDevToolsAndFormattingHelper.evaluateBase64Tool()` добавлена утилита кодирования и декодирования Base64 прямо из контекстного меню редактора без необходимости перехода в консоль. В настройки добавлен переключатель `base64ToolGuardEnabled` с диалогом «Что это?».
+- **Генератор криптографических хэшей (Cryptographic Hash Generator — #492)**:
+  - В `CodeEditorDevToolsAndFormattingHelper.evaluateHashGenerator()` вычисляются контрольные суммы MD5 и SHA-256 для любого выделенного фрагмента текста (пароли, подписи, API-ключи). В настройки добавлен переключатель `hashGeneratorToolGuardEnabled` с диалогом «Что это?».
+- **Быстрый переход в начало и конец документа (Jump to Top/Bottom Actions — #493)**:
+  - В `CodeEditorDevToolsAndFormattingHelper.evaluateJumpToTopBottom()` добавлены плавающие кнопки мгновенного перемещения к первой и последней строке файла при быстром скролле. В настройки добавлен переключатель `jumpToTopBottomGuardEnabled` с диалогом «Что это?».
+- **Быстрая очистка экрана терминала (Clear Terminal Output Action — #494)**:
+  - В `CodeEditorDevToolsAndFormattingHelper.evaluateClearTerminalOutput()` добавлена иконка мгновенной очистки видимого буфера консоли терминала с сохранением логов на диске. В настройки добавлен переключатель `clearTerminalOutputGuardEnabled` с диалогом «Что это?».
+- **Поиск по буферу вывода терминала (Terminal Buffer Search — #496)**:
+  - В `CodeEditorDevToolsAndFormattingHelper.evaluateTerminalSearch()` встроена строка поиска по выводу консоли терминала со счетчиком совпадений и переходами по найденным строкам. В настройки добавлен переключатель `terminalSearchGuardEnabled` с диалогом «Что это?».
+- **Интерфейс настроек и локализация**:
+  - В `SettingsScreen` добавлены две карточки: `CodeEditorThemesAndFormattingCard` (9 переключателей) и `CodeEditorDevToolsAndTerminalCard` (9 переключателей).
+  - Все 18 переключателей снабжены диалогами «Что это?» (Определение, При включении, При отключении).
+  - Все строковые ресурсы переведены на 22 поддерживаемых языка.
+
+---
+
 ## 📝 Что нового в версии 2.1.74 (SemVer Patch Release — Section 6: Code Editor, Syntax, IDE Productivity & File Manager — Fast Scrollbar Scrubbing, Whitespace Indicators, Markdown Live Preview, JSON/YAML Syntax Validator, Asset Image Viewer, Asset Audio Player, Smart Auto-Indent on Enter, Quick Delete Line, Simultaneous Search Highlight, Word Wrap Toggle, Cursor Position Indicator, Text Selection Statistics, Pinch-to-Zoom Font, Visual Symlink Creation, Recent Files History, Arbitrary Files Diff, Code Outline Navigation, Jump to Bracket)
 
 - **Исторический рубеж аудита**: Устранено **763 из 1045 дефектов** (**73.0%** от всего реестра)!
