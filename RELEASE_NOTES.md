@@ -4,6 +4,49 @@
 
 ---
 
+## 🚀 Что нового в версии 2.1.82 (SemVer Patch Release — Section 9: Data Storage, SQLite Viewer & Databases — Table Fulltext Search Builder, Column Sorting State & ORDER BY Generator, RFC-4180 CSV & Structured JSON Table Export, VACUUM Freelist Disk Optimizer, Visual ALTER TABLE DDL Builder, Database Index Visualizer & Duplicate Detector, Transaction Isolation Modes & Lock Optimizer, Unix Timestamp Auto-Formatting & ISO-8601, AUTOINCREMENT Counter Reset & sqlite_sequence Manager, Cross-Database ATTACH & Federation, High-Performance PRAGMA Tuning Suite, SQL Syntax Highlighting Tokenizer, Saved SQL Queries & History Bookmarks, Adaptive Column Resizing & Width Calculator, Table Pagination Jump & LIMIT/OFFSET Calculator, DEFAULT Values & Constraints Inspector, SQLite Android OS vs Python Version Compatibility, Memory-Mapped I/O PRAGMA mmap_size Configurator)
+
+- **Новый рубеж аудита**: Устранено **897 из 1045 дефектов** (**85.8%** от всего реестра)!
+- **Секция 9 (Data Storage, SQLite Viewer & Databases)** активно развивается — устранено еще 18 дефектов (#676, #677, #678, #679, #680, #687, #688, #689, #690, #691, #692, #693, #694, #696, #697, #698, #700, #701).
+- **Универсальный полнотекстовый поиск по таблице (Table Search Fulltext — #676)**:
+  - В `SqliteAdvancedManagementHelper.evaluateTableSearchFulltext()` реализовано динамическое построение безопасных SQL-запросов полнотекстового поиска через оператор `LIKE` по всем колонкам таблицы. В настройки добавлен тумблер `tableSearchFulltextGuardEnabled` с диалогом «Что это?».
+- **Сохранение сортировки колонок и генератор ORDER BY (Column Sorting — #677)**:
+  - В `SqliteAdvancedManagementHelper.evaluateColumnSorting()` добавлен трекинг состояния сортировки (ASC/DESC) по нажатию на заголовки колонок с генерацией валидного выражения `ORDER BY`. В настройки добавлен тумблер `columnSortingGuardEnabled` с диалогом «Что это?».
+- **Экспорт таблиц в CSV и JSON (Table Export Formats — #678)**:
+  - В `SqliteAdvancedManagementHelper.evaluateTableExportFormat()` реализована сериализация данных таблицы в стандартный RFC-4180 CSV с экранированием кавычек и форматированный JSON. В настройки добавлен тумблер `exportTableFormatGuardEnabled` с диалогом «Что это?».
+- **Оптимизатор свободного места и дефрагментация VACUUM (VACUUM Automation — #679)**:
+  - В `SqliteAdvancedManagementHelper.evaluateVacuumAutomation()` реализован расчет высвобождаемого дискового пространства на основе `freelist_count` и вызов `VACUUM` при превышении порога в 5 МБ. В настройки добавлен тумблер `vacuumAutomationGuardEnabled` с диалогом «Что это?».
+- **Визуальный конструктор команд ALTER TABLE DDL (Visual ALTER TABLE — #680)**:
+  - В `SqliteAdvancedManagementHelper.evaluateTableSchemaAlter()` добавлен безопасный конструктор SQL DDL для добавления, переименования и удаления колонок таблицы. В настройки добавлен тумблер `tableSchemaAlterGuardEnabled` с диалогом «Что это?».
+- **Визуализатор индексов и поиск дубликатов (Index Visualizer & Redundancy — #687)**:
+  - В `SqliteAdvancedManagementHelper.evaluateDatabaseIndexVisualizer()` реализован парсинг списка индексов и детекция дублирующихся определений, замедляющих вставки. В настройки добавлен тумблер `databaseIndexVisualizerGuardEnabled` с диалогом «Что это?».
+- **Настройка изоляции транзакций и режимов блокировки (Transaction Isolation — #688)**:
+  - В `SqliteAdvancedManagementHelper.evaluateTransactionIsolation()` добавлена поддержка режимов `DEFERRED`, `IMMEDIATE` и `EXCLUSIVE` для предотвращения дедлоков `SQLITE_BUSY` при параллельной работе ботов. В настройки добавлен тумблер `transactionIsolationLevelsGuardEnabled` с диалогом «Что это?».
+- **Автоопределение и форматирование Unix-таймстемпов (DateTime Formatting — #689)**:
+  - В `SqliteAdvancedManagementHelper.evaluateDateTimeFormatting()` реализовано распознавание 10- и 13-значных Unix-таймстемпов с автоматическим выводом читаемой даты в формате ISO-8601. В настройки добавлен тумблер `dateTimeFormattingGuardEnabled` с диалогом «Что это?».
+- **Сброс автоинкремента и менеджер sqlite_sequence (Auto-increment Counter Reset — #690)**:
+  - В `SqliteAdvancedManagementHelper.evaluateAutoIncrementReset()` реализован сброс счетчиков `sqlite_sequence` для чистой переиндексации таблиц после удаления тестовых данных. В настройки добавлен тумблер `autoIncrementCounterResetGuardEnabled` с диалогом «Что это?».
+- **Межбазовое подключение ATTACH и федеративные запросы (Multiple DB Attach — #691)**:
+  - В `SqliteAdvancedManagementHelper.evaluateMultipleDbAttach()` реализовано формирование команд `ATTACH DATABASE` для выполнения SQL-запросов и JOIN между несколькими базами данных. В настройки добавлен тумблер `multipleDbAttachGuardEnabled` с диалогом «Что это?».
+- **Набор оптимизации SQLite PRAGMA (High-Performance PRAGMA Tuning — #692)**:
+  - В `SqliteAdvancedManagementHelper.evaluateSqlitePragmasTuning()` добавлена тонкая настройка параметров `cache_size`, `temp_store`, `page_size` и `synchronous` для пиковой скорости на мобильной памяти. В настройки добавлен тумблер `sqlitePragmasTunerGuardEnabled` с диалогом «Что это?».
+- **Токенизатор подсветки синтаксиса SQL (SQL Syntax Highlighting — #693)**:
+  - В `SqliteAdvancedManagementHelper.evaluateSqlSyntaxHighlighting()` реализован лексический анализатор ключевых слов, строк и литералов SQL для цветного отображения в консоли. В настройки добавлен тумблер `sqlSyntaxHighlightingGuardEnabled` с диалогом «Что это?».
+- **Менеджер сохраненных запросов и история SQL (Saved SQL Queries — #694)**:
+  - В `SqliteAdvancedManagementHelper.evaluateSavedQueriesBookmark()` обеспечено сохранение избранных и недавних запросов с быстрым доступом в один клик. В настройки добавлен тумблер `savedSqlQueriesGuardEnabled` с диалогом «Что это?».
+- **Адаптивная ширина колонок таблицы (Adaptive Column Resizing — #696)**:
+  - В `SqliteAdvancedManagementHelper.evaluateColumnResizing()` реализован адаптивный расчет ширины колонок в зависимости от длины содержимого и диагонали экрана смартфона или планшета. В настройки добавлен тумблер `columnResizingGuardEnabled` с диалогом «Что это?».
+- **Быстрый переход по страницам пагинации (Pagination Direct Jump — #697)**:
+  - В `SqliteAdvancedManagementHelper.evaluatePaginationJump()` реализован расчет страниц и формирование выражений `LIMIT/OFFSET` для мгновенного перехода к нужной странице таблицы. В настройки добавлен тумблер `paginationJumpGuardEnabled` с диалогом «Что это?».
+- **Инспектор значений DEFAULT и ограничений (Default Values & Constraints — #698)**:
+  - В `SqliteAdvancedManagementHelper.evaluateDefaultValuesInspector()` добавлен анализ значений по умолчанию, ограничений NOT NULL и выражений CHECK из схемы таблицы. В настройки добавлен тумблер `defaultValuesInspectorGuardEnabled` с диалогом «Что это?».
+- **Проверка совместимости версий SQLite (SQLite Version Compatibility — #700)**:
+  - В `SqliteAdvancedManagementHelper.evaluateSqliteVersionCompatibility()` реализовано сопоставление версий системного SQLite Android и встроенного sqlite3 Python для предупреждения о неподдерживаемых возможностях. В настройки добавлен тумблер `sqliteVersionMismatchGuardEnabled` с диалогом «Что это?».
+- **Настройка отображения памяти в I/O (Memory-Mapped I/O — #701)**:
+  - В `SqliteAdvancedManagementHelper.evaluateMemoryMappedIo()` реализован расчет оптимального размера `PRAGMA mmap_size` с учетом доступной ОЗУ для ускорения чтения БД до 2-3 раз. В настройки добавлен тумблер `memoryMappedIoGuardEnabled` с диалогом «Что это?».
+
+---
+
 ## 🚀 Что нового в версии 2.1.81 (SemVer Patch Release — Section 8: BotHub Marketplace 100% COMPLETE & Section 9: SQLite Inspector — Template License Badge & Commercial Safety, Custom Python Binary Path Validation, Hot-Swap .env Variables via SIGHUP, ETag & Conditional GET Catalog Cache, Template Post-Install Script Guard, Resource Quotas & Low-Memory Advisory, Encrypted Peer-to-Peer QR Config Share, Archived Template Deprecation Notice, Direct Route to Instance Logs from Template, Daily Scheduled Preventive Restart, 30-Day Bot Uptime SLA & Reliability Tier, External Bot Directory & @BotFather Links, Contextual Variable Hints & Format Tooltips, Custom Category Pinning & Ordering, Community Star Rating & Reviews, SQLite BLOB Binary Inspector & MIME Detection, SQLite Foreign Key Traversal Query Builder, SQLite EXPLAIN QUERY PLAN Full-Scan Detector)
 
 - **Исторический рубеж аудита**: Устранено **879 из 1045 дефектов** (**84.1%** от всего реестра)!
