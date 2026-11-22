@@ -4,6 +4,54 @@
 
 ---
 
+## 📝 Что нового в версии 2.1.73 (SemVer Patch Release — Section 6: Code Editor, Syntax, IDE Productivity & File Manager — Multi-File Search & Replace, Bracket Pairing, Indentation Guides, Code Snippets Palette, Soft Wrap Line Numbers, Programming Font Ligatures, Built-in Hex Viewer, Import Refactoring, Block Code Folding, Inline Color Picker, Regex Tester, PEP 8 Format on Save, Multi-Cursor Editing, Comment Toggle, Visual chmod Editor, Python New File Templates, Breadcrumbs Navigation, Line Duplicate)
+
+- **Исторический рубеж аудита**: Устранено **745 из 1045 дефектов** (**71.3%** от всего реестра)!
+- **Начата ликвидация СЕКЦИИ 6 (Редактор кода, синтаксис, IDE-продуктивность и файловый менеджер)**.
+- **Устранены первые 18 дефектов Секции 6** (#430, #433, #434, #437, #438, #439, #441, #442, #445, #446, #447, #448, #449, #451, #452, #453, #454, #457).
+- **Полнотекстовый поиск и замена по проекту (Multi-File Search & Replace — #430)**:
+  - В `CodeEditorAndIdeProductivityHelper.evaluateMultiFileSearch()` реализован поиск и пакетная замена фрагментов кода и regex-паттернов во всех файлах проекта с поддержкой учета регистра. В настройки добавлен переключатель `multiFileSearchGuardEnabled` с диалогом «Что это?».
+- **Автоматическое закрытие скобок и кавычек (Auto-Closing Bracket & Quote Pairs — #433)**:
+  - В `CodeEditorAndIdeProductivityHelper.evaluateBracketPairing()` при вводе открывающей скобки `(`, `[`, `{` или кавычки автоматически вставляется закрывающая с позиционированием курсора внутри, а при повторном вводе закрывающего символа курсор мягко перескакивает через него. В настройки добавлен переключатель `bracketPairingGuardEnabled` с диалогом «Что это?».
+- **Вертикальные направляющие уровней отступов (Indentation Vertical Guide Lines — #434)**:
+  - В `CodeEditorAndIdeProductivityHelper.evaluateIndentationGuides()` визуализируются аккуратные вертикальные пунктирные линии на границах отступов (кратных 4 пробелам), облегчая чтение вложенных функций и блоков Python. В настройки добавлен переключатель `indentationGuidesGuardEnabled` с диалогом «Что это?».
+- **Палитра заготовок и сниппетов кода (Code Snippets Palette — #437)**:
+  - В `CodeEditorAndIdeProductivityHelper.evaluateCodeSnippets()` встроена библиотека быстрых шаблонов кода (`aiomsg`, `defmain`, `telebot`, `fastapi`, `logger`, `aiohttp`) для мгновенной вставки скелетов ботов по короткому триггеру. В настройки добавлен переключатель `codeSnippetsGuardEnabled` с диалогом «Что это?».
+- **Логическая нумерация строк при мягком переносе (Logical Line Numbers with Soft Wrap — #438)**:
+  - В `CodeEditorAndIdeProductivityHelper.evaluateLineNumbersWithSoftWrap()` перенесенные части длинных строк помечаются маркером-точкой `•` на левом поле, а номер строки присваивается только началу логической строки. В настройки добавлен переключатель `lineNumbersWithSoftWrapGuardEnabled` с диалогом «Что это?».
+- **Программистские лигатуры шрифта (Programming Font Ligatures — #439)**:
+  - В `CodeEditorAndIdeProductivityHelper.evaluateFontLigatures()` активируются аппаратные лигатуры OpenType (`->`, `!=`, `==`, `<=`, `>=`) для шрифтов JetBrains Mono и Fira Code, повышая читаемость кода. В настройки добавлен переключатель `fontLigaturesGuardEnabled` с диалогом «Что это?».
+- **Встроенный Hex-просмотрщик бинарных ресурсов (Built-in Hex Asset Viewer — #441)**:
+  - В `CodeEditorAndIdeProductivityHelper.evaluateHexViewer()` бинарные файлы (базы данных SQLite `.db`, байт-код `.pyc`, изображения) открываются в шестнадцатеричном виде со смещениями, HEX-кодами и ASCII-колонкой. В настройки добавлен переключатель `hexViewerGuardEnabled` с диалогом «Что это?».
+- **Автоматический рефакторинг импортов при переименовании (Automatic Import Refactoring — #442)**:
+  - В `CodeEditorAndIdeProductivityHelper.evaluateImportRefactoring()` при переименовании модуля или файла все операторы `import module` и `from module import ...` автоматически обновляются во всех зависимых исходных кодах. В настройки добавлен переключатель `importRefactoringGuardEnabled` с диалогом «Что это?».
+- **Сворачивание блоков кода (Block Code Folding — #445)**:
+  - В `CodeEditorAndIdeProductivityHelper.evaluateCodeFolding()` блоки определений функций, классов и длинных структур данных можно сворачивать и разворачивать для фокусировки на нужном участке кода. В настройки добавлен переключатель `codeFoldingGuardEnabled` с диалогом «Что это?».
+- **Инлайн-превью и выбор цвета HEX (Inline HEX Color Preview & Picker — #446)**:
+  - В `CodeEditorAndIdeProductivityHelper.evaluateColorPicker()` рядом с шестнадцатеричными кодами цветов (например, `#00E5FF`) отображается цветовой бейдж и диалог визуального подбора палитры. В настройки добавлен переключатель `colorPickerGuardEnabled` с диалогом «Что это?».
+- **Интерактивный тестер регулярных выражений (Interactive Regular Expression Tester — #447)**:
+  - В `CodeEditorAndIdeProductivityHelper.evaluateRegexTester()` встроен визуальный инспектор regex с мгновенным подсвечиванием групп совпадений и валидацией синтаксиса шаблонов. В настройки добавлен переключатель `regexTesterGuardEnabled` с диалогом «Что это?».
+- **Автоматическое форматирование по стандарту PEP 8 при сохранении (Automatic PEP 8 Format on Save — #448)**:
+  - В `CodeEditorAndIdeProductivityHelper.evaluateFormatOnSave()` при нажатии кнопки сохранения автоматически удаляются висячие пробелы на концах строк, нормализуются переносы и обеспечивается завершающий перевод строки. В настройки добавлен переключатель `formatOnSaveGuardEnabled` с диалогом «Что это?».
+- **Мультикурсорное редактирование (Multi-Cursor Simultaneous Editing — #449)**:
+  - В `CodeEditorAndIdeProductivityHelper.evaluateMultiCursorEditing()` поддерживается установка нескольких курсоров для одновременного ввода и правки повторяющихся фрагментов кода. В настройки добавлен переключатель `multiCursorEditingGuardEnabled` с диалогом «Что это?».
+- **Быстрое комментирование строк (Instant Comment/Uncomment (#) Toggle — #451)**:
+  - В `CodeEditorAndIdeProductivityHelper.evaluateCommentToggle()` выделенные строки кода за одно действие комментируются символом `#` или раскомментируются. В настройки добавлен переключатель `commentToggleGuardEnabled` с диалогом «Что это?».
+- **Визуальный редактор прав доступа файлов chmod (Visual File Permissions (chmod) Editor — #452)**:
+  - В `CodeEditorAndIdeProductivityHelper.evaluateFilePermissionsChmod()` права на чтение, запись и исполнение (`rwx`) настраиваются через графические переключатели с вычислением восьмеричного режима (`0755`, `0644`). В настройки добавлен переключатель `filePermissionsChmodGuardEnabled` с диалогом «Что это?».
+- **Шаблоны новых Python файлов с заготовками (Python Boilerplate New File Templates — #453)**:
+  - В `CodeEditorAndIdeProductivityHelper.evaluateNewFileTemplate()` при создании нового скрипта предлагаются готовые профессиональные шаблоны: асинхронный Telegram-бот, веб-хук сервер, CLI-утилита, воркер базы данных. В настройки добавлен переключатель `newFileTemplateGuardEnabled` с диалогом «Что это?».
+- **«Хлебные крошки» навигации по символам кода (Symbol Hierarchy Breadcrumbs Navigation — #454)**:
+  - В `CodeEditorAndIdeProductivityHelper.evaluateBreadcrumbsNavigation()` над областью редактора отображается цепочка текущего контекста: `проект > файл.py > класс > метод`, позволяя быстро ориентироваться в крупных скриптах. В настройки добавлен переключатель `breadcrumbsNavigationGuardEnabled` с диалогом «Что это?».
+- **Быстрое дублирование строки Ctrl+D (Instant Line Duplicate (Ctrl+D) Action — #457)**:
+  - В `CodeEditorAndIdeProductivityHelper.evaluateLineDuplicate()` текущая строка мгновенно копируется на следующую позицию с сохранением отступа одной командой без выделения и буфера обмена. В настройки добавлен переключатель `lineDuplicateGuardEnabled` с диалогом «Что это?».
+- **Интерфейс настроек и локализация**:
+  - В `SettingsScreen` добавлены две карточки: `CodeEditorSyntaxAndNavigationCard` (9 переключателей) и `CodeEditorProductivityAndActionsCard` (9 переключателей).
+  - Все 18 переключателей снабжены диалогами «Что это?» (Определение, При включении, При отключении).
+  - Все строковые ресурсы переведены на 22 поддерживаемых языка.
+
+---
+
 ## 📝 Что нового в версии 2.1.72 (SemVer Patch Release — Section 5: Networking, Ktor & WebSockets — 100% ELIMINATED: Per-Socket Bandwidth Stats, DNSSEC Verification via DoH, Remote Abort & Reset Interception, Dynamic SO_RCVBUF Buffer Scaling, Streaming Pause & Resume Support, Standard /healthz Uptime Endpoint, Standardized PyBionic User-Agent, Port Scan & SYN Flood Defense, Modern AEAD TLS Cipher Preference, Web Cookie Header Limiting & Pruning, Monotonic Bandwidth Meter with Handover Persistence, Cellular Window Scaling & Multi-Stream Acceleration, Low-Memory TCP Window Clamping)
 
 - **Исторический рубеж аудита**: Устранено **727 из 1045 дефектов** (**69.6%** от всего реестра)!
