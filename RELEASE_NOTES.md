@@ -4,6 +4,52 @@
 
 ---
 
+## 🚀 Что нового в версии 2.1.87 (SemVer Patch Release — Section 10 100% Milestone & Section 11 Kickoff: Kernel Memory Slab & PageTable Monitor, Per-Bot Crash Alert Mute Policy, Network Disconnect & RSSI Correlation, Automated Support Crash Report Generator, Alert Webhook Dispatch & Latency Test, Cyclic Wrap-Around Log Buffer Search, Per-Core CPU Frequency & Scaling Monitor, Crash Dump Privacy & Path Anonymizer, Battery Temperature Fahrenheit Display, Accurate PSS Memory vs RSS, Mobile Network Latency Jitter Profiler, Canonical Crash Signature Deduplication, Android Glance Home Screen Widgets, Material You Dynamic Color Monet, Launcher Quick Action App Shortcuts, Android 14+ Predictive Back Gesture, Tactile Haptic Feedback Tuning, Resilient Pull-to-Refresh Timeout Guard)
+
+- **Грандиозный рубеж**: Устранено **987 из 1045 дефектов** (**94.5%** от всего реестра)! В реестре осталось всего **58 дефектов**!
+- **Секция 10 (Telemetry, Logging, Monitoring & Error Parsing) ПОЛНОСТЬЮ ЗАКРЫТА НА 100% (75 из 75 дефектов устранены)!**
+- **Успешный старт Секции 11 (UI/UX, Jetpack Compose, Android Ergonomics & DeX)** — устранены первые 6 дефектов (#818, #822, #823, #824, #825, #826).
+- **Мониторинг структур памяти ядра Slab и PageTables (Kernel Memory Slab Monitor — #803)**:
+  - В `ObservabilityCompletionAndUiHardeningHelper.evaluateKernelMemory()` реализован расчет структур ядра (Slab, SReclaimable, PageTables) из `/proc/meminfo` с предупреждением при превышении 250 МБ для предотвращения крашей Low Memory Killer. В настройки добавлен тумблер `kernelMemorySlabGuardEnabled` с диалогом «Что это?».
+- **Индивидуальное отключение алертов для второстепенных ботов (Mute Alerts per Bot — #804)**:
+  - В `ObservabilityCompletionAndUiHardeningHelper.shouldSendAlertForBot()` внедрена поддержка списка заглушенных проектов для исключения ложных тревог от тестовых и экспериментальных ботов. В настройки добавлен тумблер `botAlertMuteGuardEnabled` с диалогом «Что это?».
+- **Сопоставление разрывов сети с уровнем радиосигнала RSSI (Wi-Fi Signal RSSI Correlation — #805)**:
+  - В `ObservabilityCompletionAndUiHardeningHelper.evaluateRssiCorrelation()` реализовано сопоставление разрывов сетевых сокетов с уровнем сигнала Wi-Fi/LTE (дБм) для четкого разделения проблем слабого приема и серверных сбоев. В настройки добавлен тумблер `wifiSignalRssiGuardEnabled` с диалогом «Что это?».
+- **Автогенератор технических отчетов об ошибках для поддержки (Automated Crash Report Generator — #806)**:
+  - В `ObservabilityCompletionAndUiHardeningHelper.generateCrashReport()` внедрено автоматическое формирование полного Markdown-отчета об инциденте с кодом завершения, стектрейсом и последними логами для быстрой отправки в техподдержку. В настройки добавлен тумблер `crashReportGeneratorGuardEnabled` с диалогом «Что это?».
+- **Тестовая отправка вебхука с замером задержки (Webhook Alert Test Button — #807)**:
+  - В `ObservabilityCompletionAndUiHardeningHelper.evaluateWebhookTestResponse()` добавлена кнопка проверки отправки тестового алерта в Telegram/вебхук с измерением round-trip задержки сети. В настройки добавлен тумблер `webhookTestActionGuardEnabled` с диалогом «Что это?».
+- **Циклический бесшовный поиск по буферу логов (Log Buffer Search Wrap — #808)**:
+  - В `ObservabilityCompletionAndUiHardeningHelper.navigateSearchMatch()` реализована циклическая навигация по найденным совпадениям с бесшовным переходом от последнего результата к первому и обратно. В настройки добавлен тумблер `logSearchWrapGuardEnabled` с диалогом «Что это?».
+- **Мониторинг частот ядер процессора и троттлинга (CPU Core Frequency Graph — #809)**:
+  - В `ObservabilityCompletionAndUiHardeningHelper.parseCpuCoreFrequencies()` добавлен контроль частот ядер чипсета по кластерам (LITTLE, MID, BIG) для выявления сброса частот терморегулятором. В настройки добавлен тумблер `cpuCoreFrequencyGuardEnabled` с диалогом «Что это?».
+- **Анонимизация путей и приватных данных в краш-дампах (Crash Dump Anonymization — #810)**:
+  - В `ObservabilityCompletionAndUiHardeningHelper.anonymizeCrashDump()` внедрена автоматическая замена внутренних путей (`/data/user/0/...`), логинов и IP-адресов на безопасные плейсхолдеры перед экспортом. В настройки добавлен тумблер `crashDumpAnonymizerGuardEnabled` с диалогом «Что это?».
+- **Переключение единиц измерения температуры батареи в Фаренгейты (Battery Temperature Celsius/Fahrenheit — #811)**:
+  - В `ObservabilityCompletionAndUiHardeningHelper.formatBatteryTemperature()` добавлена поддержка отображения температуры аккумулятора и SoC в градусах Фаренгейта (°F). В настройки добавлен тумблер `batteryTempFahrenheitGuardEnabled` с диалогом «Что это?».
+- **Точный учет памяти по PSS вместо завышенного RSS (Process Memory PSS vs RSS — #812)**:
+  - В `ObservabilityCompletionAndUiHardeningHelper.comparePssAndRss()` внедрен расчет Proportional Set Size (PSS) из smaps, исключающий повторный учет разделяемых библиотек Android и показывающий истинный объем RAM. В настройки добавлен тумблер `processMemoryPssGuardEnabled` с диалогом «Что это?».
+- **Профилировщик джиттера задержки мобильной сети (Network Latency Jitter Metric — #814)**:
+  - В `ObservabilityCompletionAndUiHardeningHelper.calculateLatencyJitter()` реализован расчет вариации задержки (джиттер мс) между последовательными сетевыми пакетами для оценки стабильности радиоканала. В настройки добавлен тумблер `networkLatencyJitterGuardEnabled` с диалогом «Что это?».
+- **Дедупликация и группировка сбоев по сигнатуре (Crash Signature Deduplication — #815)**:
+  - В `ObservabilityCompletionAndUiHardeningHelper.deduplicateCrashes()` внедрено хеширование сигнатуры сбоя (тип исключения + верхний стекфрейм) для группировки сотен повторяющихся ошибок в единую карточку инцидента. В настройки добавлен тумблер `crashSignatureDedupGuardEnabled` с диалогом «Что это?».
+- **Интерактивные виджеты Glance для рабочего стола Android (Home Screen App Widgets — #818)**:
+  - В `ObservabilityCompletionAndUiHardeningHelper.buildHomeWidgetPayload()` реализована модель данных и полезная нагрузка для виджетов Glance с отображением числа работающих ботов, нагрузки CPU, памяти и кнопками управления. В настройки добавлен тумблер `homeScreenWidgetsGuardEnabled` с диалогом «Что это?».
+- **Адаптивная динамическая палитра Material You Monet (Dynamic Color Material You — #822)**:
+  - В `ObservabilityCompletionAndUiHardeningHelper.resolveThemeMode()` добавлена поддержка цветовой темы Material You на базе обоев Android 12+ с возможностью сохранения фирменного стиля Cyberpunk. В настройки добавлен тумблер `materialYouDynamicColorGuardEnabled` с диалогом «Что это?».
+- **Контекстные ярлыки приложения в системном лаунчере (App Shortcuts Quick Actions — #823)**:
+  - В `ObservabilityCompletionAndUiHardeningHelper.getSupportedLauncherShortcuts()` реализована регистрация быстрых действий при долгом нажатии на иконку (Старт всех, Стоп, Консоль, Логи). В настройки добавлен тумблер `launcherQuickShortcutsGuardEnabled` с диалогом «Что это?».
+- **Поддержка предиктивного системного жеста 'Назад' (Predictive Back Gesture — #824)**:
+  - В `ObservabilityCompletionAndUiHardeningHelper.evaluatePredictiveBack()` внедрена интеграция с системным жестом Android 14+ Predictive Back с плавной анимацией закрытия экранов и защитой от случайного выхода. В настройки добавлен тумблер `predictiveBackGestureGuardEnabled` с диалогом «Что это?».
+- **Настройка тактильного отклика и профилей вибрации (Haptic Feedback Tuning — #825)**:
+  - В `ObservabilityCompletionAndUiHardeningHelper.resolveHapticConfig()` реализована регулировка интенсивности вибрации (Off, Light, Medium, Crisp, Strong) под физические особенности вибромоторов смартфонов. В настройки добавлен тумблер `hapticFeedbackTuningGuardEnabled` с диалогом «Что это?».
+- **Защита от зависания индикатора обновления списков (Pull-to-Refresh Indicator — #826)**:
+  - В `ObservabilityCompletionAndUiHardeningHelper.evaluatePullToRefreshTimeout()` внедрен 8-секундный тайм-аут безопасности, автоматически скрывающий застрявший спиннер Pull-to-Refresh при сетевых сбоях. В настройки добавлен тумблер `pullToRefreshResilienceGuardEnabled` с диалогом «Что это?».
+- **Полная 22-язычная локализация**: Все новые параметры переведены на 22 языка через `tools/sync_strings.py`.
+- **Интеграция в настройки**: Карточка `ObservabilityCompletionAndUiCard` встроена в `SettingsScreen` со всеми диалогами «Что это?».
+
+---
+
 ## 🚀 Что нового в версии 2.1.86 (SemVer Patch Release — Section 10 Advanced Telemetry, Distributed Tracing & Stream Hardening: UI Log Stream Freeze & Pause Buffer, Syslog Remote Export RFC 5424, Fatal Crash Audio Alarm for Critical Bots, Adjustable Telemetry Log Font Size, Crash History & Incident Records Purge, Per-Thread CPU Profiling & Attribution, Custom Log Tags & Metadata Decorator, Active TCP Socket Connections Monitor, Dropped Log Lines & Overflow Counter, Cold Historical Log Gzip Compression, One-Tap Android Sharesheet Log Exporter, Cold Start Latency Profiler & Rating, Worker Thread Name & ID Filter, UTC vs Local Log Timestamps Selector, OpenTelemetry & W3C Distributed Tracing, Unified Cross-Project Multi-Log Search, Visual Distinction for Stdout & Stderr, Unresolved Crash Count Navigation Badge)
 
 - **Новый рубеж аудита**: Устранено **969 из 1045 дефектов** (**92.7%** от всего реестра)! Осталось всего 76 дефектов во всем аудите!
