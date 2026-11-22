@@ -4,6 +4,53 @@
 
 ---
 
+## 📝 Что нового в версии 2.1.80 (SemVer Patch Release — Section 8: BotHub Marketplace & Ecosystem — Forum CRM Dispatcher General Fallback, Media Target Compressor Container Margin, Meme Studio Font Fallback, Motivator Pro Quote Card Caching, Round Video Master 1:1 Aspect Ratio, Spatial Audio 8D Mono Compatibility, Sticker Studio Lossless WebP Transparency, Template Update Notification Badge, Catalog Icon Multi-Tier Caching, Resilient Offline Catalog State, JSON Schema Configuration Verification, Local Webhook Mock Event Generator, High-Priority Crash Alert Notification Channel, Dynamic CLI Launch Arguments, Environment Profile Switching, BotHub Recent Search History, Template Bookmarks & Favorites, Direct Template Issue Reporting)
+
+- **Исторический рубеж аудита**: Устранено **861 из 1045 дефектов** (**82.4%** от всего реестра)!
+- **Устранены следующие 18 дефектов Секции 8** (#619, #621, #622, #623, #627, #630, #632, #633, #634, #635, #637, #638, #640, #641, #642, #644, #645, #646).
+- **Откат на префиксы в CRM без тем форума (Forum CRM Topics General Supergroup Fallback — #619)**:
+  - В `BotHubAdvancedEcosystemHelper.evaluateCrmRouting()` реализован автоматический fallback на префикс тикета `[Ticket #XYZ]` при работе бота в супергруппах без поддержки разделов тем форума. В настройки добавлен переключатель `crmRoutingGuardEnabled` с диалогом «Что это?».
+- **Запас контейнера при сжатии видео (Media Compressor Container Margin — #621)**:
+  - В `BotHubAdvancedEcosystemHelper.evaluateTargetBitrate()` в формулу расчета битрейта видео заложен 5% буфер накладных расходов контейнера MP4, исключающий отклонение файлов серверами Telegram из-за превышения лимитов. В настройки добавлен переключатель `mediaTargetCompressorGuardEnabled` с диалогом «Что это?».
+- **Запасные шрифты в Meme Studio (Meme Studio Font Fallback — #622)**:
+  - В `BotHubAdvancedEcosystemHelper.evaluateMemeFont()` при отсутствии коммерческого шрифта Impact на Android происходит автоматическое бесшовное переключение на легальные открытые аналоги (Anton, Oswald). В настройки добавлен переключатель `memeFontFallbackGuardEnabled` с диалогом «Что это?».
+- **Кэширование карточек цитат (Motivator Pro Card Caching — #623)**:
+  - В `BotHubAdvancedEcosystemHelper.evaluateCardCache()` карточки цитат кэшируются по SHA-256 хэшу текста, устраняя повторный нагрев процессора и повторный рендеринг идентичных изображений. В настройки добавлен переключатель `cardCacheGuardEnabled` с диалогом «Что это?».
+- **Центральное кадрирование видео-кружочков 1:1 (Round Video Master Aspect Ratio — #627)**:
+  - В `BotHubAdvancedEcosystemHelper.evaluateRoundVideoCrop()` перед масштабированием применяется центральный квадратный кроп `crop=min(iw,ih)`, исключающий растягивание и сплющивание лиц в видеозаметках. В настройки добавлен переключатель `roundVideoCropGuardEnabled` с диалогом «Что это?».
+- **Совместимость 8D аудио с моно-динамиками (Spatial Audio 8D Mono Compatibility — #630)**:
+  - В `BotHubAdvancedEcosystemHelper.evaluateSpatialAudioPanning()` фильтры расширения стереобазы формируются без взаимного вычитания фаз, предотвращая пропадание вокала на динамиках смартфонов. В настройки добавлен переключатель `spatialAudio8dGuardEnabled` с диалогом «Что это?».
+- **Сохранение прозрачности в Sticker Studio (Sticker Studio Lossless Transparency — #632)**:
+  - В `BotHubAdvancedEcosystemHelper.evaluateWebpStickerConversion()` при конвертации стикеров в WebP активируются флаги `lossless=1` и `alpha_q=100`, предотвращая появление черных фоновых рамок в Telegram. В настройки добавлен переключатель `webpStickerConversionGuardEnabled` с диалогом «Что это?».
+- **Уведомления об обновлениях шаблонов (Template Update Notification Badge — #633)**:
+  - В `BotHubAdvancedEcosystemHelper.evaluateTemplateUpdate()` выполняется сравнение установленной версии шаблона с каталогом BotHub с отображением бейджа «Доступно обновление». В настройки добавлен переключатель `templateUpdateNotificationGuardEnabled` с диалогом «Что это?».
+- **Кэширование иконок каталога (Catalog Icon Multi-Tier Caching — #634)**:
+  - В `BotHubAdvancedEcosystemHelper.evaluateIconCachePolicy()` настроена двухуровневая политика кэширования иконок в оперативной памяти и на диске, обеспечивающая стабильные 60 FPS при прокрутке каталога. В настройки добавлен переключатель `catalogIconCachingGuardEnabled` с диалогом «Что это?».
+- **Офлайн-состояние каталога BotHub (Resilient Offline Catalog State — #635)**:
+  - В `BotHubAdvancedEcosystemHelper.evaluateEmptyCatalogState()` при недоступности сети отображается диагностический экран с кнопкой повтора и доступом к встроенным локальным шаблонам. В настройки добавлен переключатель `emptyCatalogStateGuardEnabled` с диалогом «Что это?».
+- **Валидация по схеме JSON Schema (JSON Schema Configuration Verification — #637)**:
+  - В `BotHubAdvancedEcosystemHelper.evaluateJsonSchemaValidation()` параметры конфигурации бота проверяются по манифесту обязательных полей, предотвращая падения из-за незаполненных переменных. В настройки добавлен переключатель `jsonSchemaValidationGuardEnabled` с диалогом «Что это?».
+- **Генератор mock-событий вебхуков (Local Webhook Mock Event Generator — #638)**:
+  - В `BotHubAdvancedEcosystemHelper.evaluateMockTelegramUpdate()` формируются тестовые пакеты Telegram Update для проверки вебхуков бота локально без необходимости внешних туннелей. В настройки добавлен переключатель `localWebhookTestingGuardEnabled` с диалогом «Что это?».
+- **Приоритетный звуковой канал уведомлений (High-Priority Crash Notification Channel — #640)**:
+  - В `BotHubAdvancedEcosystemHelper.evaluateCrashAlertChannel()` падения ботов регистрируются в отдельном системном канале уведомлений с высоким приоритетом и возможностью обхода режима «Не беспокоить». В настройки добавлен переключатель `crashNotificationAlertChannelGuardEnabled` с диалогом «Что это?».
+- **Аргументы командной строки бота (Dynamic CLI Launch Arguments — #641)**:
+  - В `BotHubAdvancedEcosystemHelper.evaluateCliArguments()` поддерживается передача кастомных флагов запуска (например, `--mode=debug`, `--workers=4`) напрямую в команду запуска Python-процесса. В настройки добавлен переключатель `cliArgumentsGuardEnabled` с диалогом «Что это?».
+- **Быстрое переключение профилей окружения (Environment Profile Switching — #642)**:
+  - В `BotHubAdvancedEcosystemHelper.evaluateEnvironmentProfile()` добавлено мгновенное переключение между профилями `.env.dev`, `.env.staging` и `.env.prod` в один клик. В настройки добавлен переключатель `environmentGroupsGuardEnabled` с диалогом «Что это?».
+- **История поиска в каталоге BotHub (BotHub Recent Search History — #644)**:
+  - В `BotHubAdvancedEcosystemHelper.evaluateSearchHistory()` сохраняются последние 5 поисковых запросов в виде быстрых интерактивных чипов под поисковой строкой. В настройки добавлен переключатель `bothubSearchHistoryGuardEnabled` с диалогом «Что это?».
+- **Закладки и избранное в BotHub (Template Bookmarks & Favorites — #645)**:
+  - В `BotHubAdvancedEcosystemHelper.evaluateBookmarkToggle()` добавлены закладки шаблонов для быстрого сохранения и отдельной вкладки избранного в каталоге. В настройки добавлен переключатель `bothubFavoritesGuardEnabled` с диалогом «Что это?».
+- **Прямая отправка баг-репорта автору шаблона (Direct Template Issue Reporting — #646)**:
+  - В `BotHubAdvancedEcosystemHelper.evaluateTemplateIssueReporting()` формируется прямая ссылка на создание Issue в репозитории автора шаблона с предзаполненной системной информацией. В настройки добавлен переключатель `templateIssueReportingGuardEnabled` с диалогом «Что это?».
+- **Интерфейс настроек и локализация**:
+  - В `SettingsScreen` добавлена новая карточка: `BotHubAdvancedEcosystemCard` (18 переключателей).
+  - Все 18 переключателей снабжены диалогами «Что это?» (Определение, При включении, При отключении).
+  - Все 92 строковых ресурса переведены на 22 поддерживаемых языка.
+
+---
+
 ## 📝 Что нового в версии 2.1.79 (SemVer Patch Release — Section 7: 100% Elimination & Section 8: BotHub Marketplace & Bot Lifecycle — Deprecated Packages Warning, Pip Index Priority Enforcement, Full Build Log Retention, ANSI Escape Color Stripping, Virtualenv Console Prompt, Hot-Reload Dev Mode, Fast Bot Instance Cloning, Template Variable Type Validation, BotHub Multi-Criteria Search Filters, Bot Community Ratings & Badges, Graceful Shutdown Telegram Emergency Alert, Custom BotHub Template Export, Visual Template Previews, SQLite Database Reset with Safety Backup, Local Privacy-First Analytics Dashboard, Safe Localization Fallback, Headless Barcode Ingestion Guidance, Surgical EXIF Privacy Sanitization)
 
 - **Исторический рубеж аудита**: Устранено **843 из 1045 дефектов** (**80.7%** от всего реестра)!
