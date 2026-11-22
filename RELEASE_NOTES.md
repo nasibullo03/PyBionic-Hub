@@ -4,6 +4,34 @@
 
 ---
 
+## 📝 Что нового в версии 2.1.76 (SemVer Patch Release — Section 6: Code Editor, Syntax, IDE Productivity & File Manager — 100% ELIMINATED: Terminal Copy Selection, Font Zoom Persistence, Line Wrap Hanging Indent, Auto-Close HTML Tags, Relative File Path Autocomplete, Project Code Statistics Dashboard, Terminal Buffer File Export, Smooth Caret Harmonic Pulse)
+
+- **Исторический рубеж аудита**: Устранено **789 из 1045 дефектов** (**75.5%** от всего реестра)!
+- **СЕКЦИЯ 6 (Редактор кода, синтаксис, IDE-продуктивность и файловый менеджер) УСТРАНЕНА НА 100% (80 из 80 дефектов закрыты)!**
+- **Устранены все оставшиеся 8 дефектов Секции 6** (#497, #498, #499, #500, #501, #502, #504, #505).
+- **Копирование и блочное выделение в терминале (Terminal Copy Selection — #497)**:
+  - В `CodeEditorTerminalAndFinalPolishHelper.evaluateTerminalCopySelection()` добавлены сенсорные маркеры и режим прямоугольного выделения с кнопкой мгновенного копирования в буфер обмена. В настройки добавлен переключатель `terminalCopySelectionGuardEnabled` с диалогом «Что это?».
+- **Сохранение пользовательского масштаба шрифта (Font Zoom Preference Persistence — #498)**:
+  - В `CodeEditorTerminalAndFinalPolishHelper.evaluateFontZoomPersistence()` пользовательский масштаб шрифта (например, 18sp) сохраняется в постоянных настройках приложения и автоматически восстанавливается для всех файлов. В настройки добавлен переключатель `fontZoomPersistenceGuardEnabled` с диалогом «Что это?».
+- **Выравнивание отступа перенесенных строк (Line Wrap Hanging Indent Alignment — #499)**:
+  - В `CodeEditorTerminalAndFinalPolishHelper.evaluateLineWrapIndentAlignment()` перенесенные длинные строки автоматически смещаются вправо на величину базового отступа блока плюс 4 пробела (hanging indent), сохраняя визуальную иерархию кода. В настройки добавлен переключатель `lineWrapIndentAlignmentGuardEnabled` с диалогом «Что это?».
+- **Автозакрытие парных тегов HTML (Automatic HTML Tag Pair Closing — #500)**:
+  - В `CodeEditorTerminalAndFinalPolishHelper.evaluateAutoCloseHtmlTags()` при вводе закрывающей угловой скобки `>` автоматически вставляется парный закрывающий тег (например, `</div>`) с позиционированием курсора внутри, исключая ошибки незакрытых контейнеров. В настройки добавлен переключатель `autoCloseHtmlTagsGuardEnabled` с диалогом «Что это?».
+- **Автодополнение относительных путей к файлам (Relative File Path String Autocomplete — #501)**:
+  - В `CodeEditorTerminalAndFinalPolishHelper.evaluateFilePathAutocomplete()` при вводе путей внутри строковых литералов (например, в `open()`) предлагается автодополнение по существующим файлам и каталогам проекта, исключая падения `FileNotFoundError`. В настройки добавлен переключатель `filePathAutocompleteGuardEnabled` с диалогом «Что это?».
+- **Сводная статистика проекта и строк кода (Project Code Statistics Dashboard — #502)**:
+  - В `CodeEditorTerminalAndFinalPolishHelper.evaluateCodeStatisticsDashboard()` встроен интерактивный диалог со сводной метрикой кодовой базы: чистые строки кода (LOC), число Python-модулей, объем ассетов и общий вес проекта. В настройки добавлен переключатель `codeStatisticsDashboardGuardEnabled` с диалогом «Что это?».
+- **Экспорт буфера терминала в файл лога (Terminal Buffer File Export — #504)**:
+  - В `CodeEditorTerminalAndFinalPolishHelper.evaluateTerminalExportToFile()` добавлена выгрузка текущего содержимого консоли терминала в файл `terminal_export_YYYYMMDD_HHMMSS.log` в корень проекта для быстрого шеринга отчётов. В настройки добавлен переключатель `terminalExportToFileGuardEnabled` с диалогом «Что это?».
+- **Плавная пульсация курсора в редакторе (Smooth Caret Harmonic Pulse — #505)**:
+  - В `CodeEditorTerminalAndFinalPolishHelper.evaluateCodeEditorSmoothCaret()` резкое дискретное мигание курсора заменено мягкой гармонической синусоидальной анимацией прозрачности (Alpha 0.15 → 1.0), снижающей усталость глаз при долгой работе. В настройки добавлен переключатель `codeEditorSmoothCaretGuardEnabled` с диалогом «Что это?».
+- **Интерфейс настроек и локализация**:
+  - В `SettingsScreen` добавлена карточка: `CodeEditorTerminalAndFinalPolishCard` (8 переключателей).
+  - Все 8 переключателей снабжены диалогами «Что это?» (Определение, При включении, При отключении).
+  - Все строковые ресурсы переведены на 22 поддерживаемых языка.
+
+---
+
 ## 📝 Что нового в версии 2.1.75 (SemVer Patch Release — Section 6: Code Editor, Syntax, IDE Productivity & File Manager — Git Gutter Indicators, Fullscreen Immersive Mode, Line Sorting, Trim Trailing Whitespace, Final POSIX Newline, Dynamic Tab Size, Code Minimap, Syntax Themes, Custom Fonts, TODO Highlighter, Scratchpad, Read-Only Protection Mode, Case Conversion Tool, Base64 Tool, Cryptographic Hash Generator, Top/Bottom Jump, Clear Terminal Output, Terminal Buffer Search)
 
 - **Исторический рубеж аудита**: Устранено **781 из 1045 дефектов** (**74.7%** от всего реестра)!
