@@ -4,6 +4,53 @@
 
 ---
 
+## 📝 Что нового в версии 2.1.78 (SemVer Patch Release — Section 7: Pip Package Manager, Virtual Environments & Dependencies — NFS/SMB Cache Routing, CFFI Precompilation, Pip Dry-Run Simulation, Local Wheel Architecture Validation, Frozen Requirements Lock Snapshot, Package License Compliance Checker, Authenticated HTTP Proxy Support, Stale Build Tracker Directory Purge, PyPI Service Outage Diagnostic, Pre-install Setup.py Syntax Verification, Offline Popular Package Autocomplete, Dependency Graph Cycle Detection, Conda Environment Auto-Converter, Safe Batch Upgrade SemVer Boundary, Background Install Notification and Haptics, Download-Only Wheel Bundle Mode, Android Prefix Pip Configuration Scope, Single-Tap Cascade Dependency Cleanup)
+
+- **Исторический рубеж аудита**: Устранено **825 из 1045 дефектов** (**78.9%** от всего реестра)!
+- **Устранены следующие 18 дефектов Секции 7** (#544, #545, #546, #548, #549, #555, #556, #557, #558, #561, #562, #564, #565, #567, #569, #570, #571, #573).
+- **Маршрутизация кэша при NFS/SMB (NFS/SMB Cache Routing — #544)**:
+  - В `PipAdvancedToolsAndAutomationHelper.evaluateNfsSmbCacheRouting()` сетевые папки NFS/SMB защищаются от сбоев блокировок `fcntl ENOLCK` путем автоматического перенаправления кэша pip во внутреннюю память устройства. В настройки добавлен переключатель `pipNfsSmbCacheGuardEnabled` с диалогом «Что это?».
+- **Предварительная компиляция CFFI (CFFI Precompilation — #545)**:
+  - В `PipAdvancedToolsAndAutomationHelper.evaluateCffiPrecompilation()` для пакетов с CFFI (cryptography, pynacl, bcrypt) выполняется фоновый прогрев рантайм-кэша, предотвращая лаг при первом запуске бота. В настройки добавлен переключатель `cffiPrecompileGuardEnabled` с диалогом «Что это?».
+- **Режим симуляции установки (Pip Dry-Run Simulation — #546)**:
+  - В `PipAdvancedToolsAndAutomationHelper.evaluatePipDryRun()` добавлен флаг `--dry-run`, позволяющий заранее проверить разрешение зависимостей и конфликты без записи изменений на диск. В настройки добавлен переключатель `pipDryRunGuardEnabled` с диалогом «Что это?».
+- **Проверка локальных пакетов .whl (Local Wheel Installation — #548)**:
+  - В `PipAdvancedToolsAndAutomationHelper.evaluateLocalWheelInstallation()` выполняется валидация архитектуры (ARM64/universal) перед установкой локальных колес, исключая падения из-за несовместимости ABI. В настройки добавлен переключатель `localWheelInstallGuardEnabled` с диалогом «Что это?».
+- **Снимок замороженных зависимостей (Frozen Requirements Lock Snapshot — #549)**:
+  - В `PipAdvancedToolsAndAutomationHelper.evaluateFrozenRequirementsExport()` генерируется детерминированный снимок всех активных библиотек с точной фиксацией версий `==` для надежного экспорта. В настройки добавлен переключатель `frozenRequirementsGuardEnabled` с диалогом «Что это?».
+- **Аудит лицензий пакетов (Package License Compliance Checker — #555)**:
+  - В `PipAdvancedToolsAndAutomationHelper.evaluateLicenseInspection()` анализируются лицензии библиотек с предупреждением о жестких Copyleft-ограничениях (GPL/AGPL) для коммерческих и закрытых ботов. В настройки добавлен переключатель `pipLicenseInspectionGuardEnabled` с диалогом «Что это?».
+- **Авторизация через HTTP-прокси (Authenticated HTTP Proxy Support — #556)**:
+  - В `PipAdvancedToolsAndAutomationHelper.evaluateProxyAuth()` формируется параметр `--proxy` с безопасным маскированием учетных данных в логах и UI. В настройки добавлен переключатель `pipProxyAuthGuardEnabled` с диалогом «Что это?».
+- **Очистка остатков сборки (Stale Build Tracker Directory Purge — #557)**:
+  - В `PipAdvancedToolsAndAutomationHelper.evaluateBuildTrackerCleanup()` автоматически удаляются брошенные каталоги `pip-build-tracker` и временные лок-файлы после аварийных завершений сборки. В настройки добавлен переключатель `pipBuildTrackerCleanupGuardEnabled` с диалогом «Что это?».
+- **Диагностика сбоев PyPI 5xx (PyPI Service Outage Diagnostic — #558)**:
+  - В `PipAdvancedToolsAndAutomationHelper.evaluatePyPiServiceStatus()` распознаются сетевые ошибки HTTP 500-599 с понятным объяснением и рекомендацией переключения на зеркало вместо паники. В настройки добавлен переключатель `pypiStatusDiagnosticGuardEnabled` с диалогом «Что это?».
+- **Проверка синтаксиса setup.py (Pre-install Syntax Check — #561)**:
+  - В `PipAdvancedToolsAndAutomationHelper.evaluatePreInstallSyntaxCheck()` выявляется устаревший синтаксис Python 2 (`print "..."`, `except E, e:`) до попытки компиляции. В настройки добавлен переключатель `preInstallSyntaxCheckGuardEnabled` с диалогом «Что это?».
+- **Офлайн автодополнение библиотек (Offline Popular Package Autocomplete — #562)**:
+  - В `PipAdvancedToolsAndAutomationHelper.evaluateOfflineIndexAutocomplete()` предоставляются подсказки популярных проверенных Python-библиотек даже при отсутствии интернет-соединения. В настройки добавлен переключатель `offlineIndexAutocompleteGuardEnabled` с диалогом «Что это?».
+- **Детектор циклических зависимостей (Dependency Graph Cycle Detection — #564)**:
+  - В `PipAdvancedToolsAndAutomationHelper.evaluateDependencyGraphCycles()` с помощью поиска в глубину (DFS) выявляются замкнутые циклы в зависимостях пакетов с указанием цепочки зацикливания. В настройки добавлен переключатель `dependencyGraphCyclesGuardEnabled` с диалогом «Что это?».
+- **Конвертер окружений Conda (Conda Environment.yml Auto-Converter — #565)**:
+  - В `PipAdvancedToolsAndAutomationHelper.evaluateCondaEnvironmentConversion()` файлы `environment.yml` автоматически преобразуются в стандартный формат `requirements.txt`. В настройки добавлен переключатель `condaEnvironmentConversionGuardEnabled` с диалогом «Что это?».
+- **Безопасное пакетное обновление (Safe Batch Upgrade SemVer Boundary — #567)**:
+  - В `PipAdvancedToolsAndAutomationHelper.evaluateUpgradeAllSafety()` обновление всех пакетов ограничивается безопасным диапазоном `~=major.minor`, блокируя мажорные скачки, ломающие API. В настройки добавлен переключатель `upgradeAllSafetyGuardEnabled` с диалогом «Что это?».
+- **Уведомления фоновой установки (Background Pip Notification and Haptics — #569)**:
+  - В `PipAdvancedToolsAndAutomationHelper.evaluateBackgroundPipNotification()` длительные установки пакетов (более 10 секунд) сопровождаются системным уведомлением и тактильным откликом по завершении. В настройки добавлен переключатель `backgroundPipNotificationGuardEnabled` с диалогом «Что это?».
+- **Режим только скачивания колес (Download-Only Wheel Bundle Mode — #570)**:
+  - В `PipAdvancedToolsAndAutomationHelper.evaluateDownloadOnlyMode()` поддерживается выгрузка пакетов через `pip download` для последующего переноса на офлайн-устройства. В настройки добавлен переключатель `pipDownloadOnlyGuardEnabled` с диалогом «Что это?».
+- **Область конфигурации pip для Android (Android Prefix Pip Configuration Scope — #571)**:
+  - В `PipAdvancedToolsAndAutomationHelper.evaluatePipConfAndroidScope()` изолируется путь к файлу конфигурации внутри песочницы приложения через экспорт `PIP_CONFIG_FILE`. В настройки добавлен переключатель `pipConfAndroidScopeGuardEnabled` с диалогом «Что это?».
+- **Очистка неиспользуемых зависимостей в одно касание (Single-Tap Cascade Dependency Cleanup — #573)**:
+  - В `PipAdvancedToolsAndAutomationHelper.evaluateSingleTapUnusedCleanup()` вычисляется каскадное удаление пакета вместе со всеми его уникальными неиспользуемыми зависимостями. В настройки добавлен переключатель `singleTapUnusedCleanupGuardEnabled` с диалогом «Что это?».
+- **Интерфейс настроек и локализация**:
+  - В `SettingsScreen` добавлена карточка: `PipAdvancedToolsAndAutomationCard` (18 переключателей).
+  - Все 18 переключателей снабжены диалогами «Что это?» (Определение, При включении, При отключении).
+  - Все 92 строковых ресурса переведены на 22 поддерживаемых языка.
+
+---
+
 ## 📝 Что нового в версии 2.1.77 (SemVer Patch Release — Section 7: Pip Package Manager, Virtual Environments & Dependencies — Pip Progress Parsing, Orphaned Dependency Cleanup, High-Speed PyPI Mirrors & Failover, Pip Upgrade Notice Suppression, Requirements BOM & Non-ASCII Sanitizer, Editable Installs PYTHONPATH Mapping, PyPA Security Advisory Checker, Pip Cache Purge & Space Reclaimer, Native Binary llvm-strip, Protected Direct URL Authentication, Pre-Release Version Guard, Local & Plain HTTP Trusted Host Detection, Local Bionic Wheel Build Tag Protection, Pip Package List Fast Metadata Cache, Legacy Egg Format Detection & Conversion, Persistent Pip Configuration pip.conf, Dependency Hierarchy Tree Visualizer, Poetry Lockfile Auto-Conversion)
 
 - **Исторический рубеж аудита**: Устранено **807 из 1045 дефектов** (**77.2%** от всего реестра)!
