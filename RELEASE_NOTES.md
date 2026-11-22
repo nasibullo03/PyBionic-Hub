@@ -4,6 +4,49 @@
 
 ---
 
+## 📝 Что нового в версии 2.1.71 (SemVer Patch Release — Section 5: Networking, Ktor & WebSockets: Hotspot Tethering Auto-Detect, Web Terminal Mobile Keyboard Bar, HTTP Method Override Defense, MIME Sniffing nosniff Header, Strict Referrer-Policy Privacy, IPv6 Link-Local Scope Normalization, API Chunked Streaming Buffering, TLS Server Name Indication (SNI), Mutual TLS (mTLS) Authentication, Unix Domain Sockets for Local IPC, High-Speed gRPC Protocol Gateway, CORS Preflight Access-Control-Max-Age Caching, Static Asset ETag & Cache-Control, Embedded MQTT Micro-Broker for Home Automation, Bufferbloat TCP Latency & Send Buffer Pacing, Dashboard Subnet IP Whitelist/Blacklist, Multi-SIM APN Subscription Pinning, HTTP/3 over QUIC/UDP Transport)
+
+- **Новый рубеж аудита**: Устранено **714 из 1045 дефектов** (**68.3%** от всего реестра)!
+- **В Секции 5 (Сетевой стек, Web Dashboard Server и Ktor)** устранено 18 ключевых дефектов P2 (#375, #377, #379, #382, #383, #384, #385, #388, #389, #390, #391, #393, #394, #396, #397, #398, #399, #400).
+- **Автоопределение режима раздачи интернета (Hotspot Auto-Detect — #375)**:
+  - В `WebDashboardAndTransportDefensesHelper.evaluateHotspotAutoDetect()` отслеживаются интерфейсы точки доступа (`ap0`, `rndis0`), и в веб-панели отображается корректный баннер со шлюзовым адресом `http://192.168.43.1:8080/`. В настройки добавлен переключатель `hotspotAutoDetectGuardEnabled` с диалогом «Что это?».
+- **Виртуальная панель клавиш для мобильного веб-терминала (Web Terminal Mobile Keyboard Bar — #377)**:
+  - В `WebDashboardAndTransportDefensesHelper.evaluateWebTerminalMobileLayout()` интегрирована сенсорная панель с клавишами `Ctrl`, `Alt`, `Esc`, `Tab` и стрелками курсора над экранной клавиатурой смартфона/планшета для удобного управления консольными утилитами (nano, htop, Python REPL). В настройки добавлен переключатель `webTerminalMobileLayoutGuardEnabled` с диалогом «Что это?».
+- **Защита от подмены методов через X-HTTP-Method-Override (HTTP Method Override Defense — #379)**:
+  - В `WebDashboardAndTransportDefensesHelper.evaluateHttpMethodOverride()` блокируются попытки маскировки POST-запросов под деструктивные DELETE/PUT во внутренних REST API Ktor. В настройки добавлен переключатель `httpMethodOverrideProtectionGuardEnabled` с диалогом «Что это?».
+- **Защита от MIME-сниффинга через X-Content-Type-Options: nosniff (MIME Sniffing Defense — #382)**:
+  - В `WebDashboardAndTransportDefensesHelper.evaluateContentTypeSniffing()` во все ответы сервера принудительно внедряется заголовок `X-Content-Type-Options: nosniff`, предотвращающий выполнение текстовых логов ботов браузером как скриптов. В настройки добавлен переключатель `contentTypeSniffingProtectionGuardEnabled` с диалогом «Что это?».
+- **Защита приватности Referrer-Policy (Strict Referrer-Policy Privacy — #383)**:
+  - В `WebDashboardAndTransportDefensesHelper.evaluateReferrerPolicy()` установлен заголовок `Referrer-Policy: strict-origin-when-cross-origin`, исключающий утечку локального IP-адреса и токенов при переходе по внешним ссылкам. В настройки добавлен переключатель `referrerPolicyProtectionGuardEnabled` с диалогом «Что это?».
+- **Нормализация IPv6 Link-Local адресов с сетевыми зонами (IPv6 Link-Local Scope Normalization — #384)**:
+  - В `WebDashboardAndTransportDefensesHelper.evaluateIpv6LinkLocalScope()` адресные зоны экранируются по стандарту RFC 6874 (`fe80::1%wlan0` -> `http://[fe80::1%25wlan0]:8080/`), гарантируя безошибочный парсинг в браузерах. В настройки добавлен переключатель `ipv6LinkLocalScopeGuardEnabled` с диалогом «Что это?».
+- **Потоковая передача тяжелых ответов API частями (API Chunked Streaming Buffering — #385)**:
+  - В `WebDashboardAndTransportDefensesHelper.evaluateApiResponseBuffering()` ответы размером более 64 КБ передаются с заголовком `Transfer-Encoding: chunked` блоками по 16 КБ, предотвращая OOM и всплески аллокаций памяти кучи JVM. В настройки добавлен переключатель `apiResponseBufferingGuardEnabled` с диалогом «Что это?».
+- **Маршрутизация TLS Server Name Indication (TLS SNI Support — #388)**:
+  - В `WebDashboardAndTransportDefensesHelper.evaluateTlsSniSupport()` реализована маршрутизация входящих сертификатов по доменному имени Client Hello, позволяя хостить несколько ботов с индивидуальными SSL-сертификатами на одном порту. В настройки добавлен переключатель `tlsSniSupportGuardEnabled` с диалогом «Что это?».
+- **Взаимная аутентификация клиентов Mutual TLS (Mutual TLS mTLS Authentication — #389)**:
+  - В `WebDashboardAndTransportDefensesHelper.evaluateMtlsAuthentication()` добавлена поддержка строгой проверки клиентских сертификатов X.509 доверенным центром сертификации (CA) для корпоративных ботов. В настройки добавлен переключатель `mtlsAuthenticationGuardEnabled` с диалогом «Что это?».
+- **Unix Domain сокеты для локального IPC (Unix Domain Sockets for Local IPC — #390)**:
+  - В `WebDashboardAndTransportDefensesHelper.evaluateUnixDomainSockets()` реализовано сопряжение встроенного WebView и внутренних сервисов через AF_UNIX сокет в изолированной директории без открытия TCP-портов. В настройки добавлен переключатель `unixDomainSocketsGuardEnabled` с диалогом «Что это?».
+- **Скоростной бинарный шлюз gRPC (High-Speed gRPC Protocol Gateway — #391)**:
+  - В `WebDashboardAndTransportDefensesHelper.evaluateGrpcSupport()` интегрирован шлюз gRPC / Protocol Buffers на порту 50051 для передачи сотен событий телеметрии и команд ботов в секунду с микросекундной задержкой. В настройки добавлен переключатель `grpcSupportGuardEnabled` с диалогом «Что это?».
+- **Кэширование CORS preflight-запросов (CORS Preflight Caching — #393)**:
+  - В `WebDashboardAndTransportDefensesHelper.evaluateCorsPreflightCaching()` внедрен заголовок `Access-Control-Max-Age: 86400`, устраняющий повторяющиеся OPTIONS-запросы браузера перед каждым API-вызовом. В настройки добавлен переключатель `corsPreflightCachingGuardEnabled` с диалогом «Что это?».
+- **Кэширование статических файлов через ETag и Cache-Control (Static Asset Caching — #394)**:
+  - В `WebDashboardAndTransportDefensesHelper.evaluateStaticCachingHeaders()` для скриптов, стилей и иконок веб-интерфейса генерируются заголовки `ETag` и `Cache-Control: public, max-age=604800, immutable`, ускоряющие повторные загрузки интерфейса из кэша. В настройки добавлен переключатель `staticCachingHeadersGuardEnabled` с диалогом «Что это?».
+- **Встроенный легковесный MQTT-брокер (Embedded MQTT Micro-Broker — #396)**:
+  - В `WebDashboardAndTransportDefensesHelper.evaluateMqttSupport()` реализован микро-брокер MQTT на порту 1883 для локального обмена событиями умного дома и связки с Home Assistant без внешних облаков. В настройки добавлен переключатель `mqttProtocolSupportGuardEnabled` с диалогом «Что это?».
+- **Защита от задержек Bufferbloat и троттлинг буфера сокетов (Bufferbloat TCP Latency & Send Buffer Pacing — #397)**:
+  - В `WebDashboardAndTransportDefensesHelper.evaluateBufferbloatLatency()` размер буфера отправки сокетов `SO_SNDBUF` динамически зажимается до 32–64 КБ при скачках RTT выше 200 мс, предотвращая зависание ответов ботов во время передачи файлов. В настройки добавлен переключатель `bufferbloatLatencyGuardEnabled` с диалогом «Что это?».
+- **Белый список IP-адресов панели управления (Dashboard Subnet IP Whitelist/Blacklist — #398)**:
+  - В `WebDashboardAndTransportDefensesHelper.evaluateIpAccessControlList()` внедрена фильтрация входящих соединений по маскам подсетей CIDR (например, `192.168.1.0/24`), блокирующая сканеры сети. В настройки добавлен переключатель `ipAccessControlListGuardEnabled` с диалогом «Что это?».
+- **Привязка исходящего трафика к SIM-карте (Multi-SIM APN Subscription Pinning — #399)**:
+  - В `WebDashboardAndTransportDefensesHelper.evaluateCellularApnBinding()` сокеты мобильного интернета привязываются к указанному ID подписки SIM через `TelephonyNetworkSpecifier`, защищая от списаний в роуминге. В настройки добавлен переключатель `cellularApnBindingGuardEnabled` с диалогом «Что это?».
+- **Поддержка HTTP/3 на базе QUIC/UDP (HTTP/3 over QUIC/UDP Transport — #400)**:
+  - В `WebDashboardAndTransportDefensesHelper.evaluateHttp3QuicSupport()` реализована подготовка сетевого транспорта HTTP/3 поверх QUIC (UDP) с поддержкой 0-RTT и устойчивостью к потерям пакетов в сотовых сетях. В настройки добавлен переключатель `http3QuicSupportGuardEnabled` с диалогом «Что это?».
+
+---
+
 ## 📝 Что нового в версии 2.1.70 (SemVer Patch Release — Section 5: Networking, Ktor & WebSockets: mDNS Zeroconf Local Discovery, Persistent HTTP/1.1 Keep-Alive, TCP BBR Congestion Control, Wi-Fi Transport Binding, 24-bit TrueColor ANSI, Reactive Multi-Client State Sync, HTTP Range Requests & Resume, Sliding Session Expiration, Outgoing SSL Expiry Warnings, Port Conflict Auto-Allocation, HTTP/2 Protocol Multiplexing, Per-Bot Bandwidth Throttling, UPnP/NAT-PMP Port Forwarding, Dynamic mDNS Conflict Resolution, Web Terminal Command History Persistence, Dynamic TCP MSS & MTU Clamping, WebSocket Deflate Compression, AP Isolation Diagnostics)
 
 - **Новый рубеж аудита**: Устранено **696 из 1045 дефектов** (**66.6%** от всего реестра)!
