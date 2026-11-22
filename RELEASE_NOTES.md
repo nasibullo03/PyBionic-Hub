@@ -4,6 +4,40 @@
 
 ---
 
+## 📝 Что нового в версии 2.1.72 (SemVer Patch Release — Section 5: Networking, Ktor & WebSockets — 100% ELIMINATED: Per-Socket Bandwidth Stats, DNSSEC Verification via DoH, Remote Abort & Reset Interception, Dynamic SO_RCVBUF Buffer Scaling, Streaming Pause & Resume Support, Standard /healthz Uptime Endpoint, Standardized PyBionic User-Agent, Port Scan & SYN Flood Defense, Modern AEAD TLS Cipher Preference, Web Cookie Header Limiting & Pruning, Monotonic Bandwidth Meter with Handover Persistence, Cellular Window Scaling & Multi-Stream Acceleration, Low-Memory TCP Window Clamping)
+
+- **Исторический рубеж аудита**: Устранено **727 из 1045 дефектов** (**69.6%** от всего реестра)!
+- **СЕКЦИЯ 5 (Сетевой стек, Web Dashboard Server и Ktor) УСТРАНЕНА НА 100% (85 из 85 дефектов закрыты)!**
+- **Устранены все оставшиеся 13 дефектов Секции 5** (#401, #403, #406, #407, #410, #412, #414, #415, #416, #420, #421, #422, #425).
+- **Статистика сетевого трафика по отдельным сокетам (Per-Socket Bandwidth Stats — #401)**:
+  - В `NetworkMonitoringAndSocketOptimizationHelper.evaluatePerSocketBandwidthStats()` ведётся учёт отправленных и принятых байт для каждого удаленного адреса сокета (например, `api.telegram.org:443`), позволяя изолировать сетевой аппетит каждого бота. В настройки добавлен переключатель `perSocketBandwidthStatsGuardEnabled` с диалогом «Что это?».
+- **Криптографическая проверка DNSSEC через DoH (DNSSEC Cryptographic Validation — #403)**:
+  - В `NetworkMonitoringAndSocketOptimizationHelper.evaluateDnssecValidation()` доменные имена разрешаются через DNS-over-HTTPS со строгой верификацией криптографических RRSIG-подписей DNSSEC, предотвращая спуфинг API в ненадежных сетях Wi-Fi. В настройки добавлен переключатель `dnssecValidationGuardEnabled` с диалогом «Что это?».
+- **Перехват внезапных обрывов сокетов (Remote Abort & Reset Interception — #406)**:
+  - В `NetworkMonitoringAndSocketOptimizationHelper.evaluateRemoteAbortHandling()` ошибки сброса связи (`ECONNRESET` / `SocketException`) перехватываются штатно: в консоль выводится лаконичное сообщение, и инициируется автоматический ретрай с экспоненциальной задержкой. В настройки добавлен переключатель `remoteAbortHandlingGuardEnabled` с диалогом «Что это?».
+- **Динамическое масштабирование буферов сокетов (Dynamic Socket Buffer SO_RCVBUF Sizing — #407)**:
+  - В `NetworkMonitoringAndSocketOptimizationHelper.evaluateSocketBufferSizing()` размер буфера приёма сокетов динамически увеличивается до 1 МБ на высокоскоростных сетях 5G и гигабитном Wi-Fi, устраняя ограничение BDP при скачивании тяжелых файлов. В настройки добавлен переключатель `socketBufferSizingGuardEnabled` с диалогом «Что это?».
+- **Поддержка паузы и возобновления потоковой отдачи (Streaming Pause & Resume Support — #410)**:
+  - В `NetworkMonitoringAndSocketOptimizationHelper.evaluateStreamingPauseResume()` добавлена возможность клиентской приостановки и возобновления выгрузки тяжелых дампов логов и бэкапов через HTTP Range маркеры без скачивания заново с нуля. В настройки добавлен переключатель `streamingPauseResumeGuardEnabled` с диалогом «Что это?».
+- **Стандартный эндпоинт проверки здоровья /healthz (Standard /healthz Uptime Endpoint — #412)**:
+  - В `NetworkMonitoringAndSocketOptimizationHelper.evaluateHealthCheckEndpoint()` реализован ультралегковесный HTTP-эндпоинт `GET /healthz`, возвращающий статус `UP`, аптайм и число активных ботов в формате JSON для систем мониторинга (Uptime Kuma, Zabbix). В настройки добавлен переключатель `healthCheckEndpointGuardEnabled` с диалогом «Что это?».
+- **Стандартизированный заголовок User-Agent (Standardized User-Agent Header — #414)**:
+  - В `NetworkMonitoringAndSocketOptimizationHelper.evaluateCustomUserAgent()` ко всем исходящим HTTP-запросам прикрепляется структурированный заголовок вида `PyBionic-Runner/2.1.72 (Android API 35; Linux/Bionic; +https://github.com/nasibullo03/PyBionic)`, исключающий блокировки облачными WAF. В настройки добавлен переключатель `customUserAgentGuardEnabled` с диалогом «Что это?».
+- **Защита от сканирования портов и SYN-флуда (Port Scan & SYN Flood Defense — #415)**:
+  - В `NetworkMonitoringAndSocketOptimizationHelper.evaluatePortScanProtection()` детектируются всплески полуоткрытых соединений от сканеров сети (Nmap) с троттлингом и сбросом пакетов, защищая пул потоков Ktor и заряд аккумулятора. В настройки добавлен переключатель `portScanProtectionGuardEnabled` с диалогом «Что это?».
+- **Принудительные современные шифры AEAD (Modern AEAD TLS Cipher Preference — #416)**:
+  - В `NetworkMonitoringAndSocketOptimizationHelper.evaluateLegacySslCipherHardening()` во всех TLS-контекстах устанавливается приоритет аутентифицированных шифров ChaCha20-Poly1305 и AES-GCM с блокировкой устаревших шифров CBC (защита от атак Sweet32 и POODLE). В настройки добавлен переключатель `legacySslCipherHardeningGuardEnabled` с диалогом «Что это?».
+- **Очистка и лимитирование cookie сессий (Web Cookie Limiting & Pruning — #420)**:
+  - В `NetworkMonitoringAndSocketOptimizationHelper.evaluateWebAuthCookieSanitizer()` автоматически очищаются устаревшие сессионные куки при превышении порога размера заголовка, предотвращая сбои браузера с кодом `400 Bad Request (Request Header Or Cookie Too Large)`. В настройки добавлен переключатель `webAuthCookieSanitizerGuardEnabled` с диалогом «Что это?».
+- **Монотонный учет трафика при хендовере (Monotonic Bandwidth Meter with Handover Persistence — #421)**:
+  - В `NetworkMonitoringAndSocketOptimizationHelper.evaluateBandwidthMeterReconnection()` ведётся строго монотонный подсчёт трафика с журналированием промежуточных дельт на диск, исключающий сброс или искажение показаний при переключении сотовых вышек и Wi-Fi. В настройки добавлен переключатель `bandwidthMeterPersistenceGuardEnabled` с диалогом «Что это?».
+- **Оптимизация окна TCP и параллельные потоки (Cellular Window Scaling & Multi-Stream Acceleration — #422)**:
+  - В `NetworkMonitoringAndSocketOptimizationHelper.evaluateTcpWindowScalingOptimization()` при обнаружении сброса опции RFC 7323 операторскими прокси активируется многопоточное скачивание параллельными чанками для преодоления потолка скорости. В настройки добавлен переключатель `tcpWindowScalingOptimizationGuardEnabled` с диалогом «Что это?».
+- **Зажим окна приёма TCP при дефиците памяти (Low-Memory TCP Window Clamping — #425)**:
+  - В `NetworkMonitoringAndSocketOptimizationHelper.evaluateTcpWindowClamping()` при сигналах `onTrimMemory` окно приёма сокетов принудительно зажимается до 16 КБ, предотвращая накопление входящих сетевых очередей в оперативной памяти и спасая процесс от LMK. В настройки добавлен переключатель `tcpWindowClampingGuardEnabled` с диалогом «Что это?».
+
+---
+
 ## 📝 Что нового в версии 2.1.71 (SemVer Patch Release — Section 5: Networking, Ktor & WebSockets: Hotspot Tethering Auto-Detect, Web Terminal Mobile Keyboard Bar, HTTP Method Override Defense, MIME Sniffing nosniff Header, Strict Referrer-Policy Privacy, IPv6 Link-Local Scope Normalization, API Chunked Streaming Buffering, TLS Server Name Indication (SNI), Mutual TLS (mTLS) Authentication, Unix Domain Sockets for Local IPC, High-Speed gRPC Protocol Gateway, CORS Preflight Access-Control-Max-Age Caching, Static Asset ETag & Cache-Control, Embedded MQTT Micro-Broker for Home Automation, Bufferbloat TCP Latency & Send Buffer Pacing, Dashboard Subnet IP Whitelist/Blacklist, Multi-SIM APN Subscription Pinning, HTTP/3 over QUIC/UDP Transport)
 
 - **Новый рубеж аудита**: Устранено **714 из 1045 дефектов** (**68.3%** от всего реестра)!
