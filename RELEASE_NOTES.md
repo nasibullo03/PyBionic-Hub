@@ -4,6 +4,53 @@
 
 ---
 
+## 📝 Что нового в версии 2.1.70 (SemVer Patch Release — Section 5: Networking, Ktor & WebSockets: mDNS Zeroconf Local Discovery, Persistent HTTP/1.1 Keep-Alive, TCP BBR Congestion Control, Wi-Fi Transport Binding, 24-bit TrueColor ANSI, Reactive Multi-Client State Sync, HTTP Range Requests & Resume, Sliding Session Expiration, Outgoing SSL Expiry Warnings, Port Conflict Auto-Allocation, HTTP/2 Protocol Multiplexing, Per-Bot Bandwidth Throttling, UPnP/NAT-PMP Port Forwarding, Dynamic mDNS Conflict Resolution, Web Terminal Command History Persistence, Dynamic TCP MSS & MTU Clamping, WebSocket Deflate Compression, AP Isolation Diagnostics)
+
+- **Новый рубеж аудита**: Устранено **696 из 1045 дефектов** (**66.6%** от всего реестра)!
+- **В Секции 5 (Сетевой стек, Web Dashboard Server и Ktor)** устранено 18 ключевых дефектов P2 (#343, #349, #352, #355, #356, #358, #359, #360, #361, #362, #363, #364, #365, #369, #370, #372, #373, #374).
+- **Локальное обнаружение устройств через mDNS Zeroconf (mDNS Zeroconf Discovery — #343)**:
+  - В `NetworkProtocolAndRoutingDefensesHelper.evaluateMdnsDiscovery()` веб-сервер регистрирует домен `pybionic.local` (тип `_http._tcp.local.`) через `NsdManager`, позволяя браузерам ПК подключаться без ручного поиска IP-адреса телефона в настройках Wi-Fi. В настройки добавлен переключатель `mDnsDiscoveryGuardEnabled` с диалогом «Что это?».
+- **Постоянные TCP-соединения HTTP/1.1 Keep-Alive (HTTP Persistent Keep-Alive — #349)**:
+  - В `NetworkProtocolAndRoutingDefensesHelper.evaluateHttpKeepAlive()` активировано поддержание постоянных соединений с заголовками `Connection: keep-alive` и `Keep-Alive: timeout=60, max=1000`, исключающее задержки на повторные TLS-рукопожатия при навигации в веб-панели. В настройки добавлен переключатель `httpKeepAliveOptimizationGuardEnabled` с диалогом «Что это?».
+- **Контроль перегрузки сети TCP BBR (TCP BBR Congestion Control — #352)**:
+  - В `NetworkProtocolAndRoutingDefensesHelper.evaluateBbrCongestionControl()` задействуется алгоритм BBR (`setsockopt TCP_CONGESTION=bbr`) при поддержке ядром Linux, моделирующий пропускную способность канала и предотвращающий падение скорости и Bufferbloat в сотовых сетях. В настройки добавлен переключатель `bbrCongestionControlGuardEnabled` с диалогом «Что это?».
+- **Приоритетная привязка исходящего трафика к Wi-Fi (Wi-Fi Preferred Transport Binding — #355)**:
+  - В `NetworkProtocolAndRoutingDefensesHelper.evaluateNetworkInterfaceBinding()` реализована привязка сетевых сокетов ботов к `TRANSPORT_WIFI` при наличии активного Wi-Fi, предотвращающая нежелательный расход платного мобильного трафика функциями системного «ускорения сети». В настройки добавлен переключатель `networkInterfaceBindingGuardEnabled` с диалогом «Что это?».
+- **Поддержка 24-битного TrueColor и 256 цветов в веб-терминале (Web Terminal TrueColor ANSI — #356)**:
+  - В `NetworkProtocolAndRoutingDefensesHelper.evaluateWebTerminalAnsiColors()` xterm.js переведён в режим TrueColor (24-bit RGB) и 256-цветовой палитры, обеспечивая чистое отображение современных консольных TUI-библиотек (Python Rich, Textual). В настройки добавлен переключатель `webTerminalAnsiColorsGuardEnabled` с диалогом «Что это?».
+- **Реактивная синхронизация состояния между клиентами (Multi-Client Reactive State Sync — #358)**:
+  - В `NetworkProtocolAndRoutingDefensesHelper.evaluateMultiClientSync()` смена состояний и запуск ботов транслируются по реактивной шине WebSockets/SSE на все открытые устройства, устраняя необходимость ручного свайпа (Pull-to-Refresh) на смартфоне. В настройки добавлен переключатель `multiClientSyncGuardEnabled` с диалогом «Что это?».
+- **Докачка файлов по протоколу HTTP Range (HTTP Range Requests & Resume — #359)**:
+  - В `NetworkProtocolAndRoutingDefensesHelper.evaluateHttpRangeRequests()` добавлена поддержка HTTP-заголовков `Range` и статуса `206 Partial Content`, позволяющая браузерам и менеджерам загрузок возобновлять скачивание многогигабайтных бэкапов с места обрыва. В настройки добавлен переключатель `httpRangeRequestsResumeGuardEnabled` с диалогом «Что это?».
+- **Плавающий срок сессии веб-панели (Sliding Web Session Expiry — #360)**:
+  - В `NetworkProtocolAndRoutingDefensesHelper.evaluateSlidingSessionExpiration()` время жизни сессии автоматически продлевается на 3600 секунд при каждом активном действии пользователя в веб-редакторе, предотвращая потерю несохраненного кода. В настройки добавлен переключатель `slidingSessionExpirationGuardEnabled` с диалогом «Что это?».
+- **Предупреждение об истечении SSL-сертификатов API (Outgoing API SSL Expiry Warning — #361)**:
+  - В `NetworkProtocolAndRoutingDefensesHelper.evaluateSslCertExpiryWarning()` встроен превентивный мониторинг срока действия SSL-сертификатов удаленных API и вебхуков с выводом предупреждения в дашборде за 14 дней до истечения. В настройки добавлен переключатель `sslCertExpiryWarningGuardEnabled` с диалогом «Что это?».
+- **Сканер конфликтов локальных портов (Local Port Conflict Scanner — #362)**:
+  - В `NetworkProtocolAndRoutingDefensesHelper.evaluateLocalPortConflictScanner()` при обнаружении занятости запрашиваемого порта сканер автоматически подбирает и предлагает свободный порт (`8766`, `8767`...), предотвращая краш сервера с ошибкой `BindException`. В настройки добавлен переключатель `localPortConflictScannerGuardEnabled` с диалогом «Что это?».
+- **Мультиплексирование потоков HTTP/2 (HTTP/2 Multiplexing Protocol — #363)**:
+  - В `NetworkProtocolAndRoutingDefensesHelper.evaluateHttp2ProtocolSupport()` активирована поддержка протокола HTTP/2 (`h2` / `h2c`) в движке веб-сервера, устраняющая блокировку Head-of-Line при параллельной загрузке ресурсов дашборда. В настройки добавлен переключатель `http2ProtocolSupportGuardEnabled` с диалогом «Что это?».
+- **Ограничение полосы пропускания для отдельных ботов (Per-Bot Bandwidth Rate Limiter — #364)**:
+  - В `NetworkProtocolAndRoutingDefensesHelper.evaluatePerBotBandwidthThrottling()` внедрено ограничение скорости на базе алгоритма Token Bucket, не позволяющее ботам-загрузчикам забивать интернет-канал смартфона. В настройки добавлен переключатель `perBotBandwidthThrottlingGuardEnabled` с диалогом «Что это?».
+- **Автоматический проброс портов UPnP и NAT-PMP (UPnP / NAT-PMP Port Forwarding — #365)**:
+  - В `NetworkProtocolAndRoutingDefensesHelper.evaluateUpnpNatPmpPortForwarding()` реализовано автоматическое согласование проброса внешнего WAN-порта роутера через протоколы UPnP-IGD и NAT-PMP с продлением аренды на 3600с. В настройки добавлен переключатель `upnpNatPmpPortForwardingGuardEnabled` с диалогом «Что это?».
+- **Разрешение коллизий mDNS-имен в сети (Dynamic mDNS Hostname Conflict Resolution — #369)**:
+  - В `NetworkProtocolAndRoutingDefensesHelper.evaluateMdnsConflictResolution()` при обнаружении в локальной сети другого устройства с именем `pybionic.local` сервер автоматически добавляет суффикс MAC-адреса (`pybionic-b81c.local`), гарантируя безошибочную регистрацию домена. В настройки добавлен переключатель `mDnsConflictResolutionGuardEnabled` с диалогом «Что это?».
+- **Сохранение истории команд веб-терминала (Web Terminal Command History Persistence — #370)**:
+  - В `NetworkProtocolAndRoutingDefensesHelper.evaluateWebTerminalHistoryPersistence()` история введённых команд сохраняется в LocalStorage браузера, позволяя мгновенно перелистывать прошлые команды стрелками Вверх/Вниз даже после перезагрузки вкладки. В настройки добавлен переключатель `webTerminalHistoryPersistenceGuardEnabled` с диалогом «Что это?».
+- **Динамический TCP MSS-клампинг под MTU канала (Dynamic TCP MSS & MTU Clamping — #372)**:
+  - В `NetworkProtocolAndRoutingDefensesHelper.evaluateTcpMssClamping()` максимальный размер сегмента TCP динамически подстраивается под MTU канала (`MTU - 40`), устраняя фрагментацию пакетов в сотовых IPsec/GTP-туннелях. В настройки добавлен переключатель `tcpMssClampingGuardEnabled` с диалогом «Что это?».
+- **Сжатие трафика WebSocket permessage-deflate (WebSocket Deflate Compression — #373)**:
+  - В `NetworkProtocolAndRoutingDefensesHelper.evaluateWebSocketCompression()` включено расширение `permessage-deflate`, сжимающее текстовые логи в сессиях WebSocket на ~70%, снижая расход сотового трафика при удалённом мониторинге. В настройки добавлен переключатель `webSocketCompressionGuardEnabled` с диалогом «Что это?».
+- **Диагностика изоляции клиентов Wi-Fi (Wi-Fi AP Isolation Warning — #374)**:
+  - В `NetworkProtocolAndRoutingDefensesHelper.evaluateApIsolationWarning()` встроено определение включенной изоляции клиентов роутером (AP Isolation) в гостевых сетях с рекомендацией включения мобильной Точки доступа смартфона для прямого подключения с ПК. В настройки добавлен переключатель `apIsolationWarningGuardEnabled` с диалогом «Что это?».
+- **Интеграционные и архитектурные обновления**:
+  - Созданы два Compose-компонента в настройках сети: `NetworkProtocolAndWebTerminalDefensesCard.kt` (9 переключателей) и `AdvancedNetworkRoutingAndPerformanceCard.kt` (9 переключателей) с полными модальными окнами справки «Что это?».
+  - Добавлено 94 новых строковых ресурса, синхронизированных на все 22 языка через `tools/sync_strings.py`.
+  - Добавлены исчерпывающие тесты в `RuntimeGuardsTest.kt` (`testNetworkProtocolAndRoutingDefenses()`), успешно пройдено 189 unit-тестов (`0 failures, 0 errors`).
+
+---
+
 ## 📝 Что нового в версии 2.1.69 (SemVer Patch Release — Section 4: Multi-Tenant Security, Process Isolation & Secrets Vault: 🏆 100% OF SECTION 4 ELIMINATED! Clipboard Sensitive Data & Auto-Clear, Pip Typosquatting Protection, Root & Jailbreak Environment Warning, Hardcoded Secret Linter, Constant-Time Token Verification, Strict Modern TLSv1.2/TLSv1.3, Persistent IP Ban & Lockout, System Info Sanitization, Encrypted IPC Sockets, Password Complexity Enforcement, Prometheus Metrics Auth, Cryptographic 3-Pass File Shredding, HSTS Strict-Transport-Security, HTTP 500 Error Sanitization, Mobile PIN Brute-Force Rate Limiter, Core Dump Memory Sanitization, Master PIN Reset Attempt Limiter, ARMv8 Hardware Crypto Extensions)
 
 - **🏆 100% Устранение всех дефектов Секции 4 (Многопользовательская безопасность, Изоляция процессов и Хранилище секретов — 85 из 85 дефектов полностью устранены)!**
