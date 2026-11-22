@@ -4,6 +4,31 @@
 
 ---
 
+## 📝 Что нового в версии 2.1.63 (SemVer Patch Release — Section 2: Python 3.14 Runtime, JIT, Wheels & Bionic ABI Defenses: mimalloc Heap Tuning, Libm Floating-Point Math Precision, Subinterpreter Process Isolation, Python 3.14 Syntax Migration, Knox FIPS Hashlib Compatibility, Async Non-Blocking Logging Queue, Thread Import Lock Warmup, Versioned Pip Wheel Cache Isolation, AST Node Adapter Shims, Per-Project Readline History Persistence)
+
+- **Тюнинг аллокатора памяти mimalloc против фрагментации кучи (Memory Allocator Tuning Guard — #93)**:
+  - В `PythonRuntimeAndBionicAbiDefensesHelper.evaluateMimallocAllocatorTuning()` реализована предзагрузка высокопроизводительного аллокатора mimalloc с настройкой порога арен, предотвращающая деградацию и рост RSS памяти из-за фрагментации Bionic malloc. В настройки добавлен переключатель `mimallocAllocatorTuningGuardEnabled` с модальным окном справки «Что это?».
+- **Шимы точности вычислений с плавающей точкой libm (Libm Floating-Point Precision Guard — #94)**:
+  - В `PythonRuntimeAndBionicAbiDefensesHelper.evaluateLibmFloatingPointMath()` внедрены шимы соответствия стандарту IEEE 754 для чипсетов Unisoc/Allwinner с нестандартным округлением, гарантирующие точность расчетов в финансовых и криптографических алгоритмах. В настройки добавлен переключатель `libmFloatingPointMathGuardEnabled` с модальным окном справки «Что это?».
+- **Изоляция ресурсов воркеров на уровне процессов ОС (Subinterpreter Resource Isolation — #96)**:
+  - В `PythonRuntimeAndBionicAbiDefensesHelper.evaluateSubinterpreterIsolation()` реализовано принудительное выделение отдельных процессов ОС для параллельных воркеров вместо субинтерпретаторов PEP 554, устраняющее утечки памяти невыгруженных C-расширений. В настройки добавлен переключатель `subinterpreterResourceIsolationGuardEnabled` с модальным окном справки «Что это?».
+- **Статический аудит и миграция синтаксиса Python 3.14 (Python 3.14 Syntax Migration Guard — #104)**:
+  - В `PythonRuntimeAndBionicAbiDefensesHelper.evaluatePython314SyntaxMigration()` внедрен парсер для выявления удаленных в 3.14 конструкций (`cgi`, `pipes`, устаревшие методы `ast.Str`, сырой `asyncio.get_event_loop()`) с мгновенными рекомендациями по миграции. В настройки добавлен переключатель `python314DeprecatedSyntaxMigrationGuardEnabled` с модальным окном справки «Что это?».
+- **Совместимость hashlib с корпоративным режимом Knox FIPS (Hashlib Knox/FIPS Compatibility — #107)**:
+  - В `PythonRuntimeAndBionicAbiDefensesHelper.evaluateHashlibFipsCompatibility()` реализована автоматическая подмена на встроенные C-реализации алгоритмов MD5/SHA1 на смартфонах с принудительным режимом FIPS, исключающая сбои при расчете некриптографических контрольных сумм. В настройки добавлен переключатель `hashlibFipsCompatibilityGuardEnabled` с модальным окном справки «Что это?».
+- **Неблокирующий асинхронный вывод логов через QueueHandler (Async Non-Blocking Logging — #109)**:
+  - В `PythonRuntimeAndBionicAbiDefensesHelper.evaluateAsyncLoggingConfiguration()` внедрена маршрутизация логов через связку `QueueHandler` и фонового `QueueListener`, исключающая блокировки цикла событий asyncio при выводе в stderr и сохраняющая пропускную способность 500+ сообщений/сек. В настройки добавлен переключатель `asyncNonBlockingLoggingGuardEnabled` с модальным окном справки «Что это?».
+- **Предварительный прогрев импортов против взаимных блокировок (Thread Import Lock Deadlock Guard — #111)**:
+  - В `PythonRuntimeAndBionicAbiDefensesHelper.evaluateThreadImportLockWarmup()` реализована предварительная последовательная загрузка критических модулей рантайма до старта рабочих потоков во избежание дедлоков и ошибок `partially initialized module`. В настройки добавлен переключатель `threadImportLockDeadlockGuardEnabled` с модальным окном справки «Что это?».
+- **Изоляция кэша бинарных колес pip по тегам ABI и версиям (Isolated Versioned Pip Cache — #112)**:
+  - В `PythonRuntimeAndBionicAbiDefensesHelper.evaluatePipWheelCacheIsolation()` внедрено разделение директорий кэша pip (`cache/pip/py314`) по версиям и ABI тегам, предотвращающее установку несовместимых скомпилированных пакетов. В настройки добавлен переключатель `isolatedVersionedPipWheelCacheGuardEnabled` с модальным окном справки «Что это?».
+- **Адаптеры совместимости узлов AST для кодогенерации (AST Compatibility Shim Guard — #118)**:
+  - В `PythonRuntimeAndBionicAbiDefensesHelper.evaluateAstCompatibilityShim()` реализованы адаптеры совместимости узлов AST для библиотек валидации и ORM (Pydantic, SQLAlchemy), адаптирующие генерацию под измененные деревья синтаксиса Python 3.14. В настройки добавлен переключатель `astCompatibilityShimGuardEnabled` с модальным окном справки «Что это?».
+- **Индивидуальное сохранение истории команд Readline (Readline History Persistence — #126)**:
+  - В `PythonRuntimeAndBionicAbiDefensesHelper.evaluatePythonHistoryPersistence()` реализована индивидуальная маршрутизация переменной `PYTHON_HISTORY` в папку каждого проекта с гарантированными правами на запись, исключающая ошибки прав доступа и потерю истории терминала. В настройки добавлен переключатель `pythonHistoryPersistenceGuardEnabled` с модальным окном справки «Что это?».
+
+---
+
 ## 📝 Что нового в версии 2.1.62 (SemVer Patch Release — Section 1 100% Complete! Bionic Kernel & Low-Level Process Defenses: Native Crash Breakpad Core Dump, Background Worker Nice Priority, Command Line Vector Escaping, Netlink Socket Emulation, Direct execve LD_PRELOAD, Hang Thread Stack Dump, Bionic Timezone Fallback, Priority Inheritance Mutexes, Mmap Arena Recycling, Socket Zero-Copy sendfile, Explicit dlopen Scoping, Realtime Throttling Watchdog, Pipe Buffer Capacity Scaling)
 
 - **🏆 РАЗДЕЛ 1 (ПРОЦЕССЫ, ЯДРО LINUX, BIONIC LIBC И ЖИЗНЕННЫЙ ЦИКЛ) ПОЛНОСТЬЮ УСТРАНЕН НА 100% (85 из 85 дефектов устранены)!**
