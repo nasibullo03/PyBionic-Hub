@@ -4,6 +4,53 @@
 
 ---
 
+## 📝 Что нового в версии 2.1.77 (SemVer Patch Release — Section 7: Pip Package Manager, Virtual Environments & Dependencies — Pip Progress Parsing, Orphaned Dependency Cleanup, High-Speed PyPI Mirrors & Failover, Pip Upgrade Notice Suppression, Requirements BOM & Non-ASCII Sanitizer, Editable Installs PYTHONPATH Mapping, PyPA Security Advisory Checker, Pip Cache Purge & Space Reclaimer, Native Binary llvm-strip, Protected Direct URL Authentication, Pre-Release Version Guard, Local & Plain HTTP Trusted Host Detection, Local Bionic Wheel Build Tag Protection, Pip Package List Fast Metadata Cache, Legacy Egg Format Detection & Conversion, Persistent Pip Configuration pip.conf, Dependency Hierarchy Tree Visualizer, Poetry Lockfile Auto-Conversion)
+
+- **Исторический рубеж аудита**: Устранено **807 из 1045 дефектов** (**77.2%** от всего реестра)!
+- **Устранены следующие 18 дефектов Секции 7** (#511, #514, #518, #519, #520, #521, #525, #527, #529, #531, #532, #535, #536, #538, #539, #541, #542, #543).
+- **Парсинг прогресса скачивания pip (Pip Download Progress Parsing — #511)**:
+  - В `PipManagementAndLockfilesHelper.evaluatePipProgressParsing()` и `parseDownloadProgressLine()` терминальные возвраты каретки `\r` отключаются через `--progress-bar off`, а вывод прогресса парсится по этапам скачивания и счетчикам мегабайт без искажения консоли. В настройки добавлен переключатель `pipProgressParsingGuardEnabled` с диалогом «Что это?».
+- **Очистка сиротских зависимостей (Orphaned Dependency Cleanup — #514)**:
+  - В `PipManagementAndLockfilesHelper.evaluatePipUninstallLeftovers()` строится обратный граф зависимостей для выявления брошенных транзитивных пакетов и пустых каталогов `.dist-info` при удалении родительских библиотек. В настройки добавлен переключатель `pipUninstallLeftoversGuardEnabled` с диалогом «Что это?».
+- **Скоростные зеркала PyPI и Failover (High-Speed PyPI Mirrors & Failover — #518)**:
+  - В `PipManagementAndLockfilesHelper.evaluatePipIndexMirrors()` реализован выбор доверенных региональных CDN-зеркал (Tuna, Aliyun, Cloudflare) с автоматическим откатом на официальный PyPI при недоступности. В настройки добавлен переключатель `pipIndexMirrorsGuardEnabled` с диалогом «Что это?».
+- **Подавление предупреждений обновления pip (Pip Upgrade Notice Suppression — #519)**:
+  - В `PipManagementAndLockfilesHelper.evaluatePipUpgradeWarning()` автоматически передается флаг `--disable-pip-version-check`, защищая пропатченную под Android Bionic системную обвязку от случайного затирания. В настройки добавлен переключатель `pipUpgradeWarningGuardEnabled` с диалогом «Что это?».
+- **Санитизация BOM и комментариев в requirements (Requirements BOM & Non-ASCII Sanitizer — #520)**:
+  - В `PipManagementAndLockfilesHelper.evaluateRequirementsParsing()` удаляется невидимый маркер UTF-8 BOM (`\uFEFF`) и очищаются русские и не-ASCII комментарии, предотвращая падения `UnicodeDecodeError`. В настройки добавлен переключатель `requirementsParsingGuardEnabled` с диалогом «Что это?».
+- **Режим разработки пакетов (Editable Installs PYTHONPATH Mapping — #521)**:
+  - В `PipManagementAndLockfilesHelper.evaluateEditableInstalls()` пути разрабатываемых локальных пакетов транслируются в переменную окружения `PYTHONPATH`, обходя ограничения Android-песочницы на запись глобальных `.pth` файлов. В настройки добавлен переключатель `editableInstallsGuardEnabled` с диалогом «Что это?».
+- **Проверка уязвимостей по базе PyPA (PyPA Security Advisory Checker — #525)**:
+  - В `PipManagementAndLockfilesHelper.evaluatePipSecurityAdvisories()` версии устанавливаемых библиотек сверяются с базой критических уязвимостей CVE (requests, urllib3, jinja2, aiohttp) с рекомендацией безопасных минимальных версий. В настройки добавлен переключатель `pipSecurityAdvisoriesGuardEnabled` с диалогом «Что это?».
+- **Очистка кэша pip и освобождение памяти (Pip Cache Purge & Space Reclaimer — #527)**:
+  - В `PipManagementAndLockfilesHelper.evaluatePipCacheCleanup()` выполняется аудит объема архивов в `~/.cache/pip` и предоставляется безопасная атомарная очистка кэшированных колес и HTTP-кэша. В настройки добавлен переключатель `pipCacheCleanupGuardEnabled` с диалогом «Что это?».
+- **Очистка отладочных символов .so (Native Binary Symbol Strip — #529)**:
+  - В `PipManagementAndLockfilesHelper.evaluateBinaryStrip()` генерируется вызов `llvm-strip --strip-unneeded` для скомпилированных нативных библиотек `.so`, экономящий до 50% дискового пространства. В настройки добавлен переключатель `binaryStripGuardEnabled` с диалогом «Что это?».
+- **Авторизация прямых ссылок на пакеты .whl (Protected Direct URL Authentication — #531)**:
+  - В `PipManagementAndLockfilesHelper.evaluateDirectUrlPackages()` внедрена безопасная инъекция заголовков авторизации (Bearer / Basic) при скачивании колес из защищенных приватных репозиториев. В настройки добавлен переключатель `directUrlPackagesGuardEnabled` с диалогом «Что это?».
+- **Защита от установки пре-релизов (Pre-Release Version Guard — #532)**:
+  - В `PipManagementAndLockfilesHelper.evaluatePreReleaseVersions()` блокируется случайная установка сырых альфа- и бета-версий библиотек без явного флага `--pre`, исключая поломку работающих ботов. В настройки добавлен переключатель `preReleaseVersionsGuardEnabled` с диалогом «Что это?».
+- **Доверенные локальные HTTP-хосты (Local & Plain HTTP Trusted Host Detection — #535)**:
+  - В `PipManagementAndLockfilesHelper.evaluatePipInsecureHost()` автоматически распознаются локальные IP-адреса и тестовые HTTP-зеркала с автоматической передачей параметра `--trusted-host`, предотвращая ошибки требования SSL. В настройки добавлен переключатель `pipInsecureHostGuardEnabled` с диалогом «Что это?».
+- **Защита локальных сборок Bionic (Local Bionic Wheel Build Tag Protection — #536)**:
+  - В `PipManagementAndLockfilesHelper.evaluateWheelBuildTag()` блокируется перезапись оптимизированных под ARM64 Bionic колес с тегом `+bionic1` ванильными пакетами с PyPI с тем же номером версии. В настройки добавлен переключатель `wheelBuildTagGuardEnabled` с диалогом «Что это?».
+- **Быстрый кэш списка пакетов (Pip Package List Fast Metadata Cache — #538)**:
+  - В `PipManagementAndLockfilesHelper.evaluatePipListPerformance()` список установленных библиотек отдается из валидированного кэша метаданных, обновляясь только при изменении даты модификации `site-packages`, устраняя 5-секундный лаг диска. В настройки добавлен переключатель `pipListPerformanceGuardEnabled` с диалогом «Что это?».
+- **Обнаружение и конвертация устаревших .egg пакетов (Legacy Egg Format Detection & Conversion — #539)**:
+  - В `PipManagementAndLockfilesHelper.evaluateEggFormatDeprecation()` распознается устаревший формат `.egg` и генерируется команда автоматической конвертации в `.whl` через `wheel convert`. В настройки добавлен переключатель `eggFormatDeprecationGuardEnabled` с диалогом «Что это?».
+- **Постоянная конфигурация pip (Persistent Pip Configuration pip.conf — #541)**:
+  - В `PipManagementAndLockfilesHelper.evaluatePipConfigPersistence()` пользовательские зеркала, таймауты и параметры `pip.conf` сохраняются в постоянных настройках приложения и автоматически восстанавливаются при переустановке среды. В настройки добавлен переключатель `pipConfigPersistenceGuardEnabled` с диалогом «Что это?».
+- **Визуализатор иерархии зависимостей (Dependency Hierarchy Tree Visualizer — #542)**:
+  - В `PipManagementAndLockfilesHelper.evaluateDependencyTreeVisualizer()` строится иерархическое дерево зависимостей, показывающее точные родительские пакеты для всех установленных подбиблиотек. В настройки добавлен переключатель `dependencyTreeVisualizerGuardEnabled` с диалогом «Что это?».
+- **Автоконвертация lock-файлов Poetry (Poetry Lockfile Auto-Conversion — #543)**:
+  - В `PipManagementAndLockfilesHelper.evaluatePoetryExportIntegration()` файл `poetry.lock` автоматически парсится и конвертируется в совместимый `requirements.txt` с точной фиксацией версий. В настройки добавлен переключатель `poetryExportIntegrationGuardEnabled` с диалогом «Что это?».
+- **Интерфейс настроек и локализация**:
+  - В `SettingsScreen` добавлена карточка: `PipManagementAndLockfilesCard` (18 переключателей).
+  - Все 18 переключателей снабжены диалогами «Что это?» (Определение, При включении, При отключении).
+  - Все 92 строковых ресурса переведены на 22 поддерживаемых языка.
+
+---
+
 ## 📝 Что нового в версии 2.1.76 (SemVer Patch Release — Section 6: Code Editor, Syntax, IDE Productivity & File Manager — 100% ELIMINATED: Terminal Copy Selection, Font Zoom Persistence, Line Wrap Hanging Indent, Auto-Close HTML Tags, Relative File Path Autocomplete, Project Code Statistics Dashboard, Terminal Buffer File Export, Smooth Caret Harmonic Pulse)
 
 - **Исторический рубеж аудита**: Устранено **789 из 1045 дефектов** (**75.5%** от всего реестра)!
