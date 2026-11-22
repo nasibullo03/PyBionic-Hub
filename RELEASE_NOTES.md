@@ -4,6 +4,51 @@
 
 ---
 
+## 🚀 Что нового в версии 2.1.86 (SemVer Patch Release — Section 10 Advanced Telemetry, Distributed Tracing & Stream Hardening: UI Log Stream Freeze & Pause Buffer, Syslog Remote Export RFC 5424, Fatal Crash Audio Alarm for Critical Bots, Adjustable Telemetry Log Font Size, Crash History & Incident Records Purge, Per-Thread CPU Profiling & Attribution, Custom Log Tags & Metadata Decorator, Active TCP Socket Connections Monitor, Dropped Log Lines & Overflow Counter, Cold Historical Log Gzip Compression, One-Tap Android Sharesheet Log Exporter, Cold Start Latency Profiler & Rating, Worker Thread Name & ID Filter, UTC vs Local Log Timestamps Selector, OpenTelemetry & W3C Distributed Tracing, Unified Cross-Project Multi-Log Search, Visual Distinction for Stdout & Stderr, Unresolved Crash Count Navigation Badge)
+
+- **Новый рубеж аудита**: Устранено **969 из 1045 дефектов** (**92.7%** от всего реестра)! Осталось всего 76 дефектов во всем аудите!
+- **Секция 10 (Telemetry, Logging, Monitoring & Error Parsing) на финишной прямой** — устранено еще 18 дефектов (#782, #783, #784, #785, #786, #787, #788, #790, #791, #792, #793, #794, #795, #798, #799, #800, #801, #802).
+- **Заморозка экрана логов и буфер паузы (Pause Log Stream in UI — #782)**:
+  - В `AdvancedTelemetryAndTracingHelper.evaluatePauseLogStream()` реализована временная остановка автоматического скролла экрана для комфортного чтения и копирования логов без остановки фонового выполнения бота. В настройки добавлен тумблер `pauseLogStreamGuardEnabled` с диалогом «Что это?».
+- **Удаленный экспорт системных логов по протоколу Syslog (Syslog Remote Export — #783)**:
+  - В `AdvancedTelemetryAndTracingHelper.formatSyslogRfc5424()` внедрена поддержка стандарта RFC 5424 для структурированной отправки событий в корпоративные SIEM и сборщики логов (Logstash, Graylog, rsyslog). В настройки добавлен тумблер `syslogRemoteExportGuardEnabled` с диалогом «Что это?».
+- **Звуковой сигнал тревоги при критическом падении важного бота (Audio Alert on Fatal Crash — #784)**:
+  - В `AdvancedTelemetryAndTracingHelper.shouldTriggerFatalCrashAudioAlert()` реализована звуковая сигнализация при падении критически важных production-ботов (SIGSEGV, OOM, необработанные исключения). В настройки добавлен тумблер `fatalCrashAudioAlertGuardEnabled` с диалогом «Что это?».
+- **Настройка размера шрифта терминала логов (Telemetry Log Font Size — #785)**:
+  - В `AdvancedTelemetryAndTracingHelper.computeLogFontMetrics()` добавлена динамическая регулировка размера шрифта консоли от 9sp до 24sp с автоматическим расчетом высоты строк и вместимости экрана. В настройки добавлен тумблер `telemetryLogFontSizeGuardEnabled` с диалогом «Что это?».
+- **Очистка истории падений и инцидентов (Crash History Clear Action — #786)**:
+  - В `AdvancedTelemetryAndTracingHelper.clearCrashHistory()` реализовано удаление устаревших дампов падений с сохранением кумулятивной статистики инцидентов для чистоты диалогов и экономии памяти. В настройки добавлен тумблер `crashHistoryClearGuardEnabled` с диалогом «Что это?».
+- **Профилирование потребления CPU по потокам (Per-Thread CPU Utilization — #787)**:
+  - В `AdvancedTelemetryAndTracingHelper.calculatePerThreadCpu()` внедрен расчет нагрузки по отдельным потокам (Python main thread, asyncio worker loops, C-extensions) для выявления зависших фоновых циклов. В настройки добавлен тумблер `perThreadCpuUtilizationGuardEnabled` с диалогом «Что это?».
+- **Пользовательские теги и метаданные логов (Custom Log Tags — #788)**:
+  - В `AdvancedTelemetryAndTracingHelper.formatLogWithCustomTags()` добавлена поддержка добавления пользовательских тегов вида `[module:name env:prod]` для категоризации и целевой фильтрации сообщений. В настройки добавлен тумблер `customLogTagsGuardEnabled` с диалогом «Что это?».
+- **Мониторинг активных сетевых соединений TCP (Active TCP Connections Metric — #790)**:
+  - В `AdvancedTelemetryAndTracingHelper.parseAndEvaluateTcpConnections()` реализован парсинг `/proc/net/tcp` с подсчетом ESTABLISHED, TIME_WAIT и LISTEN сокетов и предупреждением о насыщении пула. В настройки добавлен тумблер `activeTcpConnectionsGuardEnabled` с диалогом «Что это?».
+- **Счетчик отброшенных строк при переполнении буфера (Dropped Log Lines Counter — #791)**:
+  - В `AdvancedTelemetryAndTracingHelper.evaluateDroppedLogLines()` внедрен учет пропущенных строк при переполнении кольцевого буфера во время интенсивного спама сообщениями. В настройки добавлен тумблер `droppedLogLinesCounterGuardEnabled` с диалогом «Что это?».
+- **Фоновое gzip-сжатие старых логов при простое (Cold Log Compression on Idle — #792)**:
+  - В `AdvancedTelemetryAndTracingHelper.shouldCompressColdLogFile()` реализована политика архивации логов старше 48 часов в gzip при простое устройства на зарядке, экономящая до 90% места на накопителе. В настройки добавлен тумблер `coldLogCompressionOnIdleGuardEnabled` с диалогом «Что это?».
+- **Экспорт логов через системный диалог Sharesheet (Log Share via Sharesheet — #793)**:
+  - В `AdvancedTelemetryAndTracingHelper.prepareLogSharePayload()` внедрена генерация безопасного FileProvider URI для быстрой отправки логов проекта через Telegram, Mail или Drive в один клик. В настройки добавлен тумблер `logShareSharesheetGuardEnabled` с диалогом «Что это?».
+- **Замер времени холодного старта и оценка запуска (Cold Start Latency Metric — #794)**:
+  - В `AdvancedTelemetryAndTracingHelper.evaluateColdStartLatency()` реализован тайминг холодного старта бота с градацией производительности (Optimal, Acceptable, Slow) для выявления медленных импортов. В настройки добавлен тумблер `coldStartLatencyGuardEnabled` с диалогом «Что это?».
+- **Фильтрация логов по имени и ID потока (Worker Thread Filter — #795)**:
+  - В `AdvancedTelemetryAndTracingHelper.filterLogsByWorkerThread()` добавлена фильтрация сообщений по конкретному имени или идентификатору потока для удобной отладки параллельных задач. В настройки добавлен тумблер `workerThreadFilterGuardEnabled` с диалогом «Что это?».
+- **Переключатель формата времени логов UTC / Местное (UTC vs Local Timestamp Setting — #798)**:
+  - В `AdvancedTelemetryAndTracingHelper.formatLogTimestamp()` реализовано переключение между стандартом UTC и местным часовым поясом смартфона для сопоставления с серверными логами. В настройки добавлен тумблер `utcVsLocalTimestampsGuardEnabled` с диалогом «Что это?».
+- **Распределенная трассировка OpenTelemetry и W3C (OpenTelemetry Tracing Missing — #799)**:
+  - В `AdvancedTelemetryAndTracingHelper.generateW3cTraceparent()` и `parseW3cTraceparent()` внедрена поддержка формата W3C Trace Context и генерации спанов OpenTelemetry для сквозной трассировки запросов. В настройки добавлен тумблер `opentelemetryTracingGuardEnabled` с диалогом «Что это?».
+- **Сквозной поиск по логам всех проектов (Cross-Project Log Search — #800)**:
+  - В `AdvancedTelemetryAndTracingHelper.searchCrossProjectLogs()` реализован одновременный поиск по логам всех установленных ботов с отображением тегов проектов для быстрого обнаружения общих сбоев API. В настройки добавлен тумблер `crossProjectLogSearchGuardEnabled` с диалогом «Что это?».
+- **Визуальное разделение потоков Stdout и Stderr (Stdout vs Stderr Distinction — #801)**:
+  - В `AdvancedTelemetryAndTracingHelper.classifyLogStreamLine()` внедрено цветовое кодирование потоков (бирюзовый для stdout и контрастный красный/янтарный для stderr) для мгновенного обнаружения исключений. В настройки добавлен тумблер `stdoutStderrDistinctionGuardEnabled` с диалогом «Что это?».
+- **Бейдж количества неразрешенных сбоев на вкладке (Unresolved Crash Badge Count — #802)**:
+  - В `AdvancedTelemetryAndTracingHelper.computeUnresolvedCrashBadgeCount()` реализован подсчет новых непросмотренных критических сбоев с отображением бейджа на иконке телеметрии в навигационной панели. В настройки добавлен тумблер `unresolvedCrashBadgeGuardEnabled` с диалогом «Что это?».
+- **Полная 22-язычная локализация**: Все новые строки переведены на 22 языка через `tools/sync_strings.py`.
+- **Интеграция в настройки**: Карточка `AdvancedTelemetryAndTracingCard` добавлена в `SettingsScreen` с полными 3-компонентными диалогами «Что это?» для всех 18 параметров.
+
+---
+
 ## 🚀 Что нового в версии 2.1.85 (SemVer Patch Release — Section 10 Telemetry, Logging & Diagnostics Hardening: Disk I/O Wait & Flash Latency Monitor, Personal Telegram Bot Webhook Alert Dispatcher, zRAM Compressed Swap Pressure Tracker, Log Search Highlighting & Match Counter, Hardware CPU Thermal Throttling Indicator, Per-Project Cellular/WiFi Traffic Quota Cap, High-Precision Millisecond Log Timestamps, Python GC Collections & Pause Duration Profiler, Non-Blocking Concurrent Log Read Policy, Rolling 7-Day Downsampled Telemetry History, Corrupted & C-Extension Crash Dump Resilient Parser, Network Interface Drop Incident Injector, Standalone HTML Telemetry Report Generator, Security Integrity & Tamper Audit Telemetry, Precision Date & Time Range Log Filter, ReDoS-Guarded Regular Expression Log Search, Response Latency Percentile Profiler p50/p95/p99, Battery Health & Degradation Prevention Tracker)
 
 - **Новый рубеж аудита**: Устранено **951 из 1045 дефектов** (**91.0%** от всего реестра)!
