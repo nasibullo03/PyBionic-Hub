@@ -4,6 +4,50 @@
 
 ---
 
+## 🚀 Что нового в версии 2.1.84 (SemVer Patch Release — Section 9 100% Complete & Section 10 Telemetry Kickoff: SQLite Savepoints & Nested Transactions, SQL Query Editor Autocomplete, Custom Page Size Configurator, Non-Standard DB File Magic Detection, Cell Value 1-Tap Clipboard Extractor, Table Grid Contrast & Zebra Striping, Data Filter Presets, Migration Dry-Run Logging, CIFS Network Share Lock Safety, Structured JSON & Logfmt Parser, Hierarchical Log Level Filter, Crash Parser False Positives Discriminator, Log Export Archive Packager, Prometheus / OpenMetrics Exporter, ANSI Log Sanitization, Realtime Network Speed Meter, Python Traceback Demangling & Frame Linker, Monotonic Clock Process Uptime Guard)
+
+- **Новый рекордный рубеж аудита**: Устранено **933 из 1045 дефектов** (**89.3%** от всего реестра)!
+- **Секция 9 (Data Storage, SQLite Viewer & Databases) ПОЛНОСТЬЮ ЗАВЕРШЕНА (100% — 75/75 дефектов)!**
+- **Секция 10 (Telemetry, Logging, Monitoring & Error Parsing) УСПЕШНО НАЧАТА** — устранено первые 9 дефектов (#743, #746, #747, #748, #750, #751, #752, #753, #754).
+- **Менеджер точек сохранения и вложенных транзакций (SQLite Savepoints — #726)**:
+  - В `SqliteSectionCompletionAndTelemetryHelper.evaluateSavepointManagement()` реализовано управление именованными точками сохранения (`SAVEPOINT`, `RELEASE`, `ROLLBACK TO`), позволяющее частично откатывать операции в сложных транзакционных сценариях без сброса всей транзакции. В настройки добавлен тумблер `sqliteSavepointsGuardEnabled` с диалогом «Что это?».
+- **Интеллектуальное автодополнение SQL-запросов (SQL Autocomplete — #728)**:
+  - В `SqliteSectionCompletionAndTelemetryHelper.evaluateSqlAutocomplete()` реализованы контекстные подсказки ключевых слов SQL (SELECT, FROM, WHERE, JOIN и др.), имен таблиц и столбцов по префиксу текущего токена в редакторе запросов. В настройки добавлен тумблер `sqlAutocompleteGuardEnabled` с диалогом «Что это?».
+- **Конфигуратор пользовательского размера страниц SQLite (Custom Page Size — #729)**:
+  - В `SqliteSectionCompletionAndTelemetryHelper.evaluatePageSizeSetting()` добавлена валидация степеней двойки (512–65536) и генерация `PRAGMA page_size = ...; VACUUM;` для оптимизации ввода-вывода высоконагруженных баз данных на Android-хранилище. В настройки добавлен тумблер `customPageSizeGuardEnabled` с диалогом «Что это?».
+- **Детектор SQLite файлов по 16-байтовой сигнатуре (Non-Standard DB Extensions — #731)**:
+  - В `SqliteSectionCompletionAndTelemetryHelper.evaluateDatabaseFileDetection()` обеспечена проверка первых 16 байт заголовка на соответствие сигнатуре `SQLite format 3\0`, что позволяет распознавать и открывать базы данных с нестандартными расширениями (`.dat`, `.bin`, `.cache` или без расширения). В настройки добавлен тумблер `nonStandardDbExtensionsGuardEnabled` с диалогом «Что это?».
+- **Копирование значения ячейки в буфер в 1 касание (Cell Value Quick Copy — #732)**:
+  - В `SqliteSectionCompletionAndTelemetryHelper.evaluateCellValueCopy()` реализовано мгновенное копирование содержимого выбранной ячейки таблицы в системный буфер обмена с форматированным уведомлением Toast и превью. В настройки добавлен тумблер `cellValueCopyGuardEnabled` с диалогом «Что это?».
+- **Контрастность сетки таблиц и зебра-раскраска (Table Grid Contrast — #733)**:
+  - В `SqliteSectionCompletionAndTelemetryHelper.evaluateTableGridContrast()` внедрена поддержка чередующегося фона четных и нечетных строк (`#141A24` / `#0D1117`) и четких разделителей для комфортного чтения больших таблиц в темной теме. В настройки добавлен тумблер `tableGridContrastGuardEnabled` с диалогом «Что это?».
+- **Пресеты быстрых фильтров данных WHERE (Data Filter Presets — #734)**:
+  - В `SqliteSectionCompletionAndTelemetryHelper.evaluateDataFilterPresets()` добавлены готовые шаблоны условий (`LAST_24_HOURS`, `ERRORS_ONLY`, `TOP_100`) для мгновенной фильтрации логов и записей без ручного набора SQL. В настройки добавлен тумблер `dataFilterPresetsGuardEnabled` с диалогом «Что это?».
+- **Логирование предварительной симуляции миграций (Migration Dry Run Logging — #735)**:
+  - В `SqliteSectionCompletionAndTelemetryHelper.evaluateMigrationDryRunLogging()` реализован режим предпросмотра и пошагового логирования скриптов миграции схемы БД до применения к рабочей базе. В настройки добавлен тумблер `migrationDryRunLoggingGuardEnabled` с диалогом «Что это?».
+- **Защита блокировок SQLite на сетевых ресурсах CIFS / Samba (CIFS Network Share Lock — #736)**:
+  - В `SqliteSectionCompletionAndTelemetryHelper.evaluateCifsNetworkShareLock()` добавлен детектор сетевых монтирований и применение `PRAGMA locking_mode = EXCLUSIVE;` для предотвращения повреждения базы данных из-за некорректных блокировок POSIX по сети. В настройки добавлен тумблер `cifsNetworkShareLockGuardEnabled` с диалогом «Что это?».
+- **Парсер структурированных логов JSON и Logfmt (Structured Logging JSON — #743)**:
+  - В `SqliteSectionCompletionAndTelemetryHelper.evaluateStructuredJsonLog()` реализован автоматический разбор строк вывода ботов в форматах JSON и logfmt с извлечением уровня важности, сообщения, временной метки и дополнительных атрибутов. В настройки добавлен тумблер `structuredLoggingJsonGuardEnabled` с диалогом «Что это?».
+- **Иерархический фильтр уровней логирования (Log Level Filtering — #746)**:
+  - В `SqliteSectionCompletionAndTelemetryHelper.evaluateLogLevelFilter()` внедрена иерархическая фильтрация вывода консоли по порогу важности (DEBUG < INFO < WARN < ERROR < FATAL), позволяющая скрыть шумные отладочные сообщения. В настройки добавлен тумблер `logLevelFilteringGuardEnabled` с диалогом «Что это?».
+- **Дискриминатор ложных срабатываний парсера сбоев (Crash Parser False Positives — #747)**:
+  - В `SqliteSectionCompletionAndTelemetryHelper.evaluateCrashParserFalsePositive()` реализовано разделение фатальных падений процессов от ожидаемых обработанных исключений и статус-кодов (например, HTTP 404/500), предотвращающее ложные баннеры сбоев и циклы перезапусков. В настройки добавлен тумблер `crashParserFalsePositivesGuardEnabled` с диалогом «Что это?».
+- **Упаковщик экспорта логов по временному диапазону (Log Export Archive — #748)**:
+  - В `SqliteSectionCompletionAndTelemetryHelper.evaluateLogExportArchive()` реализовано формирование сжатых ZIP-архивов логов бота за выбранный период (например, 24 часа) с расчетом размера и генерацией имени файла. В настройки добавлен тумблер `logExportShareGuardEnabled` с диалогом «Что это?».
+- **Экспортер метрик Prometheus / OpenMetrics (Prometheus Metrics Exporter — #750)**:
+  - В `SqliteSectionCompletionAndTelemetryHelper.evaluatePrometheusMetricsEndpoint()` реализована генерация стандартного текстового вывода OpenMetrics (`pybionic_uptime_seconds`, `pybionic_active_bots_count`, `pybionic_memory_bytes`) для скрейпинга Prometheus и дашбордов Grafana. В настройки добавлен тумблер `prometheusMetricsExporterGuardEnabled` с диалогом «Что это?».
+- **Очистка управляющих ANSI-последовательностей (ANSI Log Sanitization — #751)**:
+  - В `SqliteSectionCompletionAndTelemetryHelper.evaluateAnsiLogSanitization()` реализовано удаление терминальных escape-кодов цветов и позиционирования курсора при сохранении логов на диск, обеспечивающее чистый и читаемый текст. В настройки добавлен тумблер `ansiLogSanitizationGuardEnabled` с диалогом «Что это?».
+- **Измеритель скорости сетевого трафика в реальном времени (Realtime Network Speed — #752)**:
+  - В `SqliteSectionCompletionAndTelemetryHelper.evaluateNetworkSpeedMetrics()` реализован ежесекундный расчет мгновенной скорости загрузки и отдачи (КБ/с и МБ/с) сокетов ботов. В настройки добавлен тумблер `realtimeNetworkSpeedGuardEnabled` с диалогом «Что это?».
+- **Деманглинг трейсбеков Python и связывание фреймов (Python Traceback Demangling — #753)**:
+  - В `SqliteSectionCompletionAndTelemetryHelper.evaluatePythonTracebackDemangling()` реализован разбор многострочных стектрейсов ошибок Python с извлечением путей к файлам, номеров строк и имен функций для навигации к месту ошибки в 1 клик. В настройки добавлен тумблер `pythonTracebackDemanglingGuardEnabled` с диалогом «Что это?».
+- **Учет времени работы по монотонным часам (Monotonic Process Uptime — #754)**:
+  - В `SqliteSectionCompletionAndTelemetryHelper.evaluateMonotonicUptime()` обеспечен точный расчет времени непрерывной работы процесса на базе `elapsedRealtime`, исключающий сбои таймеров при синхронизации времени по NTP, переводе часов или смене часовых поясов. В настройки добавлен тумблер `processUptimeMonotonicGuardEnabled` с диалогом «Что это?».
+
+---
+
 ## 🚀 Что нового в версии 2.1.83 (SemVer Patch Release — Section 9: Data Storage, SQLite Viewer & Databases — Fast Row Count Estimation & Statistical Approximations, Multi-File Database Size & WAL Storage Footprint, Drop Table Foreign Key Cascade Guard, Extended Result Codes PRAGMA & Error Diagnostic Explainer, Visual Mermaid ER Diagram Generator, Database Triggers Inspector & Cascading Event Auditor, Export Query Results to Telegram Payload, Visual Redis Key Inspector & Data Type Auditor, SQLite Virtual Table VIEWs Inspector, User-Defined Functions UDF Registry & Syntax Validator, Alembic & Schema Migration History Viewer, Cyrillic & Unicode Case-Insensitive Collation, Incremental VACUUM Stepwise Defragmenter, Automated Backup Retention & Weekly Pruning Policy, Active Database Locks & Cursor Leak Inspector, Sub-Millisecond Query Execution Timer, Multi-line SQL Formatter & Prettifier, Raw B-Tree Page Headers Forensics)
 
 - **Новый рубеж аудита**: Устранено **915 из 1045 дефектов** (**87.6%** от всего реестра)!
