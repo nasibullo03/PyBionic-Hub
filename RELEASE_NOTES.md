@@ -4,6 +4,49 @@
 
 ---
 
+## 🚀 Что нового в версии 2.1.83 (SemVer Patch Release — Section 9: Data Storage, SQLite Viewer & Databases — Fast Row Count Estimation & Statistical Approximations, Multi-File Database Size & WAL Storage Footprint, Drop Table Foreign Key Cascade Guard, Extended Result Codes PRAGMA & Error Diagnostic Explainer, Visual Mermaid ER Diagram Generator, Database Triggers Inspector & Cascading Event Auditor, Export Query Results to Telegram Payload, Visual Redis Key Inspector & Data Type Auditor, SQLite Virtual Table VIEWs Inspector, User-Defined Functions UDF Registry & Syntax Validator, Alembic & Schema Migration History Viewer, Cyrillic & Unicode Case-Insensitive Collation, Incremental VACUUM Stepwise Defragmenter, Automated Backup Retention & Weekly Pruning Policy, Active Database Locks & Cursor Leak Inspector, Sub-Millisecond Query Execution Timer, Multi-line SQL Formatter & Prettifier, Raw B-Tree Page Headers Forensics)
+
+- **Новый рубеж аудита**: Устранено **915 из 1045 дефектов** (**87.6%** от всего реестра)!
+- **Секция 9 (Data Storage, SQLite Viewer & Databases)** приближается к завершению — устранено еще 18 дефектов (#684, #702, #703, #705, #706, #707, #708, #709, #712, #715, #716, #718, #719, #721, #722, #723, #724, #725).
+- **Быстрая оценка количества строк через статистику (Fast Row Count Estimation — #684)**:
+  - В `SqliteForensicsAndOptimizationHelper.evaluateRowCountEstimation()` реализовано использование статистических приближений для гигантских таблиц (от 50 000 строк) вместо медленного полного сканирования `SELECT count(*)`, устраняющее фризы UI. В настройки добавлен тумблер `tableRowCountEstimationGuardEnabled` с диалогом «Что это?».
+- **Инспектор составного размера БД и объема WAL (Multi-File Database Size — #702)**:
+  - В `SqliteForensicsAndOptimizationHelper.evaluateDatabaseSizeMetrics()` обеспечен учет совокупного дискового объема файлов `.db`, `-wal` и `-shm` с предупреждением при превышении 500 МБ. В настройки добавлен тумблер `databaseSizeDisplayGuardEnabled` с диалогом «Что это?».
+- **Контроль внешних ключей при удалении таблицы (Drop Table Cascade Guard — #703)**:
+  - В `SqliteForensicsAndOptimizationHelper.evaluateDropTableCascade()` добавлен аудит связей и генерация безопасного сценария каскадного удаления родительских таблиц. В настройки добавлен тумблер `dropTableCascadeGuardEnabled` с диалогом «Что это?».
+- **Расширенные коды ошибок SQLite и диагностика (Extended Result Codes — #705)**:
+  - В `SqliteForensicsAndOptimizationHelper.evaluateExtendedResultCodes()` включен `PRAGMA extended_result_codes = ON` и расшифровка точных кодов ошибок диска, блокировок и целостности. В настройки добавлен тумблер `extendedResultCodesGuardEnabled` с диалогом «Что это?».
+- **Генератор визуальных ER-диаграмм связей таблиц (ER Diagram Generator — #706)**:
+  - В `SqliteForensicsAndOptimizationHelper.evaluateErDiagramGeneration()` реализована автоматическая генерация схем Mermaid ER на базе внешних ключей базы данных. В настройки добавлен тумблер `erDiagramGeneratorGuardEnabled` с диалогом «Что это?».
+- **Инспектор триггеров и аудит автоматических событий (Triggers Viewer — #707)**:
+  - В `SqliteForensicsAndOptimizationHelper.evaluateTriggersInspection()` добавлен аудит активных триггеров таблицы с предупреждением о циклических вызовах. В настройки добавлен тумблер `sqliteTriggersViewerGuardEnabled` с диалогом «Что это?».
+- **Экспорт результатов SQL-запроса в Telegram (Export Query to Telegram — #708)**:
+  - В `SqliteForensicsAndOptimizationHelper.evaluateExportQueryToTelegram()` реализовано форматирование SQL-запроса и результатов выборки в структурированное сообщение Telegram Markdown. В настройки добавлен тумблер `exportQueryToTelegramGuardEnabled` с диалогом «Что это?».
+- **Визуальный инспектор ключей и типов данных Redis (Redis GUI Inspector — #709)**:
+  - В `SqliteForensicsAndOptimizationHelper.evaluateRedisKeyInspector()` реализована фильтрация ключей Redis по glob-шаблонам с аудитом типов (string, hash, list, set, zset). В настройки добавлен тумблер `redisGuiInspectorGuardEnabled` с диалогом «Что это?».
+- **Инспектор представлений VIEW и виртуальных таблиц (SQLite VIEWs Management — #712)**:
+  - В `SqliteForensicsAndOptimizationHelper.evaluateSqliteViewsManagement()` обеспечено отображение представлений VIEW с показом их SQL-определений и отметкой режима Read-Only. В настройки добавлен тумблер `sqliteViewsManagementGuardEnabled` с диалогом «Что это?».
+- **Поддержка пользовательских функций SQL UDF (User-Defined Functions — #715)**:
+  - В `SqliteForensicsAndOptimizationHelper.evaluateUserDefinedFunctions()` добавлена регистрация и примеры использования скалярных функций (REGEXP, MD5, REVERSE) в консоли SQLite. В настройки добавлен тумблер `userDefinedFunctionsGuardEnabled` с диалогом «Что это?».
+- **Просмотрщик истории миграций Alembic и схем БД (Migration History Viewer — #716)**:
+  - В `SqliteForensicsAndOptimizationHelper.evaluateMigrationHistory()` реализован разбор ревизий `alembic_version` со шкалой времени и индикатором актуальной схемы. В настройки добавлен тумблер `migrationHistoryViewerGuardEnabled` с диалогом «Что это?».
+- **Регистронезависимая коллиация для кириллицы (Unicode Collation — #718)**:
+  - В `SqliteForensicsAndOptimizationHelper.evaluateUnicodeCollation()` реализована корректная регистронезависимая сортировка и сопоставление русских и международных символов UTF-8. В настройки добавлен тумблер `sqliteUnicodeCollationGuardEnabled` с диалогом «Что это?».
+- **Пошаговая дефрагментация Incremental VACUUM (Incremental VACUUM — #719)**:
+  - В `SqliteForensicsAndOptimizationHelper.evaluateIncrementalVacuum()` добавлена настройка `PRAGMA auto_vacuum = INCREMENTAL` и выполнение `PRAGMA incremental_vacuum` без полной блокировки БД. В настройки добавлен тумблер `incrementalVacuumGuardEnabled` с диалогом «Что это?».
+- **Авторотация и политика хранения резервных копий (Backup Retention Policy — #721)**:
+  - В `SqliteForensicsAndOptimizationHelper.evaluateBackupRetention()` реализована ротация локальных архивов с удалением копий старше 7 дней и сохранением недельных снимков. В настройки добавлен тумблер `backupRetentionPolicyGuardEnabled` с диалогом «Что это?».
+- **Инспектор активных блокировок и утечек курсоров (Active Locks Inspector — #722)**:
+  - В `SqliteForensicsAndOptimizationHelper.evaluateActiveLocks()` реализован аудит режимов блокировок (SHARED, RESERVED, EXCLUSIVE) и предупреждение о незакрытых курсорах. В настройки добавлен тумблер `activeLocksInspectorGuardEnabled` с диалогом «Что это?».
+- **Высокоточный таймер выполнения SQL-запросов (Query Execution Time — #723)**:
+  - В `SqliteForensicsAndOptimizationHelper.evaluateQueryExecutionTime()` добавлен замер времени выполнения запроса на уровне наносекунд с классификацией скорости (FAST, NORMAL, SLOW, CRITICAL). В настройки добавлен тумблер `queryExecutionTimeGuardEnabled` с диалогом «Что это?».
+- **Автоформатирование и структурирование SQL (SQL Formatter / Prettify — #724)**:
+  - В `SqliteForensicsAndOptimizationHelper.evaluateSqlFormatter()` реализовано автоматическое форматирование SQL-запросов с переносами блоков SELECT, FROM, WHERE, JOIN. В настройки добавлен тумблер `sqlFormatterPrettifyGuardEnabled` с диалогом «Что это?».
+- **Низкоуровневый криминалистический анализ заголовков страниц B-Tree (Raw Page Headers Forensics — #725)**:
+  - В `SqliteForensicsAndOptimizationHelper.evaluateRawPageHeadersForensic()` реализован парсинг низкоуровневых флагов страниц B-Tree для аварийного извлечения данных из поврежденных баз. В настройки добавлен тумблер `rawPageHeadersForensicGuardEnabled` с диалогом «Что это?».
+
+---
+
 ## 🚀 Что нового в версии 2.1.82 (SemVer Patch Release — Section 9: Data Storage, SQLite Viewer & Databases — Table Fulltext Search Builder, Column Sorting State & ORDER BY Generator, RFC-4180 CSV & Structured JSON Table Export, VACUUM Freelist Disk Optimizer, Visual ALTER TABLE DDL Builder, Database Index Visualizer & Duplicate Detector, Transaction Isolation Modes & Lock Optimizer, Unix Timestamp Auto-Formatting & ISO-8601, AUTOINCREMENT Counter Reset & sqlite_sequence Manager, Cross-Database ATTACH & Federation, High-Performance PRAGMA Tuning Suite, SQL Syntax Highlighting Tokenizer, Saved SQL Queries & History Bookmarks, Adaptive Column Resizing & Width Calculator, Table Pagination Jump & LIMIT/OFFSET Calculator, DEFAULT Values & Constraints Inspector, SQLite Android OS vs Python Version Compatibility, Memory-Mapped I/O PRAGMA mmap_size Configurator)
 
 - **Новый рубеж аудита**: Устранено **897 из 1045 дефектов** (**85.8%** от всего реестра)!
