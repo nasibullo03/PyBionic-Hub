@@ -4,6 +4,33 @@
 
 ---
 
+## 📝 Что нового в версии 2.1.57 (SemVer Patch Release — Git Branching, Topological Graph Bounds, Mobile Shallow Clones, Rebase Backups, Docker Compose Import & Cherry-Pick Safety)
+
+- **Контроль и валидация переключения веток Git (Git Branch Management Guard — #895)**:
+  - В `GitAndDevOpsAutomationDefensesHelper.evaluateBranchCheckoutPolicy()` внедрена строгая проверка синтаксиса имени веток и проверка наличия незакоммиченных изменений в рабочем дереве с рекомендацией предварительного сохранения в Stash перед `git checkout`. В настройки добавлен переключатель `gitBranchManagementGuardEnabled` с модальным окном справки «Что это?».
+- **Ограничение глубины графа коммитов в терминале (Git Commit Graph Bounds — #900)**:
+  - В `GitAndDevOpsAutomationDefensesHelper.evaluateGitLogGraphArgs()` реализовано безопасное ограничение выборки топологического графа (`git log --graph --oneline --all`) до 10-100 коммитов, исключающее переполнение оперативной памяти и зависание мобильного терминала. В настройки добавлен переключатель `gitLogGraphViewerGuardEnabled` с модальным окном справки «Что это?».
+- **Принудительное поверхностное клонирование через мобильный интернет (Mobile Shallow Clone Enforcer — #902)**:
+  - В `GitAndDevOpsAutomationDefensesHelper.evaluateShallowClonePolicy()` внедрено автоматическое добавление параметра `--depth 1` при клонировании репозиториев через мобильный трафик или при размере более 50 МБ для колоссальной экономии трафика и ускорения загрузки. В настройки добавлен переключатель `gitShallowCloneDepthGuardEnabled` с модальным окном справки «Что это?».
+- **Резервные указатели перед интерактивным Rebase (Rebase Safety Backup Ref — #905)**:
+  - В `GitAndDevOpsAutomationDefensesHelper.evaluateRebaseSafety()` реализовано автоматическое создание защитных указателей в `refs/pybionic_backup/` перед операциями rebase и squash, гарантирующее 100% возможность восстановления коммитов при сбоях слияния. В настройки добавлен переключатель `gitInteractiveRebaseGuardEnabled` с модальным окном справки «Что это?».
+- **Безопасный импортер проектов из Docker Compose (Docker Compose Project Importer — #906)**:
+  - В `GitAndDevOpsAutomationDefensesHelper.evaluateDockerComposeImport()` внедрен парсер конфигураций `docker-compose.yml`, извлекающий названия сервисов, переменные окружения и пробросы портов для мгновенного создания шаблонов ботов PyBionic без выполнения небезопасных инструкций. В настройки добавлен переключатель `dockerComposeImportParserGuardEnabled` с модальным окном справки «Что это?».
+- **Сохранение индекса и защита от случайного сброса Stash (Git Stash Index & Drop Guard — #907)**:
+  - В `GitAndDevOpsAutomationDefensesHelper.evaluateStashAction()` реализовано автоматическое применение флага `--index` при вызове `git stash pop/apply` для сохранения состояния staged файлов и введено обязательное подтверждение при удалении правок (`stash drop`). В настройки добавлен переключатель `gitStashSafetyGuardEnabled` с модальным окном справки «Что это?».
+- **Защита TLS и повторные попытки для WebDAV-бэкапов (WebDAV TLS & Retry Backoff — #908)**:
+  - В `GitAndDevOpsAutomationDefensesHelper.evaluateWebDavEndpoint()` внедрена обязательная валидация протокола HTTPS для серверов WebDAV (Nextcloud / ownCloud) и конфигурация экспоненциальной задержки при повторных попытках (до 3 раз) при сбоях мобильной сети. В настройки добавлен переключатель `webdavBackupReliabilityGuardEnabled` с модальным окном справки «Что это?».
+- **Валидация релизных тегов SemVer 2.0.0 (SemVer Release Tag Validator — #909)**:
+  - В `GitAndDevOpsAutomationDefensesHelper.evaluateReleaseTag()` реализована валидация имен тегов по спецификации SemVer (`vMAJOR.MINOR.PATCH`), проверка на отсутствие дубликатов и принудительное создание аннотированных тегов (`git tag -a -m`). В настройки добавлен переключатель `gitReleaseTaggingGuardEnabled` с модальным окном справки «Что это?».
+- **Прямой локальный пуш с компьютера на смартфон (PC-to-Phone Git Push Daemon — #911)**:
+  - В `GitAndDevOpsAutomationDefensesHelper.evaluateLocalGitRemoteConfig()` внедрена генерация конфигурации reverse port forwarding (`adb reverse`) и прямых HTTP эндпоинтов Git, позволяющих разработчикам пушить код с ПК прямо на телефон (`git push phone main`) без внешних облаков. В настройки добавлен переключатель `localGitRemoteDaemonGuardEnabled` с модальным окном справки «Что это?».
+- **Безопасный выборочный перенос коммитов (Git Cherry-Pick Safety Guard — #912)**:
+  - В `GitAndDevOpsAutomationDefensesHelper.evaluateCherryPickSafety()` реализована проверка валидности SHA-хеша коммита, проверка чистоты рабочей копии и подготовка автоматического отката (`git cherry-pick --abort`) при возникновении конфликтов. В настройки добавлен переключатель `gitCherryPickConflictGuardEnabled` с модальным окном справки «Что это?».
+- **Модульная Compose-карточка и справки «Что это?» (Rule 5 Compliance)**:
+  - Разработан компонент `GitAndDevOpsAutomationDefensesCard.kt` с 10 реактивными переключателями и модальными окнами помощи (Определение, При включении, При отключении) со 100% переводом на все 22 языка.
+
+---
+
 ## 📝 Что нового в версии 2.1.56 (SemVer Patch Release — Android Hardware Controls, Waterfall Displays, Headset Kill-Switch & Git Safety Defenses: SECTION 13 100% COMPLETED)
 
 - **Плавное переключение аудиовыхода (Audio Output Switch Protector — #1028)**:
