@@ -4,6 +4,31 @@
 
 ---
 
+## 📝 Что нового в версии 2.1.58 (SemVer Patch Release — VPS Migration Export, Git Remote Switcher, Author Identity, GPG Commit Signing, Detached HEAD Trap, Python .gitignore, Smart Power-Aware Backups, Git Worktrees, Clean Action & Blame Bounds)
+
+- **Генератор артефактов миграции проекта на VPS (VPS Migration Export Guard — #914)**:
+  - В `GitWorktreeAndCloudBackupDefensesHelper.evaluateVpsMigrationArtifacts()` реализована автогенерация защищенного `Dockerfile` (с непривилегированным пользователем non-root), `docker-compose.yml` (с политикой перезапуска `unless-stopped`) и файла службы `systemd` (`Restart=always`) для бесшовного переноса выросшего бота на сервер Ubuntu/Debian. В настройки добавлен переключатель `vpsMigrationExportGuardEnabled` с модальным окном справки «Что это?».
+- **Безопасная смена адреса удаленного репозитория (Git Remote URL Switcher — #915)**:
+  - В `GitWorktreeAndCloudBackupDefensesHelper.evaluateGitRemoteUrl()` внедрена валидация схем URL (`https://`, `ssh://`, `git@`) и экранирование имени remote (`origin`, `upstream`), позволяющие менять адрес удаленного репозитория без рискованного ручного редактирования файла `.git/config`. В настройки добавлен переключатель `gitRemoteUrlSwitcherGuardEnabled` с модальным окном справки «Что это?».
+- **Проверка корректности профиля автора коммитов (Git Author Identity Guard — #916)**:
+  - В `GitWorktreeAndCloudBackupDefensesHelper.evaluateGitUserIdentity()` реализована проверка параметров `user.name` и `user.email`, блокирующая коммиты от имени дефолтных системных плейсхолдеров (`root@localhost`, `android@localhost`) и формирующая профессиональные команды конфигурации Git. В настройки добавлен переключатель `gitUserIdentitySetupGuardEnabled` с модальным окном справки «Что это?».
+- **Криптографическая верификация коммитов через GPG / SSH (Verified Commit Signing Guard — #917)**:
+  - В `GitWorktreeAndCloudBackupDefensesHelper.evaluateGpgCommitSigning()` внедрена поддержка подписания коммитов с мобильного устройства через SSH-ключи (стандарт Git 2.34+) или GPG-ключи с автонастройкой `commit.gpgsign` для получения зеленого бейджа «Verified» на GitHub/GitLab. В настройки добавлен переключатель `gpgCommitSigningGuardEnabled` с модальным окном справки «Что это?».
+- **Защита от потери коммитов в состоянии Detached HEAD (Git Detached HEAD Trap Guard — #919)**:
+  - В `GitWorktreeAndCloudBackupDefensesHelper.evaluateDetachedHeadSafety()` внедрено обнаружение чекаута тегов или конкретных SHA с предупреждением о риске потери коммитов и автогенерацией команды создания отдельной ветки (`git checkout -b branch-name tag`). В настройки добавлен переключатель `gitDetachedHeadTrapGuardEnabled` с модальным окном справки «Что это?».
+- **Автоматический генератор типового .gitignore для Python (Python .gitignore Generator — #920)**:
+  - В `GitWorktreeAndCloudBackupDefensesHelper.evaluateGitignoreTemplateGeneration()` реализовано создание оптимизированного `.gitignore`, блокирующего коммиты каталогов `__pycache__`, `.venv`, файлов переменных окружения `.env` и баз данных SQLite. В настройки добавлен переключатель `gitignoreTemplateGeneratorGuardEnabled` с модальным окном справки «Что это?».
+- **Создание тяжелых бэкапов только на зарядке и по Wi-Fi (Power & Wi-Fi Backup Constraint — #923)**:
+  - В `GitWorktreeAndCloudBackupDefensesHelper.evaluateBackupPowerAndNetworkCondition()` внедрено автоматическое откладывание архивации баз данных и проектов размером более 50 МБ при работе от батареи или в мобильной сети с установкой ограничений WorkManager (`requiresCharging`, `requiresUnmeteredNetwork`). В настройки добавлен переключатель `backupWifiAndChargeConditionGuardEnabled` с модальным окном справки «Что это?».
+- **Песочница рабочих деревьев Git для A/B тестирования (Git Worktree Sandbox Guard — #924)**:
+  - В `GitWorktreeAndCloudBackupDefensesHelper.evaluateGitWorktreeSafety()` реализована поддержка создания изолированных рабочих деревьев (`git worktree add`) внутри защищенной песочницы проектов с блокировкой выхода за пределы каталога (`..`), позволяющая одновременно тестировать две ветки одного бота. В настройки добавлен переключатель `gitWorktreesMissingGuardEnabled` с модальным окном справки «Что это?».
+- **Обязательный предпросмотр очистки неотслеживаемых файлов (Git Clean Preview Guard — #925)**:
+  - В `GitWorktreeAndCloudBackupDefensesHelper.evaluateGitCleanPrune()` внедрен принудительный dry-run предпросмотр (`git clean -n -d`) перед выполнением деструктивного безвозвратного удаления неотслеживаемых файлов (`-f -d`), защищающий наработки от случайного стирания. В настройки добавлен переключатель `gitCleanActionGuardEnabled` с модальным окном справки «Что это?».
+- **Ограничение диапазона строк Git Blame против OOM (Git Blame Memory Bounds Guard — #926)**:
+  - В `GitWorktreeAndCloudBackupDefensesHelper.evaluateGitBlameArgs()` реализовано безопасное ограничение диапазона построчных аннотаций авторов (до 300 строк на запрос) с флагом `--porcelain`, предотвращающее зависание интерфейса и падения по OutOfMemory при просмотре больших файлов. В настройки добавлен переключатель `gitBlameAnnotationsGuardEnabled` с модальным окном справки «Что это?».
+
+---
+
 ## 📝 Что нового в версии 2.1.57 (SemVer Patch Release — Git Branching, Topological Graph Bounds, Mobile Shallow Clones, Rebase Backups, Docker Compose Import & Cherry-Pick Safety)
 
 - **Контроль и валидация переключения веток Git (Git Branch Management Guard — #895)**:
