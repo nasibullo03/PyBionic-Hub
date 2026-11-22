@@ -4,6 +4,31 @@
 
 ---
 
+## 📝 Что нового в версии 2.1.59 (SemVer Patch Release — Single File Git History, Sparse Checkout Cone, Reflog Commit Rescue, Conventional Changelog, Offline Bundles, Pre-commit Syntax Hooks, Git Revert, Fetch Auto-Prune, Multi-Cloud Redundancy & GitHub PAT Expiry Watchdog)
+
+- **История изменений отдельного файла с отслеживанием переименований (Single File Git History — #927)**:
+  - В `GitOpsAndCloudResilienceDefensesHelper.evaluateFileHistoryArgs()` реализован безопасный запуск выборки коммитов для конкретного файла (`git log --follow -p -n 25 -- file`) без загрузки всей тяжелой истории монорепозитория. В настройки добавлен переключатель `gitFileHistoryRevisionsGuardEnabled` с модальным окном справки «Что это?».
+- **Конусное выборочное клонирование подпапок (Sparse Checkout Cone Mode — #930)**:
+  - В `GitOpsAndCloudResilienceDefensesHelper.evaluateSparseCheckout()` внедрена поддержка `git sparse-checkout set --cone` для монорепозиториев, позволяющая выкачивать только целевую папку бота и экономящая гигабайты дисковой памяти. В настройки добавлен переключатель `gitSparseCheckoutGuardEnabled` с модальным окном справки «Что это?».
+- **Спасение случайно сброшенных коммитов через журнал ссылок (Git Reflog Commit Rescue — #931)**:
+  - В `GitOpsAndCloudResilienceDefensesHelper.evaluateReflogInspection()` реализована инспекция `git reflog` и генерация безопасных команд создания спасательной ветки (`git checkout -b rescue-branch SHA`) для восстановления наработок после случайного `git reset --hard`. В настройки добавлен переключатель `gitReflogRecoveryGuardEnabled` с модальным окном справки «Что это?».
+- **Автоматический генератор списков изменений по Conventional Commits (Conventional Changelog Generator — #932)**:
+  - В `GitOpsAndCloudResilienceDefensesHelper.generateChangelogFromGitMessages()` внедрен парсер префиксов (`feat:`, `fix:`, `docs:`) для мгновенного формирования структурированных Release Notes в формате Markdown. В настройки добавлен переключатель `automatedChangelogGeneratorGuardEnabled` с модальным окном справки «Что это?».
+- **Экспорт репозитория в переносимый офлайн-файл (Offline Git Bundle Exporter — #933)**:
+  - В `GitOpsAndCloudResilienceDefensesHelper.evaluateGitBundleCreation()` реализована валидация путей и формирование бандлов (`git bundle create path.bundle --all`) для безопасного физического переноса проекта на изолированные ПК без интернета. В настройки добавлен переключатель `gitBundleCreationGuardEnabled` с модальным окном справки «Что это?».
+- **Пре-коммит валидатор синтаксиса и баланса скобок Python (Pre-commit Syntax Validator — #934)**:
+  - В `GitOpsAndCloudResilienceDefensesHelper.evaluatePreCommitHook()` внедрена автоматическая проверка индексированных файлов `.py` на незакрытые скобки и синтаксические аномалии перед коммитом, защищающая репозиторий от сломанных скриптов. В настройки добавлен переключатель `preCommitGitHooksGuardEnabled` с модальным окном справки «Что это?».
+- **Атомарный откат коммитов в один клик (One-Click Git Revert Guard — #935)**:
+  - В `GitOpsAndCloudResilienceDefensesHelper.evaluateGitRevert()` реализована валидация хеша и проверка чистоты рабочей копии перед вызовом безопасного инвертированного коммита `git revert --no-edit`, откатывающего баги без перезаписи истории. В настройки добавлен переключатель `gitRevertActionGuardEnabled` с модальным окном справки «Что это?».
+- **Автоматическая очистка удаленных веток при fetch (Remote Branch Auto-Prune — #936)**:
+  - В `GitOpsAndCloudResilienceDefensesHelper.evaluateFetchPruneArgs()` внедрено обязательное включение флага `--prune` при синхронизации `git fetch`, автоматически удаляющее устаревшие удаленные tracking-ветки. В настройки добавлен переключатель `gitFetchAutoPruneGuardEnabled` с модальным окном справки «Что это?».
+- **Мультиоблачное резервирование бэкапов в два независимых провайдера (Multi-Cloud Redundancy — #938)**:
+  - В `GitOpsAndCloudResilienceDefensesHelper.evaluateMultiCloudDispatch()` реализована одновременная выгрузка архивов в два независимых облака (например, WebDAV + S3/Drive), устраняющая единую точку отказа при блокировке аккаунта. В настройки добавлен переключатель `multiCloudRedundancyGuardEnabled` с модальным окном справки «Что это?».
+- **Превентивный контроль срока действия токена GitHub PAT (GitHub PAT Expiry Watchdog — #941)**:
+  - В `GitOpsAndCloudResilienceDefensesHelper.evaluateTokenExpiry()` внедрен мониторинг срока годности токенов доступа с предупреждением за 7 дней до блокировки, предотвращающий срыв ночных фоновых синхронизаций Git из-за ошибок 401 Unauthorized. В настройки добавлен переключатель `gitAuthTokenExpiryAlertGuardEnabled` с модальным окном справки «Что это?».
+
+---
+
 ## 📝 Что нового в версии 2.1.58 (SemVer Patch Release — VPS Migration Export, Git Remote Switcher, Author Identity, GPG Commit Signing, Detached HEAD Trap, Python .gitignore, Smart Power-Aware Backups, Git Worktrees, Clean Action & Blame Bounds)
 
 - **Генератор артефактов миграции проекта на VPS (VPS Migration Export Guard — #914)**:
