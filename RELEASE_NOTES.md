@@ -4,6 +4,53 @@
 
 ---
 
+## 📝 Что нового в версии 2.1.74 (SemVer Patch Release — Section 6: Code Editor, Syntax, IDE Productivity & File Manager — Fast Scrollbar Scrubbing, Whitespace Indicators, Markdown Live Preview, JSON/YAML Syntax Validator, Asset Image Viewer, Asset Audio Player, Smart Auto-Indent on Enter, Quick Delete Line, Simultaneous Search Highlight, Word Wrap Toggle, Cursor Position Indicator, Text Selection Statistics, Pinch-to-Zoom Font, Visual Symlink Creation, Recent Files History, Arbitrary Files Diff, Code Outline Navigation, Jump to Bracket)
+
+- **Исторический рубеж аудита**: Устранено **763 из 1045 дефектов** (**73.0%** от всего реестра)!
+- **Устранены следующие 18 дефектов Секции 6** (#458, #459, #460, #461, #462, #463, #464, #465, #467, #468, #469, #470, #471, #473, #474, #475, #476, #477).
+- **Полоса быстрой прокрутки и плавающий индикатор (Fast Scrollbar Scrubbing — #458)**:
+  - В `CodeEditorNavigationAndMediaHelper.evaluateScrollbarScrubbing()` расширена активная область касания вертикального ползунка до 36dp с плавающим бейджем `Ln X / Total` при перетаскивании для мгновенной навигации по длинным файлам. В настройки добавлен переключатель `scrollbarScrubbingGuardEnabled` с диалогом «Что это?».
+- **Отображение невидимых символов и переводов строк (Whitespace & Line Ending Indicators — #459)**:
+  - В `CodeEditorNavigationAndMediaHelper.evaluateWhitespaceRendering()` добавлена визуализация пробелов (точками `·`), табуляций (стрелками `→`) и маркеров окончания строк (`CRLF` vs `LF`) для выявления скрытых символов Windows `\r`. В настройки добавлен переключатель `whitespaceRenderingGuardEnabled` с диалогом «Что это?».
+- **Живой предпросмотр документации Markdown (Markdown Document Live Preview — #460)**:
+  - В `CodeEditorNavigationAndMediaHelper.evaluateMarkdownPreview()` добавлена интерактивная вкладка предпросмотра `README.md` с визуальным рендерингом заголовков, списков, таблиц и блоков кода. В настройки добавлен переключатель `markdownPreviewGuardEnabled` с диалогом «Что это?».
+- **Валидация синтаксиса JSON и YAML на лету (Live JSON/YAML Syntax Validator — #461)**:
+  - В `CodeEditorNavigationAndMediaHelper.evaluateJsonYamlValidation()` встроен непрерывный синтаксический анализатор конфигов (`config.json`, `config.yaml`), предотвращающий падения ботов при старте из-за пропущенных запятых или запрещенных табуляций. В настройки добавлен переключатель `jsonYamlValidationGuardEnabled` с диалогом «Что это?».
+- **Встроенный просмотрщик изображений проекта (Integrated Asset Image Viewer — #462)**:
+  - В `CodeEditorNavigationAndMediaHelper.evaluateAssetImageViewer()` графические ассеты (`.png`, `.jpg`, `.webp`, `.svg`, `.ico`) открываются во встроенной вкладке редактора без переключения во внешние галереи. В настройки добавлен переключатель `assetImageViewerGuardEnabled` с диалогом «Что это?».
+- **Встроенный аудиоплеер голосовых файлов (Integrated Voice & Audio Player — #463)**:
+  - В `CodeEditorNavigationAndMediaHelper.evaluateAssetAudioPlayer()` встроен аудиоплеер с элементами управления воспроизведением и перемоткой для проверки голосовых файлов ботов (`.ogg`, `.mp3`, `.wav`, `.m4a`). В настройки добавлен переключатель `assetAudioPlayerGuardEnabled` с диалогом «Что это?».
+- **Умный автоотступ при нажатии Enter (Smart Auto-Indent on Enter — #464)**:
+  - В `CodeEditorNavigationAndMediaHelper.evaluateAutoIndentOnEnter()` анализируется завершение строки двоеточием (`:`) или скобкой, автоматически добавляя 4 пробела отступа новой строке и избавляя от повторных нажатий на клавиатуре. В настройки добавлен переключатель `autoIndentOnEnterGuardEnabled` с диалогом «Что это?».
+- **Быстрое удаление строки в одно касание (Quick Delete Line Action — #465)**:
+  - В `CodeEditorNavigationAndMediaHelper.evaluateDeleteLineAction()` добавлена кнопка мгновенного удаления всей текущей строки на панели действий без утомительного выделения текста. В настройки добавлен переключатель `deleteLineActionGuardEnabled` с диалогом «Что это?».
+- **Одновременная подсветка совпадений поиска (Simultaneous Search Matches Highlight — #467)**:
+  - В `CodeEditorNavigationAndMediaHelper.evaluateSearchMatchHighlight()` все найденные вхождения поискового запроса подсвечиваются на экране одновременно янтарным цветом с бирюзовым выделением активного совпадения. В настройки добавлен переключатель `searchMatchHighlightGuardEnabled` с диалогом «Что это?».
+- **Быстрое переключение переноса строк (Editor Word Wrap Quick Toggle — #468)**:
+  - В `CodeEditorNavigationAndMediaHelper.evaluateWordWrapToggle()` добавлен переключатель между мягким переносом строк и горизонтальной прокруткой прямо на верхней панели редактора. В настройки добавлен переключатель `wordWrapToggleGuardEnabled` с диалогом «Что это?».
+- **Индикатор координат курсора (Cursor Position Coordinate Indicator — #469)**:
+  - В `CodeEditorNavigationAndMediaHelper.evaluateCursorPositionIndicator()` в подвале редактора отображаются точные координаты курсора в реальном времени (`Ln 42, Col 15`) для быстрой навигации по трассировкам ошибок Python. В настройки добавлен переключатель `cursorPositionIndicatorGuardEnabled` с диалогом «Что это?».
+- **Статистика объема выделенного фрагмента текста (Text Selection Statistics Badge — #470)**:
+  - В `CodeEditorNavigationAndMediaHelper.evaluateSelectionStatistics()` при выделении текста отображается бейдж с количеством строк, слов и символов, упрощая контроль ограничений Telegram (до 4096 символов). В настройки добавлен переключатель `selectionStatisticsGuardEnabled` с диалогом «Что это?».
+- **Масштабирование шрифта жестом Pinch-to-Zoom (Pinch-to-Zoom Dynamic Font Scaling — #471)**:
+  - В `CodeEditorNavigationAndMediaHelper.evaluatePinchToZoomFont()` реализовано плавное изменение размера шрифта кода от 10sp до 32sp жестом двух пальцев прямо на экране без захода в настройки. В настройки добавлен переключатель `pinchToZoomFontGuardEnabled` с диалогом «Что это?».
+- **Создание символических ссылок в менеджере файлов (Visual Symlink Creation — #473)**:
+  - В `CodeEditorNavigationAndMediaHelper.evaluateSymlinkCreation()` добавлен графический диалог создания символических ссылок Linux (`ln -s`), позволяя шарить общие библиотеки и базы данных между проектами без дублирования памяти. В настройки добавлен переключатель `symlinkCreationGuardEnabled` с диалогом «Что это?».
+- **Быстрое переключение недавних файлов (Recent Files Fast Switcher — #474)**:
+  - В `CodeEditorNavigationAndMediaHelper.evaluateRecentFilesHistory()` ведется история последних 10 открытых файлов проекта для мгновенного переключения в один тап без блуждания по дереву каталогов. В настройки добавлен переключатель `recentFilesHistoryGuardEnabled` с диалогом «Что это?».
+- **Построчное сравнение произвольных файлов (Arbitrary Files Side-by-Side Diff — #475)**:
+  - В `CodeEditorNavigationAndMediaHelper.evaluateFileComparisonDiff()` реализован построчный инструмент сравнения любых двух файлов проекта с подсветкой различающихся строк. В настройки добавлен переключатель `fileComparisonDiffGuardEnabled` с диалогом «Что это?».
+- **Дерево символов и навигация по функциям (Code Outline & Symbol Navigation — #476)**:
+  - В `CodeEditorNavigationAndMediaHelper.evaluateCodeOutline()` строится интерактивное дерево классов и асинхронных функций текущего файла с возможностью мгновенного перехода к определению в один тап. В настройки добавлен переключатель `codeOutlineGuardEnabled` с диалогом «Что это?».
+- **Быстрый переход к парной скобке (Jump to Matching Bracket Action — #477)**:
+  - В `CodeEditorNavigationAndMediaHelper.evaluateJumpToMatchingBracket()` курсор моментально перемещается между открывающей и закрывающей парными скобками `()`, `[]`, `{}` с учетом вложенности. В настройки добавлен переключатель `jumpToMatchingBracketGuardEnabled` с диалогом «Что это?».
+- **Интерфейс настроек и локализация**:
+  - В `SettingsScreen` добавлены две карточки: `CodeEditorVisualsAndNavigationCard` (9 переключателей) и `CodeEditorMediaAndToolsCard` (9 переключателей).
+  - Все 18 переключателей снабжены диалогами «Что это?» (Определение, При включении, При отключении).
+  - Все строковые ресурсы переведены на 22 поддерживаемых языка.
+
+---
+
 ## 📝 Что нового в версии 2.1.73 (SemVer Patch Release — Section 6: Code Editor, Syntax, IDE Productivity & File Manager — Multi-File Search & Replace, Bracket Pairing, Indentation Guides, Code Snippets Palette, Soft Wrap Line Numbers, Programming Font Ligatures, Built-in Hex Viewer, Import Refactoring, Block Code Folding, Inline Color Picker, Regex Tester, PEP 8 Format on Save, Multi-Cursor Editing, Comment Toggle, Visual chmod Editor, Python New File Templates, Breadcrumbs Navigation, Line Duplicate)
 
 - **Исторический рубеж аудита**: Устранено **745 из 1045 дефектов** (**71.3%** от всего реестра)!
