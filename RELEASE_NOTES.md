@@ -4,6 +4,34 @@
 
 ---
 
+## 📝 Что нового в версии 2.1.60 (SemVer Patch Release — Section 12 100% Complete! SemVer Bumping, Monorepo Subdirs, Status Auto-Refresh, Deployment Audit Trail, Rebase Pull, Animated QR Code Transfer, Commit Auto-Suggest, Bisect Wizard, Cloud Quota Watchdog, GitHub Releases API & OpenPGP Keyring)
+
+- **🏆 РАЗДЕЛ 12 (DEVOPS, GIT & CLOUD SYNC) ПОЛНОСТЬЮ УСТРАНЕН НА 100% (70 из 70 дефектов устранены)!**
+- **Автоматический инкремент версий SemVer перед релизом (SemVer Bump Automation — #942)**:
+  - В `GitAutomationAndCloudSyncFinalDefensesHelper.evaluateSemVerBump()` реализован расчет и повышение версий (Major, Minor, Patch) в `version.properties` и свойствах проекта с поддержкой стандарта SemVer 2.0.0. В настройки добавлен переключатель `semverBumpAutomationGuardEnabled` с модальным окном справки «Что это?».
+- **Изоляция и запуск вложенных папок монорепозитория (Monorepo Project Subdirectory — #944)**:
+  - В `GitAutomationAndCloudSyncFinalDefensesHelper.evaluateMonorepoSubdirectory()` внедрена поддержка выбора рабочей папки проекта внутри общего клонированного монорепозитория с защитой от directory traversal (`..`), позволяющая запускать несколько независимых ботов из одного репозитория. В настройки добавлен переключатель `monorepoProjectSubdirGuardEnabled` с модальным окном справки «Что это?».
+- **Автоматическая инвалидация и обновление статуса Git при сохранении (Git Status Auto-Refresh — #945)**:
+  - В `GitAutomationAndCloudSyncFinalDefensesHelper.evaluateGitStatusInvalidation()` реализована дебаунсированная инвалидация кэша статуса Git при событиях сохранения файлов в редакторе кода. В настройки добавлен переключатель `gitStatusAutoRefreshGuardEnabled` с модальным окном справки «Что это?».
+- **Персистентный журнал аудита истории деплоев (Deployment History Audit Log — #947)**:
+  - В `GitAutomationAndCloudSyncFinalDefensesHelper.evaluateDeploymentAuditRecord()` внедрено сохранение структурированного файла `deployment_history.json` с хэшем коммита, временем, статусом и длительностью каждого обновления. В настройки добавлен переключатель `deploymentHistoryAuditLogGuardEnabled` с модальным окном справки «Что это?».
+- **Линейная история коммитов через Git Pull Rebase (Git Pull Linear Rebase Enforcer — #948)**:
+  - В `GitAutomationAndCloudSyncFinalDefensesHelper.evaluatePullStrategy()` реализовано автоматическое применение флага `--rebase` при получении обновлений, предотвращающее появление замусоривающих мердж-коммитов `Merge branch...`. В настройки добавлен переключатель `gitPullRebaseStrategyGuardEnabled` с модальным окном справки «Что это?».
+- **Оптический перенос кода через анимированные QR-коды (Animated QR Air-Gapped Transfer — #953)**:
+  - В `GitAutomationAndCloudSyncFinalDefensesHelper.evaluateAnimatedQrFrames()` внедрен генератор фонтанных кадров QR (`F:i/N:data`) для оптической передачи скриптов на камеру изолированного ПК в закрытых контурах без сети, USB или Bluetooth. В настройки добавлен переключатель `airGappedQrCodeTransferGuardEnabled` с модальным окном справки «Что это?».
+- **Умная подсказка сообщений коммитов по измененным файлам (Conventional Commit Auto-Suggest — #954)**:
+  - В `GitAutomationAndCloudSyncFinalDefensesHelper.evaluateCommitMessageSuggestion()` реализован автоанализ путей измененных модулей с генерацией информативных шаблонов Conventional Commits (например, `fix(handlers): update admin.py`). В настройки добавлен переключатель `gitCommitMessageAutoSuggestGuardEnabled` с модальным окном справки «Что это?».
+- **Пошаговый мастер бинарного поиска багов Git Bisect (Git Bisect Regression Assistant — #955)**:
+  - В `GitAutomationAndCloudSyncFinalDefensesHelper.evaluateBisectStep()` добавлен графический помощник бинарного поиска регрессий с кнопками фиксации вердикта `good` / `bad` и безопасным сбросом `reset`. В настройки добавлен переключатель `gitBisectAssistantGuardEnabled` с модальным окном справки «Что это?».
+- **Предупреждение о переполнении облачного диска (Cloud Storage Quota Watchdog — #957)**:
+  - В `GitAutomationAndCloudSyncFinalDefensesHelper.evaluateStorageQuota()` внедрен контроль свободного места в облаке Google Drive / WebDAV с алертом при заполнении более чем на 90%. В настройки добавлен переключатель `cloudStorageQuotaWarningGuardEnabled` с модальным окном справки «Что это?».
+- **Прямая публикация релизов через GitHub Releases API (GitHub Release Auto-Publisher — #959)**:
+  - В `GitAutomationAndCloudSyncFinalDefensesHelper.evaluateGitHubReleasePayload()` реализована генерация API-запросов к GitHub Releases для автоматического создания релиза с Release Notes при пуше тега. В настройки добавлен переключатель `changelogReleaseTagTriggerGuardEnabled` с модальным окном справки «Что это?».
+- **Импорт существующих ключей OpenPGP (OpenPGP Keyring Importer — #960)**:
+  - В `GitAutomationAndCloudSyncFinalDefensesHelper.evaluateGpgKeyRingImport()` добавлена валидация текстовых блоков публичных ключей OpenPGP (`.asc`) с автоматической подготовкой команд `gpg --import` и `commit.gpgsign`. В настройки добавлен переключатель `gitGpgKeyRingImportGuardEnabled` с модальным окном справки «Что это?».
+
+---
+
 ## 📝 Что нового в версии 2.1.59 (SemVer Patch Release — Single File Git History, Sparse Checkout Cone, Reflog Commit Rescue, Conventional Changelog, Offline Bundles, Pre-commit Syntax Hooks, Git Revert, Fetch Auto-Prune, Multi-Cloud Redundancy & GitHub PAT Expiry Watchdog)
 
 - **История изменений отдельного файла с отслеживанием переименований (Single File Git History — #927)**:
