@@ -4,6 +4,52 @@
 
 ---
 
+## 🚀 Что нового в версии 2.1.81 (SemVer Patch Release — Section 8: BotHub Marketplace 100% COMPLETE & Section 9: SQLite Inspector — Template License Badge & Commercial Safety, Custom Python Binary Path Validation, Hot-Swap .env Variables via SIGHUP, ETag & Conditional GET Catalog Cache, Template Post-Install Script Guard, Resource Quotas & Low-Memory Advisory, Encrypted Peer-to-Peer QR Config Share, Archived Template Deprecation Notice, Direct Route to Instance Logs from Template, Daily Scheduled Preventive Restart, 30-Day Bot Uptime SLA & Reliability Tier, External Bot Directory & @BotFather Links, Contextual Variable Hints & Format Tooltips, Custom Category Pinning & Ordering, Community Star Rating & Reviews, SQLite BLOB Binary Inspector & MIME Detection, SQLite Foreign Key Traversal Query Builder, SQLite EXPLAIN QUERY PLAN Full-Scan Detector)
+
+- **Исторический рубеж аудита**: Устранено **879 из 1045 дефектов** (**84.1%** от всего реестра)!
+- **Секция 8 (BotHub Marketplace & Ecosystem) полностью закрыта — 100% (80/80)!**
+- **Секция 9 (Data Storage, SQLite Viewer & Databases) открыта — первые 3 дефекта (#671, #672, #673) устранены!**
+- **Устранены следующие 18 дефектов** (#647, #648, #649, #650, #652, #653, #654, #656, #657, #659, #660, #661, #663, #664, #665, #671, #672, #673).
+- **Метки лицензий и коммерческая безопасность шаблонов (Template License Badge — #647)**:
+  - В `BotHubAndSqliteEcosystemHelper.evaluateTemplateLicense()` реализована классификация лицензий (MIT, Apache-2.0, GPL-3.0, AGPL-3.0) с бейджами безопасности и предупреждениями о copyleft. В настройки добавлен тумблер `templateLicenseDisplayGuardEnabled` с диалогом «Что это?».
+- **Валидация пути кастомного бинарника Python (Custom Python Binary Path — #648)**:
+  - В `BotHubAndSqliteEcosystemHelper.evaluateCustomPythonBinary()` обеспечена поддержка индивидуального указания пути к интерпретатору Python на уровне бота с проверкой существования файла и прав запуска. В настройки добавлен тумблер `customPythonBinaryGuardEnabled` с диалогом «Что это?».
+- **Горячая перезагрузка переменных .env по SIGHUP (Hot-Swap Env Vars — #649)**:
+  - В `BotHubAndSqliteEcosystemHelper.evaluateHotSwapEnvironment()` реализована отправка сигнала SIGHUP процессам ботов для обновления конфигурации окружения без разрыва соединений. В настройки добавлен тумблер `hotSwapEnvVarsGuardEnabled` с диалогом «Что это?».
+- **Кэширование каталога по ETag (Catalog Cache ETag — #650)**:
+  - В `BotHubAndSqliteEcosystemHelper.evaluateCatalogCacheETag()` настроена валидация If-None-Match и HTTP 304 Not Modified, предотвращающая избыточный расход мобильного трафика. В настройки добавлен тумблер `staleCatalogCacheGuardEnabled` с диалогом «Что это?».
+- **Защита выполнения post-install скриптов (Post-Install Scripts Guard — #652)**:
+  - В `BotHubAndSqliteEcosystemHelper.evaluatePostInstallScript()` добавлен контроль и верификация скриптов начальной настройки шаблонов. В настройки добавлен тумблер `prePostInstallScriptsGuardEnabled` с диалогом «Что это?».
+- **Квоты ресурсов и предупреждения о нехватке памяти (Resource Quotas & Low-RAM Warning — #653)**:
+  - В `BotHubAndSqliteEcosystemHelper.evaluateResourceQuotas()` реализовано сопоставление требований шаблона к оперативной памяти с объемом доступного ОЗУ устройства, защищая от LMK. В настройки добавлен тумблер `resourceQuotasPerTemplateGuardEnabled` с диалогом «Что это?».
+- **Зашифрованная передача настроек по QR-коду (Encrypted QR Config Share — #654)**:
+  - В `BotHubAndSqliteEcosystemHelper.evaluateQrConfigShare()` реализован протокол `pybionic://import` с шифрованием переменных окружения для безопасного переноса конфигурации между устройствами. В настройки добавлен тумблер `qrConfigShareGuardEnabled` с диалогом «Что это?».
+- **Уведомления об архивированных и устаревших шаблонах (Template Deprecation Notice — #656)**:
+  - В `BotHubAndSqliteEcosystemHelper.evaluateTemplateDeprecation()` добавлено автоматическое информирование пользователя об устаревших проектах с рекомендациями современных замен. В настройки добавлен тумблер `templateDeprecationNoticeGuardEnabled` с диалогом «Что это?».
+- **Прямой переход к логам экземпляра из карточки каталога (Template Log Navigation — #657)**:
+  - В `BotHubAndSqliteEcosystemHelper.evaluateTemplateLogNavigation()` создана бесшовная навигация к живому выводу консоли установленного бота прямо из каталога BotHub. В настройки добавлен тумблер `botLogFilteringInTemplateGuardEnabled` с диалогом «Что это?».
+- **Ежедневный профилактический перезапуск (Daily Auto-Restart Schedule — #659)**:
+  - В `BotHubAndSqliteEcosystemHelper.evaluateDailyAutoRestart()` реализован расчет ночного окна обслуживания (04:00 AM) для плановой мягкой перезагрузки и предотвращения утечек памяти. В настройки добавлен тумблер `dailyAutoRestartScheduleGuardEnabled` с диалогом «Что это?».
+- **Расчет доступности бота за 30 дней (30-Day Bot Uptime SLA — #660)**:
+  - В `BotHubAndSqliteEcosystemHelper.evaluateUptimeSla()` вычисляется процент безотказной работы и присваивается уровень SLA (от Tier-1 99.9%+ до Degraded). В настройки добавлен тумблер `botUptimeSlaTrackerGuardEnabled` с диалогом «Что это?».
+- **Ссылки на регистрацию ботов и каталоги (External Bot Directory & @BotFather Links — #661)**:
+  - В `BotHubAndSqliteEcosystemHelper.evaluateExternalDirectoryLinks()` интегрированы прямые ссылки на регистрацию бота через @BotFather в Telegram и профили на Top.gg. В настройки добавлен тумблер `externalBotDirectoryGuardEnabled` с диалогом «Что это?».
+- **Контекстные подсказки и форматы переменных (Variable Tooltips — #663)**:
+  - В `BotHubAndSqliteEcosystemHelper.evaluateVariableTooltip()` внедрены контекстные примеры и описания для типовых конфигурационных параметров. В настройки добавлен тумблер `templateVariableTooltipsGuardEnabled` с диалогом «Что это?».
+- **Закрепление и сортировка категорий каталога (Category Pinning & Ordering — #664)**:
+  - В `BotHubAndSqliteEcosystemHelper.evaluateCategoryOrder()` обеспечена возможность кастомизации порядка категорий шаблонов BotHub и закрепления избранных. В настройки добавлен тумблер `templateCategoryReorderingGuardEnabled` с диалогом «Что это?».
+- **Рейтинг шаблонов и оценки сообщества (Community Star Rating — #665)**:
+  - В `BotHubAndSqliteEcosystemHelper.evaluateStarRatingSubmission()` реализован алгоритм агрегации оценок от 1 до 5 звезд для вычисления объективного рейтинга шаблона. В настройки добавлен тумблер `templateStarRatingGuardEnabled` с диалогом «Что это?».
+- **Инспектор SQLite BLOB и распознавание медиа (SQLite BLOB Inspector — #671)**:
+  - В `BotHubAndSqliteEcosystemHelper.evaluateBlobInspection()` реализован анализ magic-байтов в полях BLOB для распознавания изображений (PNG, JPEG, WebP, GIF) и формирования шестнадцатеричных дампов. В настройки добавлен тумблер `sqliteBlobInspectionGuardEnabled` с диалогом «Что это?».
+- **Навигатор по внешним ключам SQLite (Foreign Key Traversal — #672)**:
+  - В `BotHubAndSqliteEcosystemHelper.evaluateForeignKeyLink()` автоматизировано построение запросов для мгновенного перехода к связанным записям по связям FOREIGN KEY. В настройки добавлен тумблер `sqliteForeignKeyTraversalGuardEnabled` с диалогом «Что это?».
+- **Анализ EXPLAIN QUERY PLAN и поиск SCAN TABLE (Query Plan Explain — #673)**:
+  - В `BotHubAndSqliteEcosystemHelper.evaluateQueryPlan()` выполняется парсинг плана запросов SQLite с автоматическим обнаружением медленного полного сканирования таблиц и подсказками по индексам. В настройки добавлен тумблер `sqliteQueryPlanExplainGuardEnabled` с диалогом «Что это?».
+- **Полная локализация**: Все 18 новых параметров снабжены 3-составными диалогами «Что это?» и переведены на 22 языка.
+
+---
+
 ## 📝 Что нового в версии 2.1.80 (SemVer Patch Release — Section 8: BotHub Marketplace & Ecosystem — Forum CRM Dispatcher General Fallback, Media Target Compressor Container Margin, Meme Studio Font Fallback, Motivator Pro Quote Card Caching, Round Video Master 1:1 Aspect Ratio, Spatial Audio 8D Mono Compatibility, Sticker Studio Lossless WebP Transparency, Template Update Notification Badge, Catalog Icon Multi-Tier Caching, Resilient Offline Catalog State, JSON Schema Configuration Verification, Local Webhook Mock Event Generator, High-Priority Crash Alert Notification Channel, Dynamic CLI Launch Arguments, Environment Profile Switching, BotHub Recent Search History, Template Bookmarks & Favorites, Direct Template Issue Reporting)
 
 - **Исторический рубеж аудита**: Устранено **861 из 1045 дефектов** (**82.4%** от всего реестра)!
