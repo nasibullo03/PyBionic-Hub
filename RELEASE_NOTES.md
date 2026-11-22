@@ -4,6 +4,49 @@
 
 ---
 
+## 🚀 Что нового в версии 2.1.85 (SemVer Patch Release — Section 10 Telemetry, Logging & Diagnostics Hardening: Disk I/O Wait & Flash Latency Monitor, Personal Telegram Bot Webhook Alert Dispatcher, zRAM Compressed Swap Pressure Tracker, Log Search Highlighting & Match Counter, Hardware CPU Thermal Throttling Indicator, Per-Project Cellular/WiFi Traffic Quota Cap, High-Precision Millisecond Log Timestamps, Python GC Collections & Pause Duration Profiler, Non-Blocking Concurrent Log Read Policy, Rolling 7-Day Downsampled Telemetry History, Corrupted & C-Extension Crash Dump Resilient Parser, Network Interface Drop Incident Injector, Standalone HTML Telemetry Report Generator, Security Integrity & Tamper Audit Telemetry, Precision Date & Time Range Log Filter, ReDoS-Guarded Regular Expression Log Search, Response Latency Percentile Profiler p50/p95/p99, Battery Health & Degradation Prevention Tracker)
+
+- **Новый рубеж аудита**: Устранено **951 из 1045 дефектов** (**91.0%** от всего реестра)!
+- **Секция 10 (Telemetry, Logging, Monitoring & Error Parsing) активно закрывается** — устранено еще 18 дефектов (#755, #757, #758, #760, #763, #764, #765, #766, #769, #770, #771, #772, #774, #776, #777, #778, #780, #781).
+- **Монитор задержек дискового ввода-вывода (Disk I/O Wait — #755)**:
+  - В `TelemetryAndDiagnosticsHardeningHelper.evaluateDiskIoWaitMonitoring()` реализован расчет процента ожидания диска (iowait) из `/proc/stat` с выявлением деградации флеш-памяти и предупреждением при iowait > 15%. В настройки добавлен тумблер `diskIoWaitMonitoringGuardEnabled` с диалогом «Что это?».
+- **Диспетчер алертов в личный Telegram-бот (Telegram Alert Webhook — #757)**:
+  - В `TelemetryAndDiagnosticsHardeningHelper.evaluateTelegramAlertWebhook()` добавлено форматирование аварийных сводок об инцидентах в Markdown и отправка через персональный Telegram Bot Webhook. В настройки добавлен тумблер `telegramAlertWebhookGuardEnabled` с диалогом «Что это?».
+- **Трекер нагрузки сжатой памяти zRAM (zRAM Swap Tracking — #758)**:
+  - В `TelemetryAndDiagnosticsHardeningHelper.evaluateZramSwapTracking()` реализован расчет степени заполнения zRAM swap с ранжированием нагрузки (LOW, MODERATE, CRITICAL) для предотвращения системных зависаний при нехватке памяти. В настройки добавлен тумблер `zramSwapTrackingGuardEnabled` с диалогом «Что это?».
+- **Подсветка результатов поиска и счетчик совпадений в логах (Log Search Highlighting — #760)**:
+  - В `TelemetryAndDiagnosticsHardeningHelper.evaluateLogSearchHighlighting()` внедрена подсветка совпадений `<mark>` и сквозной подсчет количества найденных вхождений в окне логов. В настройки добавлен тумблер `logSearchHighlightingGuardEnabled` с диалогом «Что это?».
+- **Индикатор аппаратного теплового троттлинга процессора (CPU Throttling Indicator — #763)**:
+  - В `TelemetryAndDiagnosticsHardeningHelper.evaluateCpuThrottlingIndicator()` обеспечено прослушивание теплового статуса Android (`THERMAL_STATUS_MODERATE` и выше) и фиксация сброса частот процессора более чем на 25% из-за нагрева. В настройки добавлен тумблер `cpuThrottlingIndicatorGuardEnabled` с диалогом «Что это?».
+- **Квоты и лимиты сетевого трафика на проект (Per-Project Traffic Quota — #764)**:
+  - В `TelemetryAndDiagnosticsHardeningHelper.evaluateProjectTrafficQuota()` реализован учет потребления мобильного и Wi-Fi трафика проектом с предупреждением при 80% и ограничением при 100% квоты. В настройки добавлен тумблер `projectTrafficQuotaGuardEnabled` с диалогом «Что это?».
+- **Высокоточные миллисекундные метки времени в логах (Log Timestamps Microseconds — #765)**:
+  - В `TelemetryAndDiagnosticsHardeningHelper.evaluateHighPrecisionTimestamps()` внедрен формат `HH:mm:ss.SSS` для точного разбора порядка быстрых конкурентных событий и гонок процессов. В настройки добавлен тумблер `logHighPrecisionTimestampsGuardEnabled` с диалогом «Что это?».
+- **Профилировщик пауз и генераций сборщика мусора (Garbage Collector Metrics — #766)**:
+  - В `TelemetryAndDiagnosticsHardeningHelper.evaluateGarbageCollectorMetrics()` реализован мониторинг сборок мусора Python по поколениям (`gc.get_stats`) и фиксация блокирующих пауз > 50 мс. В настройки добавлен тумблер `garbageCollectorMetricsGuardEnabled` с диалогом «Что это?».
+- **Неблокирующее чтение логов при активной записи (Log File Lock Contention — #769)**:
+  - В `TelemetryAndDiagnosticsHardeningHelper.evaluateLogFileLockContention()` внедрена стратегия безопасного чтения через разделяемые блокировки или снапшоты, исключающая фризы UI при непрерывном потоке вывода. В настройки добавлен тумблер `logFileLockContentionGuardEnabled` с диалогом «Что это?».
+- **7-дневная скользящая история телеметрии (Metrics Retention — #770)**:
+  - В `TelemetryAndDiagnosticsHardeningHelper.evaluateMetricsRetention()` реализовано прореживание и сохранение недельной истории метрик (288 точек в день) для экономии хранилища при сохранении долгосрочных трендов. В настройки добавлен тумблер `metricsRetentionHistoryGuardEnabled` с диалогом «Что это?».
+- **Устойчивый парсер поврежденных и C-дампов (Corrupted Crash Dumps — #771)**:
+  - В `TelemetryAndDiagnosticsHardeningHelper.evaluateCorruptedCrashDump()` реализован разбор низкоуровневых падений SIGSEGV, SIGABRT и извлечение адресов ошибок и фреймов стека даже при смешивании со сторонним stdout. В настройки добавлен тумблер `corruptedCrashDumpsParserGuardEnabled` с диалогом «Что это?».
+- **Инжектор событий обрыва сети в журнал инцидентов (Network Drop Telemetry — #772)**:
+  - В `TelemetryAndDiagnosticsHardeningHelper.evaluateNetworkDropTelemetry()` реализована автоматическая запись системных маркеров `[SYSTEM_NET_DROP]` в поток логов при потере Wi-Fi или сотового соединения. В настройки добавлен тумблер `networkDropTelemetryGuardEnabled` с диалогом «Что это?».
+- **Генератор автономных HTML-отчетов (Telemetry Export Format — #774)**:
+  - В `TelemetryAndDiagnosticsHardeningHelper.evaluateTelemetryHtmlExport()` добавлен экспорт автономных HTML-отчетов с ключевыми метриками стабильности бота для предоставления клиентам. В настройки добавлен тумблер `telemetryHtmlExportGuardEnabled` с диалогом «Что это?».
+- **Телеметрия контроля целостности среды (App Integrity Tamper Telemetry — #776)**:
+  - В `TelemetryAndDiagnosticsHardeningHelper.evaluateAppIntegrityTelemetry()` внедрена фиксация проверок цифровой подписи APK, статуса отладчика и признаков эмулятора в изолированном журнале безопасности. В настройки добавлен тумблер `appIntegrityTelemetryGuardEnabled` с диалогом «Что это?».
+- **Точный фильтр логов по диапазону дат и времени (Log Filter by Date Range — #777)**:
+  - В `TelemetryAndDiagnosticsHardeningHelper.evaluateLogDateRangeFilter()` реализована быстрая фильтрация записей логов в рамках произвольного окна времени (от начальной до конечной временной метки). В настройки добавлен тумблер `logDateRangeFilterGuardEnabled` с диалогом «Что это?».
+- **Поиск по логам регулярными выражениями с защитой от ReDoS (Regex Search in Logs — #778)**:
+  - В `TelemetryAndDiagnosticsHardeningHelper.evaluateLogRegexSearch()` реализована поддержка регулярных выражений в окне поиска с валидацией синтаксиса и защитой от катастрофического отката. В настройки добавлен тумблер `logRegexSearchGuardEnabled` с диалогом «Что это?».
+- **Профилировщик перцентилей задержки ответов p50/p95/p99 (Latency Percentiles — #780)**:
+  - В `TelemetryAndDiagnosticsHardeningHelper.evaluateLatencyPercentiles()` реализован расчет процентилей времени ответа хэндлеров бота (p50 медиана, p95, p99 хвосты) для выявления скрытых задержек. В настройки добавлен тумблер `latencyPercentilesGuardEnabled` с диалогом «Что это?».
+- **Трекер деградации батареи и рекомендации по защите (Battery Degradation Tracker — #781)**:
+  - В `TelemetryAndDiagnosticsHardeningHelper.evaluateBatteryDegradationTracker()` реализовано отслеживание длительного нахождения на 100% заряде и температуры батареи с рекомендацией включения режима защиты (лимит заряда 80%). В настройки добавлен тумблер `batteryDegradationTrackerGuardEnabled` с диалогом «Что это?».
+
+---
+
 ## 🚀 Что нового в версии 2.1.84 (SemVer Patch Release — Section 9 100% Complete & Section 10 Telemetry Kickoff: SQLite Savepoints & Nested Transactions, SQL Query Editor Autocomplete, Custom Page Size Configurator, Non-Standard DB File Magic Detection, Cell Value 1-Tap Clipboard Extractor, Table Grid Contrast & Zebra Striping, Data Filter Presets, Migration Dry-Run Logging, CIFS Network Share Lock Safety, Structured JSON & Logfmt Parser, Hierarchical Log Level Filter, Crash Parser False Positives Discriminator, Log Export Archive Packager, Prometheus / OpenMetrics Exporter, ANSI Log Sanitization, Realtime Network Speed Meter, Python Traceback Demangling & Frame Linker, Monotonic Clock Process Uptime Guard)
 
 - **Новый рекордный рубеж аудита**: Устранено **933 из 1045 дефектов** (**89.3%** от всего реестра)!
