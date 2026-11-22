@@ -4,6 +4,31 @@
 
 ---
 
+## 📝 Что нового в версии 2.1.61 (SemVer Patch Release — Section 1: Linux Kernel, Bionic Libc & Process Lifecycle Defenses: SIGWINCH Terminal Resize, CPU Core Affinity Scheduling, epoll_create Legacy Shim, pidfd Atomic Lifecycle, Bionic UTF-8 Locale Sanitizer, ARG_MAX @response File Overflow, I/O Priority Scheduling, wordexp Safe Tilde Expander, Realtime Audio Thread Priority, fmemopen Compatibility Fallback)
+
+- **Отслеживание размеров окна терминала и передача SIGWINCH (SIGWINCH Terminal Resize Guard — #6)**:
+  - В `LinuxKernelAndProcessLifecycleDefensesHelper.evaluateTerminalResize()` реализован расчет геометрии окна терминала (`TIOCSWINSZ` ioctl) при поворотах экрана Android, открытии виртуальной клавиатуры и переходе в режим разделения экрана. В настройки добавлен переключатель `sigwinchTerminalResizeGuardEnabled` с модальным окном справки «Что это?».
+- **Планирование привязки CPU ядер к big/LITTLE кластерам (CPU Core Affinity Scheduling — #9)**:
+  - В `LinuxKernelAndProcessLifecycleDefensesHelper.evaluateCpuAffinity()` внедрен расчет масок `sched_setaffinity` для изоляции тяжелых вычислений Python на производительных ядрах и удержания фоновых воркеров на энергоэффективных ядрах. В настройки добавлен переключатель `cpuCoreAffinitySchedulingGuardEnabled` с модальным окном справки «Что это?».
+- **Шим обратной совместимости epoll_create (epoll_create Legacy Shim — #21)**:
+  - В `LinuxKernelAndProcessLifecycleDefensesHelper.evaluateEpollCreateShim()` реализована маршрутизация устаревшего системного вызова `epoll_create(size)` из старых нативных библиотек в современный `epoll_create1(EPOLL_CLOEXEC)` для предотвращения утечек дескрипторов при форках. В настройки добавлен переключатель `epollCreateLegacyShimGuardEnabled` с модальным окном справки «Что это?».
+- **Атомарное управление жизненным циклом через pidfd (pidfd Process Lifecycle Guard — #31)**:
+  - В `LinuxKernelAndProcessLifecycleDefensesHelper.evaluatePidfdSignaling()` внедрено использование `pidfd_open` и `pidfd_send_signal` на ядрах Linux 5.4+ для полного исключения race-condition переиспользования числовых PID при завершении процессов. В настройки добавлен переключатель `pidfdLifecycleManagementGuardEnabled` с модальным окном справки «Что это?».
+- **Санитизация окружения и локали UTF-8 для Bionic (Bionic Locale UTF-8 Sanitizer — #32)**:
+  - В `LinuxKernelAndProcessLifecycleDefensesHelper.evaluateBionicLocaleEnvironment()` внедрена автоматическая установка `C.UTF-8` и `PYTHONUTF8=1` для обхода ограничений базы данных локалей Android Bionic libc и исключения `UnicodeEncodeError`. В настройки добавлен переключатель `bionicLocaleFallbackSanitizerGuardEnabled` с модальным окном справки «Что это?».
+- **Защита от превышения лимита ARG_MAX через файл ответа (execve ARG_MAX Response File Guard — #34)**:
+  - В `LinuxKernelAndProcessLifecycleDefensesHelper.evaluateArgMaxOverflow()` реализован контроль длины аргументов командной строки ядра и автоматическая генерация файла `@response.args` при переполнении, исключая сбои ядра `E2BIG (Argument list too long)`. В настройки добавлен переключатель `execveArgMaxResponseFileGuardEnabled` с модальным окном справки «Что это?».
+- **Планирование классов приоритета ввода-вывода (I/O Priority Class Scheduling — #38)**:
+  - В `LinuxKernelAndProcessLifecycleDefensesHelper.evaluateIoPriority()` реализована настройка классов приоритета `ionice` (`IOPRIO_CLASS_BE` и `IOPRIO_CLASS_IDLE`) для защиты от блокировок UI и флеш-памяти во время тяжелой фоновой обработки данных. В настройки добавлен переключатель `ioPriorityClassSchedulingGuardEnabled` с модальным окном справки «Что это?».
+- **Безопасное раскрытие путей с тильдой и шаблонами (wordexp Tilde Path Expander — #39)**:
+  - В `LinuxKernelAndProcessLifecycleDefensesHelper.evaluateWordexpFallback()` внедрено безопасное раскрытие путей с домашней директорией (`~/`) без зависимости от отсутствующей в Bionic функции `wordexp(3)` и без рисков шелл-инъекций. В настройки добавлен переключатель `wordexpTildePathExpanderGuardEnabled` с модальным окном справки «Что это?».
+- **Приоритет потоков аудио в реальном времени (Realtime Audio Thread Priority — #42)**:
+  - В `LinuxKernelAndProcessLifecycleDefensesHelper.evaluateAudioThreadPriority()` реализовано назначение приоритета `THREAD_PRIORITY_AUDIO` (nice -16) для потоков захвата и воспроизведения речи голосовых ботов Telegram и VoIP. В настройки добавлен переключатель `realtimeAudioThreadPriorityGuardEnabled` с модальным окном справки «Что это?».
+- **Совместимость с fmemopen для устаревших версий (fmemopen Compatibility Fallback — #45)**:
+  - В `LinuxKernelAndProcessLifecycleDefensesHelper.evaluateFmemopenCompatibility()` внедрено обнаружение поддержки `fmemopen` с эмуляцией буферов памяти на версиях Android с API < 23 для предотвращения сбоев `UnsatisfiedLinkError`. В настройки добавлен переключатель `fmemopenCompatFallbackGuardEnabled` с модальным окном справки «Что это?».
+
+---
+
 ## 📝 Что нового в версии 2.1.60 (SemVer Patch Release — Section 12 100% Complete! SemVer Bumping, Monorepo Subdirs, Status Auto-Refresh, Deployment Audit Trail, Rebase Pull, Animated QR Code Transfer, Commit Auto-Suggest, Bisect Wizard, Cloud Quota Watchdog, GitHub Releases API & OpenPGP Keyring)
 
 - **🏆 РАЗДЕЛ 12 (DEVOPS, GIT & CLOUD SYNC) ПОЛНОСТЬЮ УСТРАНЕН НА 100% (70 из 70 дефектов устранены)!**
