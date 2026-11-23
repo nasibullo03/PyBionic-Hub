@@ -4,6 +4,25 @@
 
 ---
 
+## 🚀 Что нового в версии 2.1.96 (SemVer Patch Release — Комплексная стандартизация карточек ядра ServerBehaviorCard, RuntimeSecurityGuardsCard, NetworkAndRuntimeHardeningCard, ProcessSandboxAndSecurityCard и OemPowerAndProcessWatchdogCard по Правилу 5)
+
+- **МАССОВАЯ СТАНДАРТИЗАЦИЯ ИНТЕРФЕЙСА НАСТРОЕК В СООТВЕТСТВИИ С ПРАВИЛОМ 5 (81 ПЕРЕКЛЮЧАТЕЛЬ)**:
+  - **ServerBehaviorCard & RuntimeSecurityGuardsCard**:
+    * 46 переключателей ядра сервера 24/7 и 13 переключателей рантайм-безопасности полностью переведены на стандартный шаблон с трёхчастным диалогом «Что это?» (Что это / Когда включено / Когда выключено).
+    * Интегрирован диалог свободного числового ввода `OutlinedTextField` для лимита дочерних процессов (`maxChildProcessesLimit`, от 1 до 64) с чипами быстрого выбора (4, 8, 16, 32, Custom).
+    * Интегрирован диалог свободного ввода для таймаута мягкого завершения SIGTERM (`sigtermGraceTimeoutSeconds`, от 1 до 120 сек) с чипами (3s, 5s, 10s, 15s, 30s, Custom).
+  - **NetworkAndRuntimeHardeningCard**:
+    * Все 10 защитных переключателей оснащены трёхчастными диалогами помощи: SSRF Link-Local Guard (#308), Disable Production Debug Endpoints (#324), Pickle State Serialization Guard (#335), Pip Dependency Confusion Guard (#337), Safe Code Execution Guard (#358), Weak Password Detection (#359), DNS Negative Caching Tuning (#398), TCP SO_REUSEADDR Enforcer (#399), Strict Webhook Path Validation (#401), Port Exhaustion Exponential Backoff (#422).
+  - **ProcessSandboxAndSecurityCard**:
+    * Все 10 переключателей песочницы оснащены трёхчастными диалогами помощи: Mount Namespace & Path Traversal Guard (#22), IPC Namespace Isolation (#23), Seccomp-BPF Dangerous Syscall Policy (#33), posix_spawn Exec Optimization (#47), User Namespace & PRoot Isolation Advisor (#48), ReDoS Catastrophic Backtracking Pattern Scanner (#54), Regex Execution Timeout Hard Enforcement (#55), Android Keystore Recovery Handler (#89), Unix Local Socket Peer UID Authentication (#90), Project Backup ZIP AES-256 Encryption (#103).
+  - **OemPowerAndProcessWatchdogCard**:
+    * Все 10 OEM-переключателей оснащены трёхчастными диалогами помощи: Android 12+ Exact Alarm Schedule Fallback (#186), Multiprocessing Bionic Named Semaphores Fallback (#153), ctypes ARM64 16-byte Stack Pointer Alignment (#170), Weakref Callback Process Teardown Safety (#172), Adaptive High-Priority Background Wakelock (#187), Samsung OneUI Deep Sleep Advisor (#188), Foreground Service Heartbeat Watchdog (#190), Vivo / iQOO Background Network Advisor (#191), Oppo / Realme Quick Freeze Advisor (#192), Low Memory Killer Child Process Watchdog (#195).
+  - **Полный паритет переводов на 22 языках**:
+    * Добавлено 275+ строковых ресурсов с подробными описаниями каждого режима, преимуществ включенного состояния и рисков отключения.
+    * Синхронизированы все 22 локали (`ar`, `az`, `de`, `es`, `fa`, `fr`, `hi`, `in`, `it`, `ja`, `kk`, `ko`, `ky`, `pl`, `pt`, `tg`, `th`, `tr`, `uk`, `uz`, `vi`, `zh-rCN`), паритет ключей `Max diff: 0`.
+
+---
+
 ## 🚀 Что нового в версии 2.1.95 (SemVer Patch Release — Комплексный оверхол мобильной эргономики UI/UX, навигации, жестов, продуктивности редактора кода и терминала)
 
 - **МАСШТАБНОЕ УЛУЧШЕНИЕ МОБИЛЬНОЙ ЭРГОНОМИКИ UI/UX И ЖЕСТОВ (#1–#20)**:
