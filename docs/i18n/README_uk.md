@@ -1,6 +1,6 @@
 # 🇺🇦 ⚡ PyBionic Runner — Автономний запуск Python 3.14 на Android 24/7
 
-[![Release](https://img.shields.io/badge/Release-v2.1.1-00E5FF.svg?style=for-the-badge&logo=android&logoColor=black)](https://github.com/nasibullo03/PyBionic-Hub/releases/latest)
+[![Release](https://img.shields.io/badge/Release-v2.2.0-00E5FF.svg?style=for-the-badge&logo=android&logoColor=black)](https://github.com/nasibullo03/PyBionic/releases/latest)
 [![Python](https://img.shields.io/badge/Python-3.14.10_Bionic-FFD700.svg?style=for-the-badge&logo=python&logoColor=black)](https://python.org)
 [![Platform](https://img.shields.io/badge/Platform-Android_8.0+-3DDC84.svg?style=for-the-badge&logo=android&logoColor=white)](https://android.com)
 [![License](https://img.shields.io/badge/License-AGPL_v3-blue.svg?style=for-the-badge)](../../LICENSE)
@@ -17,8 +17,8 @@
 ---
 
 <p align="center">
-  <a href="https://github.com/nasibullo03/PyBionic-Hub/releases/latest">
-    <img src="https://img.shields.io/badge/🚀_ЗАВАНТАЖИТИ_PYBIONIC_APK-v2.1.1-00E5FF?style=for-the-badge&logo=android&logoColor=black" alt="Download APK" height="50">
+  <a href="https://github.com/nasibullo03/PyBionic/releases/latest">
+    <img src="https://img.shields.io/badge/🚀_ЗАВАНТАЖИТИ_PYBIONIC_APK-v2.2.0-00E5FF?style=for-the-badge&logo=android&logoColor=black" alt="Download APK" height="50">
   </a>
 </p>
 
@@ -48,8 +48,8 @@
 
 ## 🚀 Швидкий старт
 
-1. **Завантажте APK:** Завантажте свіжу версію з розділу [GitHub Releases](https://github.com/nasibullo03/PyBionic-Hub/releases/latest).
-2. **Встановіть:** Встановіть `PyBionic-Runner-v2.1.1-arm64.apk` на Android 8.0+ (ARM64).
+1. **Завантажте APK:** Завантажте свіжу версію з розділу [GitHub Releases](https://github.com/nasibullo03/PyBionic/releases/latest).
+2. **Встановіть:** Встановіть `PyBionic-Runner-v2.2.0-arm64.apk` на Android 8.0+ (ARM64).
 3. **Дозволи:** Дозвольте сповіщення та вимкніть оптимізацію батареї для безперервної роботи 24/7.
 4. **Запуск першого бота:** Перейдіть у вкладку **BotHub**, виберіть шаблон, введіть токен і натисніть **▶ Запустити**.
 5. **Керування з комп'ютера:** Відкрийте **Налаштування** ➔ **Web Dashboard**, перейдіть за вказаною IP у браузері ПК та введіть PIN.

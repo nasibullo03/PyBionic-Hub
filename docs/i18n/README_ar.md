@@ -1,6 +1,6 @@
 # 🇸🇦 ⚡ PyBionic Runner — بيئة تشغيل بايثون 3.14 على أندرويد على مدار الساعة 24/7
 
-[![Release](https://img.shields.io/badge/Release-v2.1.1-00E5FF.svg?style=for-the-badge&logo=android&logoColor=black)](https://github.com/nasibullo03/PyBionic-Hub/releases/latest)
+[![Release](https://img.shields.io/badge/Release-v2.2.0-00E5FF.svg?style=for-the-badge&logo=android&logoColor=black)](https://github.com/nasibullo03/PyBionic/releases/latest)
 [![Python](https://img.shields.io/badge/Python-3.14.10_Bionic-FFD700.svg?style=for-the-badge&logo=python&logoColor=black)](https://python.org)
 [![Platform](https://img.shields.io/badge/Platform-Android_8.0+-3DDC84.svg?style=for-the-badge&logo=android&logoColor=white)](https://android.com)
 [![License](https://img.shields.io/badge/License-AGPL_v3-blue.svg?style=for-the-badge)](../../LICENSE)
@@ -17,8 +17,8 @@
 ---
 
 <p align="center">
-  <a href="https://github.com/nasibullo03/PyBionic-Hub/releases/latest">
-    <img src="https://img.shields.io/badge/🚀_تحميل_تطبيق_PYBIONIC_APK-v2.1.1-00E5FF?style=for-the-badge&logo=android&logoColor=black" alt="Download APK" height="50">
+  <a href="https://github.com/nasibullo03/PyBionic/releases/latest">
+    <img src="https://img.shields.io/badge/🚀_تحميل_تطبيق_PYBIONIC_APK-v2.2.0-00E5FF?style=for-the-badge&logo=android&logoColor=black" alt="Download APK" height="50">
   </a>
 </p>
 
@@ -48,8 +48,8 @@
 
 ## 🚀 البدء السريع
 
-1. **تحميل التطبيق:** حمّل أحدث إصدار من صفحة [إصدارات GitHub](https://github.com/nasibullo03/PyBionic-Hub/releases/latest).
-2. **التثبيت:** ثبّت ملف `PyBionic-Runner-v2.1.1-arm64.apk` على هاتف يعمل بنظام Android 8.0 فما فوق.
+1. **تحميل التطبيق:** حمّل أحدث إصدار من صفحة [إصدارات GitHub](https://github.com/nasibullo03/PyBionic/releases/latest).
+2. **التثبيت:** ثبّت ملف `PyBionic-Runner-v2.2.0-arm64.apk` على هاتف يعمل بنظام Android 8.0 فما فوق.
 3. **الأذونات:** امنح إذن الإشعارات ووافق على **تعطيل تحسينات البطارية** لضمان التشغيل الدائم 24/7.
 4. **تشغيل أول بوت:** افتح تبويب **BotHub**، اختر القالب المناسب، أدخل التوكن واضغط على **▶ تشغيل**.
 5. **التحكم من الحاسوب:** ادخل إلى **الإعدادات** ➔ **Web Dashboard**، وافتح العنوان في متصفح حاسوبك وأدخل رمز PIN.

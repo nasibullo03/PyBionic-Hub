@@ -1,6 +1,6 @@
 # 🇹🇭 ⚡ PyBionic Runner — สภาพแวดล้อมการรัน Python 3.14 บน Android ต่อเนื่องตลอด 24/7
 
-[![Release](https://img.shields.io/badge/Release-v2.1.1-00E5FF.svg?style=for-the-badge&logo=android&logoColor=black)](https://github.com/nasibullo03/PyBionic-Hub/releases/latest)
+[![Release](https://img.shields.io/badge/Release-v2.2.0-00E5FF.svg?style=for-the-badge&logo=android&logoColor=black)](https://github.com/nasibullo03/PyBionic/releases/latest)
 [![Python](https://img.shields.io/badge/Python-3.14.10_Bionic-FFD700.svg?style=for-the-badge&logo=python&logoColor=black)](https://python.org)
 [![Platform](https://img.shields.io/badge/Platform-Android_8.0+-3DDC84.svg?style=for-the-badge&logo=android&logoColor=white)](https://android.com)
 [![License](https://img.shields.io/badge/License-AGPL_v3-blue.svg?style=for-the-badge)](../../LICENSE)
@@ -17,8 +17,8 @@
 ---
 
 <p align="center">
-  <a href="https://github.com/nasibullo03/PyBionic-Hub/releases/latest">
-    <img src="https://img.shields.io/badge/🚀_ดาวน์โหลด_PYBIONIC_APK-v2.1.1-00E5FF?style=for-the-badge&logo=android&logoColor=black" alt="Download APK" height="50">
+  <a href="https://github.com/nasibullo03/PyBionic/releases/latest">
+    <img src="https://img.shields.io/badge/🚀_ดาวน์โหลด_PYBIONIC_APK-v2.2.0-00E5FF?style=for-the-badge&logo=android&logoColor=black" alt="Download APK" height="50">
   </a>
 </p>
 
@@ -48,8 +48,8 @@
 
 ## 🚀 เริ่มต้นใช้งานด่วน
 
-1. **ดาวน์โหลด APK:** ดาวน์โหลดเวอร์ชันล่าสุดได้จาก [GitHub Releases](https://github.com/nasibullo03/PyBionic-Hub/releases/latest)
-2. **ติดตั้ง:** ติดตั้งไฟล์ `PyBionic-Runner-v2.1.1-arm64.apk` บนอุปกรณ์ Android 8.0+ (ARM64)
+1. **ดาวน์โหลด APK:** ดาวน์โหลดเวอร์ชันล่าสุดได้จาก [GitHub Releases](https://github.com/nasibullo03/PyBionic/releases/latest)
+2. **ติดตั้ง:** ติดตั้งไฟล์ `PyBionic-Runner-v2.2.0-arm64.apk` บนอุปกรณ์ Android 8.0+ (ARM64)
 3. **การอนุญาต:** อนุญาตการแจ้งเตือนและปิดการเพิ่มประสิทธิภาพแบตเตอรี่เพื่อให้ระบบทำงานได้ตลอด 24/7
 4. **เริ่มบอทแรก:** ไปที่แท็บ **BotHub** เลือกเทมเพลต ใส่โทเค็นของคุณ แล้วกด **▶ เริ่มทำงาน**
 5. **ควบคุมจาก PC:** ไปที่ **การตั้งค่า** ➔ **Web Dashboard** เปิดที่อยู่ IP ในเบราว์เซอร์ของคอมพิวเตอร์แล้วใส่รหัส PIN

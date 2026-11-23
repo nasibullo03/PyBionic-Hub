@@ -1,6 +1,6 @@
 # 🇯🇵 ⚡ PyBionic Runner — Android上で24時間365日常駐するネイティブPython 3.14環境
 
-[![Release](https://img.shields.io/badge/Release-v2.1.1-00E5FF.svg?style=for-the-badge&logo=android&logoColor=black)](https://github.com/nasibullo03/PyBionic-Hub/releases/latest)
+[![Release](https://img.shields.io/badge/Release-v2.2.0-00E5FF.svg?style=for-the-badge&logo=android&logoColor=black)](https://github.com/nasibullo03/PyBionic/releases/latest)
 [![Python](https://img.shields.io/badge/Python-3.14.10_Bionic-FFD700.svg?style=for-the-badge&logo=python&logoColor=black)](https://python.org)
 [![Platform](https://img.shields.io/badge/Platform-Android_8.0+-3DDC84.svg?style=for-the-badge&logo=android&logoColor=white)](https://android.com)
 [![License](https://img.shields.io/badge/License-AGPL_v3-blue.svg?style=for-the-badge)](../../LICENSE)
@@ -17,8 +17,8 @@
 ---
 
 <p align="center">
-  <a href="https://github.com/nasibullo03/PyBionic-Hub/releases/latest">
-    <img src="https://img.shields.io/badge/🚀_PYBIONIC_APKをダウンロード-v2.1.1-00E5FF?style=for-the-badge&logo=android&logoColor=black" alt="Download APK" height="50">
+  <a href="https://github.com/nasibullo03/PyBionic/releases/latest">
+    <img src="https://img.shields.io/badge/🚀_PYBIONIC_APKをダウンロード-v2.2.0-00E5FF?style=for-the-badge&logo=android&logoColor=black" alt="Download APK" height="50">
   </a>
 </p>
 
@@ -48,8 +48,8 @@
 
 ## 🚀 クイックスタート
 
-1. **APKのダウンロード：** [GitHub Releases](https://github.com/nasibullo03/PyBionic-Hub/releases/latest) から最新版APKを入手します。
-2. **インストール：** Android 8.0以上（ARM64）の端末に `PyBionic-Runner-v2.1.1-arm64.apk` をインストールします。
+1. **APKのダウンロード：** [GitHub Releases](https://github.com/nasibullo03/PyBionic/releases/latest) から最新版APKを入手します。
+2. **インストール：** Android 8.0以上（ARM64）の端末に `PyBionic-Runner-v2.2.0-arm64.apk` をインストールします。
 3. **権限の許可：** 通知の許可を与え、常時稼働のために**バッテリー最適化の無効化**を承認します。
 4. **ボットの起動：** 下部の **BotHub** タブを開き、テンプレートを選択してトークンを入力し、**▶ 起動** をタップします。
 5. **PCから操作：** **設定** ➔ **Web Dashboard** を開き、PCのブラウザで表示されたIPにアクセスしてPINを入力します。

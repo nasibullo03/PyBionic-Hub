@@ -18,7 +18,7 @@
 
 <p align="center">
   <a href="https://github.com/nasibullo03/PyBionic/releases/latest">
-    <img src="https://img.shields.io/badge/🚀_DOWNLOAD_PYBIONIC_APK-v2.1.33-00E5FF?style=for-the-badge&logo=android&logoColor=black" alt="Download APK" height="50">
+    <img src="https://img.shields.io/badge/🚀_DOWNLOAD_PYBIONIC_APK-v2.2.0-00E5FF?style=for-the-badge&logo=android&logoColor=black" alt="Download APK" height="50">
   </a>
 </p>
 
@@ -50,7 +50,7 @@ Unlike heavy chroot or Linux emulators (Termux, PRoot, UserLAnd), PyBionic is co
 ## 🚀 Quick Start
 
 1. **Download APK:** Get the latest release from [GitHub Releases](https://github.com/nasibullo03/PyBionic/releases/latest).
-2. **Install:** Install `PyBionic-Runner-v2.1.1-arm64.apk` on your Android device (Android 8.0+ / arm64-v8a).
+2. **Install:** Install `PyBionic-Runner-v2.2.0-arm64.apk` on your Android device (Android 8.0+ / arm64-v8a).
 3. **Launch & Permissions:** Allow Notification permission and accept the prompt to **Disable Battery Optimizations** for uninterrupted 24/7 background operation.
 4. **Run a Bot:**
    - Tap **BotHub** at the bottom.

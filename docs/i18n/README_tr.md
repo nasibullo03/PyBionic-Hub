@@ -1,6 +1,6 @@
 # 🇹🇷 ⚡ PyBionic Runner — Android'de 7/24 Kesintisiz Python 3.14 Çalıştırma
 
-[![Release](https://img.shields.io/badge/Release-v2.1.1-00E5FF.svg?style=for-the-badge&logo=android&logoColor=black)](https://github.com/nasibullo03/PyBionic-Hub/releases/latest)
+[![Release](https://img.shields.io/badge/Release-v2.2.0-00E5FF.svg?style=for-the-badge&logo=android&logoColor=black)](https://github.com/nasibullo03/PyBionic/releases/latest)
 [![Python](https://img.shields.io/badge/Python-3.14.10_Bionic-FFD700.svg?style=for-the-badge&logo=python&logoColor=black)](https://python.org)
 [![Platform](https://img.shields.io/badge/Platform-Android_8.0+-3DDC84.svg?style=for-the-badge&logo=android&logoColor=white)](https://android.com)
 [![License](https://img.shields.io/badge/License-AGPL_v3-blue.svg?style=for-the-badge)](../../LICENSE)
@@ -17,8 +17,8 @@
 ---
 
 <p align="center">
-  <a href="https://github.com/nasibullo03/PyBionic-Hub/releases/latest">
-    <img src="https://img.shields.io/badge/🚀_PYBIONIC_APK_İNDİR-v2.1.1-00E5FF?style=for-the-badge&logo=android&logoColor=black" alt="Download APK" height="50">
+  <a href="https://github.com/nasibullo03/PyBionic/releases/latest">
+    <img src="https://img.shields.io/badge/🚀_PYBIONIC_APK_İNDİR-v2.2.0-00E5FF?style=for-the-badge&logo=android&logoColor=black" alt="Download APK" height="50">
   </a>
 </p>
 
@@ -48,8 +48,8 @@ Ağır Linux emülatörlerinin (Termux, PRoot, UserLAnd) aksine PyBionic, doğru
 
 ## 🚀 Hızlı Başlangıç
 
-1. **APK İndirin:** En son sürümü [GitHub Releases](https://github.com/nasibullo03/PyBionic-Hub/releases/latest) sayfasından edinin.
-2. **Kurun:** `PyBionic-Runner-v2.1.1-arm64.apk` dosyasını Android 8.0+ (ARM64) cihazınıza yükleyin.
+1. **APK İndirin:** En son sürümü [GitHub Releases](https://github.com/nasibullo03/PyBionic/releases/latest) sayfasından edinin.
+2. **Kurun:** `PyBionic-Runner-v2.2.0-arm64.apk` dosyasını Android 8.0+ (ARM64) cihazınıza yükleyin.
 3. **İzinler:** Bildirim iznini verin ve 7/24 çalışma için pil optimizasyonunu devre dışı bırakın.
 4. **İlk Botu Çalıştırın:** **BotHub** sekmesine gidin, bir şablon seçin, tokeninizi girin ve **▶ Çalıştır**'a basın.
 5. **Bilgisayardan Yönetin:** **Ayarlar** ➔ **Web Dashboard** yolunu izleyin, IP adresini bilgisayarınızda açın ve PIN kodunu girin.

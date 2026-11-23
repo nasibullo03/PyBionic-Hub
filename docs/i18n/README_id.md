@@ -1,6 +1,6 @@
 # 🇮🇩 ⚡ PyBionic Runner — Lingkungan Eksekusi Python 3.14 Mandiri di Android 24/7
 
-[![Release](https://img.shields.io/badge/Release-v2.1.1-00E5FF.svg?style=for-the-badge&logo=android&logoColor=black)](https://github.com/nasibullo03/PyBionic-Hub/releases/latest)
+[![Release](https://img.shields.io/badge/Release-v2.2.0-00E5FF.svg?style=for-the-badge&logo=android&logoColor=black)](https://github.com/nasibullo03/PyBionic/releases/latest)
 [![Python](https://img.shields.io/badge/Python-3.14.10_Bionic-FFD700.svg?style=for-the-badge&logo=python&logoColor=black)](https://python.org)
 [![Platform](https://img.shields.io/badge/Platform-Android_8.0+-3DDC84.svg?style=for-the-badge&logo=android&logoColor=white)](https://android.com)
 [![License](https://img.shields.io/badge/License-AGPL_v3-blue.svg?style=for-the-badge)](../../LICENSE)
@@ -17,8 +17,8 @@
 ---
 
 <p align="center">
-  <a href="https://github.com/nasibullo03/PyBionic-Hub/releases/latest">
-    <img src="https://img.shields.io/badge/🚀_UNDUH_PYBIONIC_APK-v2.1.1-00E5FF?style=for-the-badge&logo=android&logoColor=black" alt="Download APK" height="50">
+  <a href="https://github.com/nasibullo03/PyBionic/releases/latest">
+    <img src="https://img.shields.io/badge/🚀_UNDUH_PYBIONIC_APK-v2.2.0-00E5FF?style=for-the-badge&logo=android&logoColor=black" alt="Download APK" height="50">
   </a>
 </p>
 
@@ -48,8 +48,8 @@ Tidak seperti emulator Linux yang berat (Termux, PRoot, UserLAnd), PyBionic diko
 
 ## 🚀 Panduan Cepat
 
-1. **Unduh APK:** Dapatkan versi terbaru dari [GitHub Releases](https://github.com/nasibullo03/PyBionic-Hub/releases/latest).
-2. **Pasang:** Pasang `PyBionic-Runner-v2.1.1-arm64.apk` pada perangkat Android 8.0+ (ARM64) Anda.
+1. **Unduh APK:** Dapatkan versi terbaru dari [GitHub Releases](https://github.com/nasibullo03/PyBionic/releases/latest).
+2. **Pasang:** Pasang `PyBionic-Runner-v2.2.0-arm64.apk` pada perangkat Android 8.0+ (ARM64) Anda.
 3. **Izin:** Berikan izin notifikasi dan nonaktifkan pengoptimalan baterai agar bot berjalan 24/7 tanpa henti.
 4. **Jalankan Bot Pertama:** Buka tab **BotHub**, pilih template, masukkan token Anda, lalu tekan **▶ Jalankan**.
 5. **Kontrol dari Komputer:** Buka **Pengaturan** ➔ **Web Dashboard**, akses IP di browser komputer Anda, dan masukkan PIN.

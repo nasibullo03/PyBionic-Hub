@@ -1,6 +1,6 @@
 # 🇪🇸 ⚡ PyBionic Runner — Entorno de ejecución de Python 3.14 en Android 24/7
 
-[![Release](https://img.shields.io/badge/Release-v2.1.1-00E5FF.svg?style=for-the-badge&logo=android&logoColor=black)](https://github.com/nasibullo03/PyBionic-Hub/releases/latest)
+[![Release](https://img.shields.io/badge/Release-v2.2.0-00E5FF.svg?style=for-the-badge&logo=android&logoColor=black)](https://github.com/nasibullo03/PyBionic/releases/latest)
 [![Python](https://img.shields.io/badge/Python-3.14.10_Bionic-FFD700.svg?style=for-the-badge&logo=python&logoColor=black)](https://python.org)
 [![Platform](https://img.shields.io/badge/Platform-Android_8.0+-3DDC84.svg?style=for-the-badge&logo=android&logoColor=white)](https://android.com)
 [![License](https://img.shields.io/badge/License-AGPL_v3-blue.svg?style=for-the-badge)](../../LICENSE)
@@ -17,8 +17,8 @@
 ---
 
 <p align="center">
-  <a href="https://github.com/nasibullo03/PyBionic-Hub/releases/latest">
-    <img src="https://img.shields.io/badge/🚀_DESCARGAR_PYBIONIC_APK-v2.1.1-00E5FF?style=for-the-badge&logo=android&logoColor=black" alt="Download APK" height="50">
+  <a href="https://github.com/nasibullo03/PyBionic/releases/latest">
+    <img src="https://img.shields.io/badge/🚀_DESCARGAR_PYBIONIC_APK-v2.2.0-00E5FF?style=for-the-badge&logo=android&logoColor=black" alt="Download APK" height="50">
   </a>
 </p>
 
@@ -48,8 +48,8 @@ A diferencia de los emuladores pesados de Linux (Termux, PRoot, UserLAnd), PyBio
 
 ## 🚀 Inicio rápido
 
-1. **Descargue el APK:** Obtenga la última versión desde [GitHub Releases](https://github.com/nasibullo03/PyBionic-Hub/releases/latest).
-2. **Instale:** Instale `PyBionic-Runner-v2.1.1-arm64.apk` en su dispositivo Android 8.0+ (ARM64).
+1. **Descargue el APK:** Obtenga la última versión desde [GitHub Releases](https://github.com/nasibullo03/PyBionic/releases/latest).
+2. **Instale:** Instale `PyBionic-Runner-v2.2.0-arm64.apk` en su dispositivo Android 8.0+ (ARM64).
 3. **Permisos:** Conceda permiso de notificaciones y desactive la optimización de batería para operación 24/7.
 4. **Ejecute un bot:** Vaya a **BotHub**, elija una plantilla, introduzca su token y pulse **▶ Ejecutar**.
 5. **Control desde PC:** Vaya a **Ajustes** ➔ **Web Dashboard**, abra la IP en el navegador de su computadora e ingrese el PIN.
