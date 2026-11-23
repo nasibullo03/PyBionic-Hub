@@ -4,6 +4,30 @@
 
 ---
 
+## 🚀 Что нового в версии 2.1.93 (SemVer Patch Release — Универсальная конфигурируемость ядра и устранение зашитых параметров: CWD in sys.path Guard, Multiprocessing Start Method Selector, SQLite Journal Mode Pragma Selector, Custom TCP Keepalive Interval, Dynamic Battery Thermal Throttle Limit, Circuit Breaker Crash Threshold & Reset Window, WebAuth Brute-Force Rate Limiting & Lockout, Web Dashboard Upload Bandwidth Throttle, Log Rotation Max Size & Retention Policy, Memory Trim Policy Selector, CI/CD Webhook HMAC Secret Validation, Custom Parameter Dialogs with Range Clamping)
+
+- **ГЛУБОКАЯ АРХИТЕКТУРНАЯ УНИФИКАЦИЯ И ПРИВЕДЕНИЕ К ПРАВИЛУ 5**:
+  - Устранены ограничения ранних хардкодных дефектов (#114, #132, #140, #143, #178, #181, #194, #202, #266, #283, #303, #742, #761, #910).
+  - Создан компонент `CoreArchitecturalHardeningAndCustomizationHelper` с 20 чистыми алгоритмами, моделями и валидаторами параметров.
+  - Разработана специализированная карточка настроек `CoreArchitecturalHardeningCard` с полной поддержкой трёхчастных диалогов «Что это?» (Что это / Когда включено / Когда выключено) и интерактивными диалогами ввода произвольных чисел.
+  - **Разрешение CWD в Python sys.path (#114, P0)**: Внедрен переключатель `allowCwdInSysPathGuardEnabled` с защитой от подмены стандартных библиотек по умолчанию и возможностью включения для legacy-проектов.
+  - **Селектор метода старта процессов Multiprocessing (#132, P0)**: Добавлен выбор между безопасным `SPAWN` (по умолчанию, исключающим дедлоки с Bionic libc), `FORK` и `FORKSERVER`.
+  - **Режим журналирования баз данных SQLite (#140, P1)**: Добавлен селектор режимов `WAL` (по умолчанию), `DELETE`, `TRUNCATE`, `MEMORY` для полной совместимости с внешними SD-картами.
+  - **Пользовательский интервал TCP Keepalive NAT (#178, P1)**: Добавлен интерактивный ввод интервала проверки сокетов (от 10 до 3600 секунд) для предотвращения разрыва связей сотовыми операторами LTE/5G.
+  - **Настраиваемый порог термального троттлинга батареи (#181, P1)**: Добавлен ввод порога температуры (от 35°C до 60°C) под горячие процессоры (Snapdragon 8 Gen 1, Tensor).
+  - **Порог срабатывания и окно сброса Circuit Breaker (#202 / #761, P0)**: Настраиваемое количество падений (от 1 до 50) и таймаут сброса счетчика сбоев (от 5 до 3600 секунд).
+  - **Лимит попыток входа и таймаут блокировки WebAuth (#266, P1)**: Настраиваемое количество попыток ввода пароля (от 1 до 20) и время блокировки (от 1 до 1440 минут) для защиты от брутфорса.
+  - **Лимит скорости загрузки файлов через Web Dashboard (#303, P1)**: Настраиваемое ограничение пропускной способности аплоада в КБ/с (0 = безлимитно) для защиты полосы пропускания активных ботов.
+  - **Политика дисковой ротации логов (#742, P0)**: Настройка максимального размера файла логов в МБ (от 1 до 100 МБ) и количества хранимых копий (от 1 до 20).
+  - **Стратегия реагирования на нехватку оперативной памяти Trim RAM (#194, P1)**: Выбор стратегии при `TRIM_MEMORY_RUNNING_CRITICAL` (`FORCE_GC`, `PAUSE_BOTS`, `MONITOR_ONLY`).
+  - **Секретный токен для CI/CD Webhooks деплоя (#910, P0)**: Поле ввода секретного ключа для проверки криптографической HMAC-SHA256 подписи входящих хуков GitHub и GitLab.
+  - **Проверка заголовка X-Telegram-Bot-Api-Secret-Token (#283, P1)**: Валидация секретного токена вебхуков Telegram.
+  - **Безопасная распаковка архивов Zip Slip (#143, P0)**: Каноническая верификация путей при распаковке файлов.
+  - **Кастомные диалоги числового ввода с защитным клэмпингом диапазонов**: Замена жестких ограничений FilterChip на свободный ввод с проверкой границ для лимитов процессов, таймаутов SIGTERM, размеров тел запросов и буфера логов.
+  - **100% паритет локализации на 22 языка**: Все разъяснения и заголовки переведены и синхронизированы через `tools/sync_strings.py`.
+
+---
+
 ## 🚀 Что нового в версии 2.1.92 (SemVer Patch Release — Специальный пост-аудит эргономики: Mobile Developer Ergonomics, Terminal & UI/UX Hardening: Editor Line Numbers Gutter, Python Symbol Quick Bar Toolbar, IME Active Cursor Follower, Log Console Scroll Jitter Freeze, Terminal Search Text Highlighter, One-Tap Log Share & Export, Adaptive 5-Tab Navigation Layout, Zero Bots Empty State Onboarding, Accidental Bot Stop Confirmation, 48dp Touch Targets Accessible Enforcer, Password & Secret Eye Visibility Toggle, Live Telegram Bot Token Validator, SQLite Inspector Cell Content Expander, Web Dashboard Disconnect Alert Banner, Code Editor Syntax Bracket Matching, Terminal Tail Line Truncation Guard, Project Card Drag Handle Visual Cue, Secret Vault Clipboard Auto-Clear, DeX Multi-Window Freeform Window Snap, Haptic Feedback Intensity Customizer)
 
 - **СПЕЦИАЛЬНЫЙ ПОСТ-АУДИТ ЭРГОНОМИКИ И ТЕРМИНАЛА (Mobile Developer Ergonomics & UI/UX Hardening)**:
