@@ -4,6 +4,16 @@
 
 ---
 
+## 🚀 Что нового в версии 2.1.94 (SemVer Patch Release — Стандартизация диалогов «Что это?» и кастомных параметров в AdvancedSecurityGuardsCard)
+
+- **СТАНДАРТИЗАЦИЯ ADVANCED SECURITY GUARDS В СООТВЕТСТВИИ С ПРАВИЛОМ 5**:
+  - Карточка `AdvancedSecurityGuardsCard` полностью переведена на стандартный шаблон `AdvancedSecurityToggleRowWithHelp` с трёхчастным диалогом «Что это?» (Что это / Когда включено / Когда выключено).
+  - Оснащены интерактивными диалогами помощи все 10 защитных переключателей: Strict CORS (#321), Inbound HTTP Body Limit (#387), Session Eviction (#408), WebSocket Tab Wakeup Reconnect (#423), API Request Execution Timeout (#424), SecretVault File Lock (#315), mktemp Race Condition Guard (#326), Web Server Production Debug Guard (#285), XML External Entity XXE Protection (#307), ReDoS Catastrophic Backtracking Guard (#327).
+  - Добавлены интерактивные диалоги свободного числового ввода (`OutlinedTextField`) для параметров `maxHttpBodySizeMb` (до 1024 МБ) и `apiRequestTimeoutSeconds` (до 600 сек) взамен жестких инкрементных ограничений.
+  - Все новые строковые ресурсы разъяснений сгенерированы и синхронизированы на все 22 языка локализации с полным паритетом ключей (`Max diff: 0`).
+
+---
+
 ## 🚀 Что нового в версии 2.1.93 (SemVer Patch Release — Универсальная конфигурируемость ядра и устранение зашитых параметров: CWD in sys.path Guard, Multiprocessing Start Method Selector, SQLite Journal Mode Pragma Selector, Custom TCP Keepalive Interval, Dynamic Battery Thermal Throttle Limit, Circuit Breaker Crash Threshold & Reset Window, WebAuth Brute-Force Rate Limiting & Lockout, Web Dashboard Upload Bandwidth Throttle, Log Rotation Max Size & Retention Policy, Memory Trim Policy Selector, CI/CD Webhook HMAC Secret Validation, Custom Parameter Dialogs with Range Clamping)
 
 - **ГЛУБОКАЯ АРХИТЕКТУРНАЯ УНИФИКАЦИЯ И ПРИВЕДЕНИЕ К ПРАВИЛУ 5**:
