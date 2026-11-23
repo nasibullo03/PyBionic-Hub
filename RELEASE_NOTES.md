@@ -4,6 +4,63 @@
 
 ---
 
+## 🚀 Что нового в версии 2.1.97 (SemVer Patch Release — Комплексная стандартизация карточек ProcessIsolationAndProtocolHardeningCard, BionicRuntimeAndNetworkResilienceCard, BionicAbiAndPackagingHardeningCard и PythonRuntimeAndOptimizationCard по Правилу 5)
+
+- **МАССОВАЯ СТАНДАРТИЗАЦИЯ ИНТЕРФЕЙСА НАСТРОЕК В СООТВЕТСТВИИ С ПРАВИЛОМ 5 (40 ПЕРЕКЛЮЧАТЕЛЕЙ)**:
+  - **ProcessIsolationAndProtocolHardeningCard**:
+    * Все 10 переключателей сетевой безопасности и изоляции процессов переведены на стандартный шаблон с трёхчастным диалогом «Что это?» (Что это / Когда включено / Когда выключено):
+      1. Logcat Process Isolation (#49) — изоляция потока логов строго под текущий PID раннера Python.
+      2. SIGBUS Bus Error Handler (#59) — перехват сбоев шины mmap и защита от мгновенного краша процесса.
+      3. Process Tree Tracking & PGID Cleanup (#82) — рекурсивное отслеживание и очистка дочерних процессов по PGID.
+      4. CFFI Zero-Buffer Guard (#304) — обнаружение и блокировка нулевых буферов перед вызовом нативного C-кода.
+      5. Credential Memory Scrubbing (#339) — немедленное зануление памяти после передачи API-токенов и паролей.
+      6. TCP Zero-Window Protection (#368) — мониторинг состояния нулевого окна TCP и предотвращение зависания сокетов.
+      7. SSE Stream Keep-Alive (#378) — периодическая отправка `: ping` для предотвращения обрыва SSE мобильными NAT.
+      8. Subresource Integrity & Strict CSP (#395) — проверка SRI-хэшей и защита веб-дашборда от подмены скриптов.
+      9. HTTP 429 Retry-After Interceptor (#402) — автоматический разбор заголовка Retry-After и экспоненциальная пауза.
+      10. SSL Handshake Timeout Enforcer (#404) — строгий 15-секундный таймаут TLS-рукопожатия для защиты рабочих потоков.
+  - **BionicRuntimeAndNetworkResilienceCard**:
+    * Все 10 переключателей Bionic рантайма и устойчивости сети оснащены трёхчастными диалогами помощи:
+      1. Bionic Linker Path Enforcer (#12) — очистка `LD_LIBRARY_PATH` и приоритет совместимых Bionic библиотек.
+      2. Pthread Cancel Emulation (#25) — эмуляция отсутствующей в Bionic функции `pthread_cancel` для C-расширений.
+      3. RTLD_DEEPBIND Workaround (#57) — безопасная подмена неподдерживаемого флага `RTLD_DEEPBIND` на Android.
+      4. POSIX Semaphore Fallback (#73) — перенаправление именованных семафоров `/dev/shm` на анонимные futex/pipe.
+      5. Bytecode Hash Validation (#97) — сверка SHA-256 контрольных сумм `.pyc` файлов против сбоев накопителя.
+      6. Native Signal Watchdog (#100) — перехват нативных сигналов POSIX (SIGSEGV, SIGFPE) со снятием бэктрейса.
+      7. Strict Process Isolation Restart (#113) — полная зачистка дескрипторов и памяти перед автоперезапуском бота.
+      8. Captive Portal Detection (#366) — обнаружение страницы авторизации Wi-Fi до отправки сетевых запросов ботами.
+      9. Stale Connection Flush (#405) — автоматический сброс устаревших сокетов TCP при смене сети (Wi-Fi ↔ 4G/5G).
+      10. ServerSocket Listen Backlog Increased (#413) — расширение очереди backlog со 128 до 1024 соединений.
+  - **BionicAbiAndPackagingHardeningCard**:
+    * Все 10 переключателей ABI и упаковки оснащены трёхчастными диалогами помощи:
+      1. Bionic stat64 / fstat64 ABI Shim (#16) — эмуляция 64-битных вызовов stat64 для старых binary wheels.
+      2. Kernel CPU Share Throttling (#76) — лимиты cgroup CPU shares и nice-приоритеты против перегрева смартфона.
+      3. Pthread Atfork Mutex Reset (#81) — сброс мьютексов через `pthread_atfork` в дочерних форкнутых процессах.
+      4. Python 3.14 GIL Enforcement (#89) — контроль инвариантов GIL в многопоточных модулях C/C++.
+      5. Synthetic VirtualEnv Scaffolding (#92) — изолированные структуры виртуальных окружений `pyvenv.cfg`.
+      6. Dlopen TLS Slots Limit Guard (#95) — контроль лимита слотов статического TLS компоновщика Bionic.
+      7. LibFFI Path Enforcer (#103) — принудительная линковка с безопасной версией `libffi.so` из комплекта.
+      8. Python 3.14 Basic REPL Fallback (#110) — автоматический переход на базовый REPL без поддержки curses/TTY.
+      9. LXML Parser Advisor (#115) — рекомендации бинарных сборок lxml без необходимости компиляции C-кода.
+      10. FFmpeg / FFprobe Diagnostic Advisor (#116) — ранняя проверка бинарников FFmpeg для скриптов обработки медиа.
+  - **PythonRuntimeAndOptimizationCard**:
+    * Все 10 переключателей оптимизации Python-рантайма оснащены трёхчастными диалогами помощи:
+      1. Pillow Imaging Library Advisor (#117) — готовые ARM64 wheels для Pillow без компиляторов на телефоне.
+      2. Mobile ML Threads Optimizer (#124) — автонастройка `OMP_NUM_THREADS` под архитектуру ядер процессора.
+      3. Aiohttp Threaded DNS Resolver (#125) — надежное разрешение имен через потоки вместо сбоящего c-ares.
+      4. PyDecimal Pure-Python Fallback (#129) — чистая реализация `_pydecimal` при отсутствии нативного C-модуля.
+      5. Popen Destructor Deadlock Guard (#138) — защита деструктора `Popen.__del__` от зависания сборщика мусора.
+      6. Scipy / Fortran Wheel Advisor (#142) — готовые wheels для SciPy/NumPy с BLAS/LAPACK без gfortran.
+      7. UVLoop Graceful Fallback (#148) — прозрачный переход на стандартный цикл asyncio вместо uvloop на Android.
+      8. Pydantic-Core Maturin Wheel Advisor (#149) — быстрые wheels для Pydantic v2 без компилятора Rust на устройстве.
+      9. Fast Close FDs via Proc (#154) — ускорение спавна процессов через `/proc/self/fd` (с сотен мс до <2 мс).
+      10. Daemon Thread Atexit Buffer Flush (#168) — корректный сброс буферов файлов и баз данных перед выходом из процесса.
+  - **Полный паритет переводов на 22 языках**:
+    * Добавлено 120 новых строковых ресурсов с подробными техническими разъяснениями.
+    * Синхронизированы все 22 локали (`ar`, `az`, `de`, `es`, `fa`, `fr`, `hi`, `in`, `it`, `ja`, `kk`, `ko`, `ky`, `pl`, `pt`, `tg`, `th`, `tr`, `uk`, `uz`, `vi`, `zh-rCN`), паритет ключей `Max diff: 0` (6097 ключей в каждой локали).
+
+---
+
 ## 🚀 Что нового в версии 2.1.96 (SemVer Patch Release — Комплексная стандартизация карточек ядра ServerBehaviorCard, RuntimeSecurityGuardsCard, NetworkAndRuntimeHardeningCard, ProcessSandboxAndSecurityCard и OemPowerAndProcessWatchdogCard по Правилу 5)
 
 - **МАССОВАЯ СТАНДАРТИЗАЦИЯ ИНТЕРФЕЙСА НАСТРОЕК В СООТВЕТСТВИИ С ПРАВИЛОМ 5 (81 ПЕРЕКЛЮЧАТЕЛЬ)**:
