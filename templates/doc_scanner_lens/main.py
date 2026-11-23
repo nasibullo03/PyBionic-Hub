@@ -14,6 +14,7 @@ Features:
 from __future__ import annotations
 
 import pybionic_core as core
+import pybionic_web as web
 import html
 import io
 import json
@@ -593,169 +594,48 @@ def setup_bot() -> telebot.TeleBot | None:
 # ---------------------------------------------------------------------------
 # Web Studio Handler (Cyberpunk Neon UI on Port 8103)
 # ---------------------------------------------------------------------------
-WEB_STUDIO_HTML = """<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Doc Scanner Lens Pro Studio</title>
-<style>
-:root {
-  --bg: #0a0e17;
-  --panel: #111927;
-  --accent: #00e5ff;
-  --accent-glow: rgba(0, 229, 255, 0.3);
-  --green: #00ff66;
-  --text: #e2e8f0;
-  --muted: #64748b;
-  --border: #1e293b;
-}
-* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
-body { background: var(--bg); color: var(--text); padding: 24px; }
-.container { max-width: 900px; margin: 0 auto; }
-header { margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
-h1 { font-size: 24px; color: var(--accent); text-shadow: 0 0 10px var(--accent-glow); display: flex; align-items: center; gap: 10px; }
-.badge { background: rgba(0, 229, 255, 0.15); color: var(--accent); padding: 4px 12px; border-radius: 999px; font-size: 12px; border: 1px solid var(--accent); }
-.card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
-.card-title { font-size: 16px; font-weight: 600; margin-bottom: 14px; color: #f8fafc; }
-.drop-zone { border: 2px dashed var(--accent); border-radius: 10px; padding: 32px 16px; text-align: center; cursor: pointer; background: rgba(0, 229, 255, 0.02); transition: all 0.2s; }
-.drop-zone:hover { background: rgba(0, 229, 255, 0.08); border-color: #fff; }
-.btn-group { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
-button { background: var(--panel); color: var(--text); border: 1px solid var(--border); padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: 500; transition: all 0.2s; }
-button:hover { border-color: var(--accent); color: var(--accent); }
-button.active { background: var(--accent); color: #000; font-weight: 600; border-color: var(--accent); box-shadow: 0 0 12px var(--accent-glow); }
-button.primary { background: var(--green); color: #000; font-weight: 600; border: none; }
-button.primary:hover { box-shadow: 0 0 12px rgba(0, 255, 102, 0.4); }
-.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; }
-.stat-box { background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border); border-radius: 8px; padding: 14px; text-align: center; }
-.stat-num { font-size: 26px; font-weight: 700; color: var(--accent); }
-.stat-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
-#statusMsg { margin-top: 12px; font-size: 13px; color: var(--green); min-height: 20px; }
-</style>
-</head>
-<body>
-<div class="container">
-  <header>
-    <h1>📄 Doc Scanner Lens Pro</h1>
-    <span class="badge">Port 8103 • Online</span>
-  </header>
+def render_studio(handler: Any) -> None:
+    lang = web.resolve_lang(handler)
+    T = web.translator(lang)
+    css = ("<style>.ds-pages{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:10px}"
+           ".ds-page{position:relative;aspect-ratio:3/4;border-radius:10px;overflow:hidden;border:1px solid var(--line);background:var(--surface2);animation:pbup .35s var(--ease) both}"
+           ".ds-page img{width:100%;height:100%;object-fit:cover}.ds-page b{position:absolute;inset-inline-start:6px;top:6px;min-width:22px;height:22px;border-radius:7px;"
+           "display:grid;place-items:center;font-size:12px;color:#fff;background:var(--brand)}</style>")
+    modes = [("whitener", "📄 " + T("w_f_whitener")), ("gray", "🔘 " + T("w_f_gray")), ("binarize", "⬛ " + T("w_f_bw")), ("color", "🎨 " + T("w_f_color"))]
+    sub = {"whitener": T("w_f_whitener_sub"), "gray": T("w_f_gray_sub"), "binarize": T("w_f_bw_sub"), "color": T("w_f_color_sub")}
+    left = web.card(T("w_card_scan"),
+        web.field(T("w_filter"), web.segmented("mode", modes, "whitener", sub=sub))
+        + web.dropzone("pf", T("w_drop_pages"), "JPG · PNG · WEBP · BMP", accept="image/*", multiple=True, icon_name="image")
+        + web.progress("prog"), icon_name="image")
+    right = web.card(T("w_card_bundle"),
+        '<div class="ds-pages" id="pages"></div>' + web.empty_state(T("w_no_pages"), "file", id="empty")
+        + '<div class="pb-row">' + web.button(T("w_compile"), "pdf", icon_name="download", disabled=True)
+        + web.button(T("clear"), "clr", kind="danger", icon_name="trash") + "</div>",
+        icon_name="file", aside='<span class="pb-tag" id="cnt">0</span>')
+    st = web.card(T("statistics"), web.stats([(T("w_st_pages"), "0", "s1", "image"), (T("w_st_pdfs"), "0", "s2", "file"),
+                                              (T("w_st_mb"), "0", "s3", "chart")]), icon_name="chart")
+    hero = web.hero(T("w_title"), T("w_hero"), "📄", chips=["PDF", T("w_f_whitener"), T("w_f_bw")])
+    web.send_page(handler, lang, title=T("w_title"), emoji="📄", brand="#2563eb", port=WEB_PORT,
+                  hero_html=hero, body=css + web.grid(left, right, min_width=330) + st, script=DOC_JS)
 
-  <div class="card">
-    <div class="card-title">1. Document Filter Mode</div>
-    <div class="btn-group">
-      <button class="filter-btn active" data-mode="whitener">📄 Paper Whitener</button>
-      <button class="filter-btn" data-mode="gray">🔘 Grayscale Clean</button>
-      <button class="filter-btn" data-mode="binarize">⬛ 1-Bit Monochrome</button>
-      <button class="filter-btn" data-mode="color">🎨 Color Enhanced</button>
-    </div>
-  </div>
 
-  <div class="card">
-    <div class="card-title">2. Upload Page Photos</div>
-    <div class="drop-zone" id="dropZone">
-      <p style="font-size: 15px; margin-bottom: 6px;">📂 Drag & drop page photo here, or click to select</p>
-      <p style="font-size: 12px; color: var(--muted);">Supports JPG, PNG, WEBP, BMP</p>
-      <input type="file" id="fileInput" accept="image/*" style="display:none;">
-    </div>
-    <div id="statusMsg"></div>
-    <div class="btn-group" style="margin-top: 16px;">
-      <button class="primary" id="btnCompile">📦 Compile Bundle into PDF</button>
-      <button id="btnClear" style="color: #ff5555; border-color: #ff5555;">🗑 Clear Pages</button>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">Engine Statistics</div>
-    <div class="stats-grid">
-      <div class="stat-box"><div class="stat-num" id="statPages">0</div><div class="stat-label">Pages Scanned</div></div>
-      <div class="stat-box"><div class="stat-num" id="statPdfs">0</div><div class="stat-label">PDF Documents Built</div></div>
-      <div class="stat-box"><div class="stat-num" id="statMb">0 MB</div><div class="stat-label">Data Volume Processed</div></div>
-    </div>
-  </div>
-</div>
-
-<script>
-let activeMode = 'whitener';
-document.querySelectorAll('.filter-btn').forEach(b => {
-  b.addEventListener('click', () => {
-    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-    b.classList.add('active');
-    activeMode = b.dataset.mode;
-  });
-});
-
-const dropZone = document.getElementById('dropZone');
-const fileInput = document.getElementById('fileInput');
-const statusMsg = document.getElementById('statusMsg');
-
-dropZone.addEventListener('click', () => fileInput.click());
-dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.style.borderColor = '#fff'; });
-dropZone.addEventListener('dragleave', () => { dropZone.style.borderColor = 'var(--accent)'; });
-dropZone.addEventListener('drop', (e) => {
-  e.preventDefault();
-  dropZone.style.borderColor = 'var(--accent)';
-  if (e.dataTransfer.files.length) uploadFile(e.dataTransfer.files[0]);
-});
-fileInput.addEventListener('change', () => {
-  if (fileInput.files.length) uploadFile(fileInput.files[0]);
-});
-
-function uploadFile(file) {
-  statusMsg.textContent = '⏳ Processing document page with ' + activeMode + ' filter...';
-  const fd = new FormData();
-  fd.append('file', file);
-  fd.append('filter', activeMode);
-  fetch('/api/upload_page', { method: 'POST', body: fd })
-    .then(r => r.json())
-    .then(data => {
-      if (data.success) {
-        statusMsg.textContent = '✅ Page #' + data.page_num + ' added! Total in bundle: ' + data.total_pages;
-        refreshStats();
-      } else {
-        statusMsg.textContent = '❌ Upload failed: ' + data.error;
-      }
-    })
-    .catch(err => { statusMsg.textContent = '❌ Network error: ' + err; });
-}
-
-document.getElementById('btnCompile').addEventListener('click', () => {
-  statusMsg.textContent = '⏳ Generating PDF document...';
-  fetch('/api/compile_pdf', { method: 'POST' })
-    .then(r => r.json())
-    .then(data => {
-      if (data.success) {
-        statusMsg.textContent = '🎉 PDF built successfully! Downloading...';
-        window.location.href = data.download_url;
-        refreshStats();
-      } else {
-        statusMsg.textContent = '⚠️ ' + data.error;
-      }
-    })
-    .catch(err => { statusMsg.textContent = '❌ Error: ' + err; });
-});
-
-document.getElementById('btnClear').addEventListener('click', () => {
-  fetch('/api/clear', { method: 'POST' })
-    .then(r => r.json())
-    .then(() => {
-      statusMsg.textContent = '🗑 Session cleared.';
-      refreshStats();
-    });
-});
-
-function refreshStats() {
-  fetch('/api/status').then(r => r.json()).then(data => {
-    if (data.stats) {
-      document.getElementById('statPages').textContent = data.stats.total_pages;
-      document.getElementById('statPdfs').textContent = data.stats.total_pdfs;
-      document.getElementById('statMb').textContent = data.stats.total_mb + ' MB';
-    }
-  });
-}
-refreshStats();
-</script>
-</body>
-</html>
+DOC_JS = r"""
+const $=s=>document.querySelector(s);let n=0;
+function addThumb(file,num){const d=document.createElement('div');d.className='ds-page';d.innerHTML=`<img alt=""><b>${num}</b>`;d.querySelector('img').src=URL.createObjectURL(file);$('#pages').appendChild(d)}
+function setCount(c){n=c;$('#cnt').textContent=c;$('#empty').hidden=c>0;$('#pdf').disabled=c===0}
+async function stats(){const d=await pb.json('/api/status').catch(()=>({}));if(d.stats){pb.count($('#s1'),d.stats.total_pages||0);pb.count($('#s2'),d.stats.total_pdfs||0);$('#s3').textContent=(d.stats.total_mb||0)+' MB'}}
+$('#pf-zone').addEventListener('pb:files',async e=>{const fs=e.detail;for(let i=0;i<fs.length;i++){
+  const fd=new FormData();fd.append('file',fs[i]);fd.append('filter',$('#mode').dataset.value);
+  try{const d=await pb.upload('/api/upload_page',fd,p=>pb.progress('prog',p<100?p:null,pb.t('w_uploading_page',{i:i+1,n:fs.length})));
+    if(!d.success)throw new Error(d.error||pb.t('error'));addThumb(fs[i],d.page_num);setCount(d.total_pages);
+  }catch(err){pb.toast(pb.t('error')+': '+err.message,true);break}}
+  pb.progress('prog',100,pb.t('w_pages_in_bundle',{n}));stats()});
+$('#pdf').onclick=async()=>{const b=$('#pdf');pb.busy(b,true);pb.progress('prog',null,pb.t('w_building_pdf'));
+  try{const d=await pb.post('/api/compile_pdf',{});if(!d.success)throw new Error(d.error||pb.t('error'));pb.progress('prog',100,pb.t('done'));
+    const a=document.createElement('a');a.href=d.download_url;a.download='';document.body.appendChild(a);a.click();a.remove();pb.toast(pb.t('done'));stats()}
+  catch(err){pb.hide('prog');pb.toast(pb.t('error')+': '+err.message,true)}finally{pb.busy(b,false);$('#pdf').disabled=n===0}};
+$('#clr').onclick=async()=>{await pb.post('/api/clear',{}).catch(()=>{});$('#pages').innerHTML='';setCount(0);pb.hide('prog');pb.toast(pb.t('w_cleared'));stats()};
+setCount(0);stats();
 """
 
 
@@ -763,10 +643,7 @@ class WebStudioHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         parsed = urlparse(self.path)
         if parsed.path == "/":
-            self.send_response(HTTPStatus.OK)
-            self.send_header("Content-Type", "text/html; charset=utf-8")
-            self.end_headers()
-            self.wfile.write(WEB_STUDIO_HTML.encode("utf-8"))
+            render_studio(self)
         elif parsed.path == "/api/status":
             self.send_response(HTTPStatus.OK)
             self.send_header("Content-Type", "application/json")

@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 import pybionic_core as core
+import pybionic_web as web
 import base64
 import gzip
 import html
@@ -189,6 +190,41 @@ def detect_sticker_kind(sticker: Any) -> str:
     return "webp"
 
 
+def render_studio(handler: Any, port: int) -> None:
+    lang = web.resolve_lang(handler)
+    T = web.translator(lang)
+    fmts = [("png", "PNG"), ("gif", "GIF"), ("mp4", "MP4"), ("webp", "WebP"), ("json", "Lottie")]
+    sub = {"png": T("w_fmt_png"), "gif": T("w_fmt_gif"), "mp4": T("w_fmt_mp4"), "webp": T("w_fmt_webp"), "json": ".tgs → JSON"}
+    css = ("<style>.st-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px}"
+           ".st-cell{display:grid;gap:6px;padding:8px;border-radius:12px;background:var(--surface2);border:1px solid var(--line);text-align:center;font-size:12px;animation:pbup .4s var(--ease) both}"
+           ".st-cell img,.st-cell video{width:100%;aspect-ratio:1;object-fit:contain;border-radius:8px;background:repeating-conic-gradient(var(--surface2) 0 25%,transparent 0 50%) 0 0/16px 16px}"
+           ".st-cell a{color:var(--brand);text-decoration:none;font-weight:600;overflow-wrap:anywhere}</style>")
+    left = web.card(T("web_title"), web.dropzone("fi", T("drop_stickers_here"), "WebP · WebM · TGS", accept=".webp,.webm,.tgs", multiple=True, icon_name="image")
+                    + web.field(T("w_target_fmt"), web.segmented("fmt", fmts, "png", sub=sub))
+                    + web.button(T("btn_convert"), "go", icon_name="sparkles", disabled=True) + web.progress("prog"), icon_name="image")
+    right = web.card(T("w_ready_files"), '<div class="st-grid" id="grid"></div>' + web.empty_state(T("w_files_empty"), "image", id="empty")
+                     + '<a class="pb-btn pb-btn-primary" id="zip" hidden download>' + web.icon("download") + f'<span>{web.esc(T("btn_download_zip"))}</span></a>',
+                     icon_name="folder")
+    hero = web.hero(T("w_title"), T("web_subtitle"), "🎨", chips=["WebP", "WebM", "TGS", "PNG · GIF · MP4"])
+    web.send_page(handler, lang, title=T("w_title"), emoji="🎨", brand="#f59e0b", port=port,
+                  hero_html=hero, body=css + web.grid(left, right, min_width=330), script=STICKER_JS)
+
+
+STICKER_JS = r"""
+const $=s=>document.querySelector(s);let files=[];const go=$('#go');
+$('#fi-zone').addEventListener('pb:files',e=>{files=e.detail;go.disabled=!files.length});
+go.onclick=async()=>{if(!files.length){pb.toast(pb.t('w_need_stickers'),true);return}
+  pb.busy(go,true);const fmt=$('#fmt').dataset.value;const fd=new FormData();fd.append('fmt',fmt);files.forEach(f=>fd.append('files',f));
+  try{const d=await pb.upload('/api/convert',fd,p=>pb.progress('prog',p<100?p:null,p<100?pb.t('uploading',{pct:p}):pb.t('processing')));
+    if(!d.files)throw new Error(d.error||pb.t('error'));pb.progress('prog',100,pb.t('w_processed',{n:d.files.length}));
+    $('#empty').hidden=d.files.length>0;
+    $('#grid').innerHTML=d.files.map(f=>{const u=pb.esc(f.url);const m=fmt==='mp4'?`<video src="${u}" autoplay loop muted playsinline></video>`:(fmt==='json'?`<span class="pb-tag">JSON</span>`:`<img src="${u}" alt="">`);
+      return `<div class="st-cell">${m}<a href="${u}" download="${pb.esc(f.name)}">${pb.esc(f.name)}</a></div>`}).join('');
+    const z=$('#zip');if(d.zipUrl){z.href=d.zipUrl;z.hidden=false}else z.hidden=true;pb.toast(pb.t('done'))}
+  catch(err){pb.hide('prog');pb.toast(pb.t('error')+': '+err.message,true)}finally{pb.busy(go,false)}};
+"""
+
+
 def start_web_studio(port: int) -> None:
     class Handler(http.server.BaseHTTPRequestHandler):
         def log_message(self, fmt: str, *args: Any) -> None:
@@ -196,243 +232,7 @@ def start_web_studio(port: int) -> None:
 
         def do_GET(self) -> None:
             u = urllib.parse.urlparse(self.path)
-            lang = urllib.parse.parse_qs(u.query).get("lang", [current_lang()])[0]
-            rtl_attr = ' dir="rtl"' if is_rtl(lang) else ""
-
-            lang_options = "\n".join(
-                f'<option value="{code}"{" selected" if code == lang else ""}>{html.escape(label)}</option>'
-                for code, label in SUPPORTED_LANGUAGES
-            )
-
-            html_page = f"""<!doctype html>
-<html lang="{lang}"{rtl_attr}>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>{html.escape(t('web_title', lang_override=lang))}</title>
-<style>
-:root {{
-  --bg-deep: #0A0F1A;
-  --bg-card: #121A2B;
-  --bg-input: #0D1322;
-  --accent-cyan: #00D8FF;
-  --accent-emerald: #00E676;
-  --accent-gold: #FFC107;
-  --text-main: #E6F1FF;
-  --text-dim: #8BA0C6;
-  --border: #1F2D4A;
-}}
-* {{ box-sizing: border-box; margin: 0; padding: 0; }}
-body {{
-  background: var(--bg-deep);
-  color: var(--text-main);
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-  padding: 16px;
-  max-width: 680px;
-  margin: 0 auto;
-}}
-header {{
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  border-bottom: 1px solid var(--border);
-  padding-bottom: 12px;
-}}
-.brand {{ font-size: 20px; font-weight: 800; color: var(--accent-cyan); }}
-.lang-sel {{
-  background: var(--bg-input);
-  color: var(--text-main);
-  border: 1px solid var(--border);
-  padding: 6px 10px;
-  border-radius: 8px;
-  font-size: 13px;
-}}
-.card {{
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 20px;
-  margin-bottom: 20px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-}}
-.drop-zone {{
-  border: 2px dashed var(--accent-cyan);
-  border-radius: 12px;
-  padding: 30px 16px;
-  text-align: center;
-  cursor: pointer;
-  background: rgba(0, 216, 255, 0.03);
-  transition: all 0.2s;
-  margin-top: 14px;
-}}
-.drop-zone.dragover {{ background: rgba(0, 216, 255, 0.12); }}
-select, button {{
-  width: 100%;
-  padding: 12px;
-  margin-top: 12px;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: var(--bg-input);
-  color: var(--text-main);
-  font-size: 15px;
-}}
-button.primary {{
-  background: linear-gradient(135deg, #00D8FF, #0088cc);
-  color: #001B2E;
-  font-weight: 700;
-  border: none;
-  cursor: pointer;
-}}
-button.primary:hover {{ opacity: 0.95; }}
-.preview-grid {{
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-  gap: 12px;
-  margin-top: 16px;
-}}
-.preview-item {{
-  background: var(--bg-input);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 8px;
-  text-align: center;
-}}
-.preview-item img, .preview-item video {{
-  max-width: 100%;
-  max-height: 110px;
-  border-radius: 6px;
-  margin-bottom: 6px;
-}}
-.preview-item a {{
-  color: var(--accent-cyan);
-  font-size: 12px;
-  text-decoration: none;
-  font-weight: 600;
-}}
-</style>
-</head>
-<body>
-<header>
-  <div class="brand">🎨 StickerPack Studio</div>
-  <select class="lang-sel" onchange="location.href='/?lang='+this.value">
-    {lang_options}
-  </select>
-</header>
-
-<div class="card">
-  <h2>{html.escape(t('web_title', lang_override=lang))}</h2>
-  <p style="color:var(--text-dim);margin-top:6px;font-size:14px">{html.escape(t('web_subtitle', lang_override=lang))}</p>
-
-  <div class="drop-zone" id="dz" onclick="document.getElementById('fi').click()">
-    <div style="font-size:28px">📥</div>
-    <div style="margin-top:8px;font-weight:600">{html.escape(t('drop_stickers_here', lang_override=lang))}</div>
-    <div style="color:var(--text-dim);font-size:12px;margin-top:4px">WebP • WebM • TGS</div>
-  </div>
-  <input type="file" id="fi" multiple accept=".webp,.webm,.tgs" style="display:none">
-
-  <div style="margin-top:14px">
-    <label style="font-size:13px;color:var(--text-dim)">Целевой формат:</label>
-    <select id="fmt">
-      <option value="png">PNG (Изображение)</option>
-      <option value="gif">GIF (Анимация)</option>
-      <option value="mp4">MP4 (Видео)</option>
-      <option value="webp">WebP</option>
-      <option value="json">Lottie JSON (.tgs)</option>
-    </select>
-  </div>
-
-  <button class="primary" id="btn-cvt" onclick="convertFiles()">{html.escape(t('btn_convert', lang_override=lang))}</button>
-  <div id="status" style="margin-top:12px;font-size:14px;color:var(--accent-gold);text-align:center"></div>
-</div>
-
-<div class="card" id="results-card" style="display:none">
-  <div style="display:flex;justify-content:space-between;align-items:center">
-    <h3>Готовые файлы</h3>
-    <a id="zip-link" style="display:none" href="#"><button class="primary" style="padding:6px 14px;font-size:13px;margin:0">{html.escape(t('btn_download_zip', lang_override=lang))}</button></a>
-  </div>
-  <div class="preview-grid" id="grid"></div>
-</div>
-
-<script>
-let selectedFiles = [];
-const fi = document.getElementById('fi');
-const dz = document.getElementById('dz');
-
-['dragenter', 'dragover'].forEach(e => dz.addEventListener(e, (ev) => {{ ev.preventDefault(); dz.classList.add('dragover'); }}));
-['dragleave', 'drop'].forEach(e => dz.addEventListener(e, (ev) => {{ ev.preventDefault(); dz.classList.remove('dragover'); }}));
-dz.addEventListener('drop', (ev) => {{
-  if (ev.dataTransfer.files) {{
-    selectedFiles = Array.from(ev.dataTransfer.files);
-    updateDropText();
-  }}
-}});
-fi.addEventListener('change', () => {{
-  if (fi.files) {{
-    selectedFiles = Array.from(fi.files);
-    updateDropText();
-  }}
-}});
-
-function updateDropText() {{
-  dz.querySelector('div:nth-child(2)').textContent = `Выбрано файлов: ${{selectedFiles.length}}`;
-}}
-
-async function convertFiles() {{
-  if (!selectedFiles.length) {{
-    alert('Пожалуйста, выберите хотя бы один файл стикера (.webp, .webm, .tgs)!');
-    return;
-  }}
-  const fmt = document.getElementById('fmt').value;
-  const status = document.getElementById('status');
-  status.textContent = 'Обработка...';
-  const grid = document.getElementById('grid');
-  grid.innerHTML = '';
-  document.getElementById('results-card').style.display = 'block';
-
-  const formData = new FormData();
-  formData.append('fmt', fmt);
-  for (const f of selectedFiles) {{
-    formData.append('files', f);
-  }}
-
-  try {{
-    const res = await fetch('/api/convert', {{ method: 'POST', body: formData }});
-    const data = await res.json();
-    status.textContent = `Готово! Обработано файлов: ${{data.files.length}}`;
-
-    if (data.zipUrl) {{
-      const zipLink = document.getElementById('zip-link');
-      zipLink.href = data.zipUrl;
-      zipLink.style.display = 'inline-block';
-    }}
-
-    data.files.forEach(f => {{
-      const div = document.createElement('div');
-      div.className = 'preview-item';
-      let media = '';
-      if (fmt === 'mp4') {{
-        media = `<video src="${{f.url}}" autoplay loop muted playsinline></video>`;
-      }} else {{
-        media = `<img src="${{f.url}}">`;
-      }}
-      div.innerHTML = `${{media}}<br><a href="${{f.url}}" download="${{f.name}}">⬇ ${{f.name}}</a>`;
-      grid.appendChild(div);
-    }});
-  }} catch (err) {{
-    status.textContent = 'Ошибка конвертации: ' + err;
-  }}
-}}
-</script>
-</body>
-</html>
-"""
-            raw = html_page.encode("utf-8")
-            self.send_response(200)
-            self.send_header("Content-Type", "text/html; charset=utf-8")
-            self.send_header("Content-Length", str(len(raw)))
-            self.end_headers()
-            self.wfile.write(raw)
+            render_studio(self, port)
 
         def do_POST(self) -> None:
             if self.path == "/api/convert":

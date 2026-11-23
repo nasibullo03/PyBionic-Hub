@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 import pybionic_core as core
+import pybionic_web as web
 import datetime
 import html
 import http.server
@@ -238,6 +239,76 @@ def complete_habit(user_id: int, habit_id: int) -> tuple[bool, int]:
         return True, new_streak
 
 
+def render_studio(handler: Any, port: int) -> None:
+    lang = web.resolve_lang(handler)
+    T = web.translator(lang)
+    today = datetime.date.today()
+    today_iso = today.isoformat()
+    week_days = [today - datetime.timedelta(days=i) for i in range(6, -1, -1)]
+    with get_conn() as conn:
+        habits = conn.execute("SELECT * FROM habits WHERE user_id = 0 ORDER BY streak DESC, id ASC").fetchall()
+        done_week = {
+            row["done_date"]
+            for row in conn.execute(
+                "SELECT DISTINCT done_date FROM checkins WHERE user_id = 0 AND done_date >= ?",
+                (week_days[0].isoformat(),),
+            ).fetchall()
+        }
+    quotes = t_list("quotes", lang_override=lang)
+    quote = random.choice(quotes) if quotes else pick_quote()
+    css = ("<style>.mv-quote{font-family:'Unbounded','Onest',system-ui,sans-serif;font-weight:500;font-size:clamp(18px,2.4vw,24px);line-height:1.45;padding:22px 24px;border-radius:18px;"
+           "background:linear-gradient(135deg,color-mix(in srgb,var(--brand) 16%,transparent),color-mix(in srgb,var(--brand2) 10%,transparent));border:1px solid var(--line);position:relative}"
+           ".mv-quote:before{content:'“';position:absolute;top:-18px;left:14px;font-size:72px;color:var(--brand);opacity:.35}"
+           ".mv-week{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-top:16px}.mv-day{text-align:center;font-size:12px;color:var(--muted)}"
+           ".mv-day i{display:grid;place-items:center;aspect-ratio:1;border-radius:14px;margin-bottom:6px;font-style:normal;font-weight:700;font-size:15px;"
+           "background:var(--surface2);border:1px solid var(--line);color:var(--muted);transition:transform .2s}"
+           ".mv-day.on i{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;border-color:transparent;box-shadow:0 6px 18px -8px var(--brand)}"
+           ".mv-day.today i{outline:2px solid var(--brand);outline-offset:2px}"
+           ".mv-habit{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:var(--surface2);margin-bottom:8px;transition:transform .2s}"
+           ".mv-habit:hover{transform:translateY(-1px)}.mv-habit b{flex:1;font-weight:600;word-break:break-word}"
+           ".mv-streak{font-size:13px;color:var(--muted);white-space:nowrap}.mv-habit.done .mv-streak{color:#22c55e;font-weight:600}"
+           ".mv-add{display:flex;gap:8px;margin-top:12px}.mv-add .pb-input-wrap,.mv-add>input{flex:1}</style>")
+    days_unit = T("days_unit")
+    rows = []
+    for h in habits:
+        done = h["last_done_date"] == today_iso
+        btn = (web.button(T("w_done"), cls="pb-btn-sm", kind="ghost", icon_name="check", disabled=True) if done
+               else web.button(T("w_mark"), cls="pb-btn-sm mv-check", icon_name="check", **{"data-id": str(h["id"])}))
+        rows.append(f'<div class="mv-habit{" done" if done else ""}"><b>{web.esc(h["title"])}</b>'
+                    f'<span class="mv-streak">🔥 {int(h["streak"] or 0)} {web.esc(days_unit)}</span>{btn}</div>')
+    habits_html = "".join(rows) or web.empty_state(T("w_no_habits"), "list")
+    week_html = "".join(
+        f'<div class="mv-day{" on" if d.isoformat() in done_week else ""}{" today" if d == today else ""}"><i>{d.day}</i>{web.esc(T("w_wd" + str(d.isoweekday())))}</div>'
+        for d in week_days)
+    done_today = sum(1 for h in habits if h["last_done_date"] == today_iso)
+    best = max((int(h["streak"] or 0) for h in habits), default=0)
+    left = web.card(T("w_card_today"),
+        f'<div class="mv-quote">{web.esc(quote)}</div>'
+        + f'<h4 style="margin:18px 0 0">{web.esc(T("w_week"))}</h4><div class="mv-week">{week_html}</div>'
+        + '<div class="pb-row" style="margin-top:16px">' + web.link_button(T("w_card_btn"), "/api/card", kind="ghost", icon_name="image", target="_blank") + "</div>",
+        icon_name="sparkles")
+    right = web.card(T("w_card_habits"),
+        f'<div id="habits">{habits_html}</div>'
+        + '<form class="mv-add" id="add">' + web.input_("title", T("ph_habit_name"), icon_name="plus", maxlength="64", required=True, autocomplete="off")
+        + web.button(re.sub(r"^[^\w(]+", "", T("btn_add_habit")), "addbtn", type="submit", icon_name="plus") + "</form>", icon_name="list")
+    st = web.stats([(T("w_st_habits"), str(len(habits)), None, "list"), (T("w_st_today"), f"{done_today}", None, "check"),
+                    (T("w_st_best"), str(best), None, "zap"), (T("w_st_week"), str(len(done_week)), None, "clock")])
+    hero = web.hero(T("w_title"), T("w_hero"), "🔥", chips=[T("w_chip_streaks"), T("w_chip_quotes"), "PNG"])
+    web.send_page(handler, lang, title=T("w_title"), emoji="🔥", brand="#f97316", port=port, hero_html=hero,
+                  body=css + st + web.grid(left, right, min_width=330), script=MOTIVATOR_JS)
+
+
+MOTIVATOR_JS = r"""
+document.querySelectorAll('.mv-check').forEach(b=>b.onclick=async()=>{pb.busy(b,true);
+  try{const r=await fetch('/api/checkin?id='+b.dataset.id,{method:'POST'});if(!r.ok)throw new Error('HTTP '+r.status);pb.toast(pb.t('w_marked'));setTimeout(()=>location.reload(),500)}
+  catch(e){pb.busy(b,false);pb.toast(pb.t('error_conn'),true)}});
+document.getElementById('add').addEventListener('submit',async e=>{e.preventDefault();const v=document.getElementById('title').value.trim();if(!v)return;
+  const b=document.getElementById('addbtn');pb.busy(b,true);
+  try{await fetch('/api/add_habit',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'title='+encodeURIComponent(v),redirect:'manual'});location.reload()}
+  catch(err){pb.busy(b,false);pb.toast(pb.t('error_conn'),true)}});
+"""
+
+
 def start_web_dashboard(port: int) -> None:
     class Handler(http.server.BaseHTTPRequestHandler):
         def log_message(self, fmt: str, *args: Any) -> None:
@@ -254,225 +325,7 @@ def start_web_dashboard(port: int) -> None:
                 self.wfile.write(png)
                 return
 
-            lang = urllib.parse.parse_qs(u.query).get("lang", [current_lang()])[0]
-            rtl_attr = ' dir="rtl"' if is_rtl(lang) else ""
-
-            lang_options = "\n".join(
-                f'<option value="{code}"{" selected" if code == lang else ""}>{html.escape(label)}</option>'
-                for code, label in SUPPORTED_LANGUAGES
-            )
-
-            today = datetime.date.today()
-            today_iso = today.isoformat()
-            week_days = [(today - datetime.timedelta(days=i)).isoformat() for i in range(6, -1, -1)]
-
-            with get_conn() as conn:
-                habits = conn.execute("SELECT * FROM habits WHERE user_id = 0 ORDER BY streak DESC, id ASC").fetchall()
-                done_week = {
-                    row["done_date"]
-                    for row in conn.execute(
-                        "SELECT DISTINCT done_date FROM checkins WHERE user_id = 0 AND done_date >= ?",
-                        (week_days[0],),
-                    ).fetchall()
-                }
-
-            habit_items_html = ""
-            for h in habits:
-                is_done = h["last_done_date"] == today_iso
-                badge = f'<span class="badge done">✓ {h["streak"]} {html.escape(t("days_unit", lang_override=lang))}</span>' if is_done else f'<span class="badge todo">{h["streak"]} {html.escape(t("days_unit", lang_override=lang))}</span>'
-                btn_state = 'disabled style="opacity:0.5"' if is_done else f'onclick="checkin({h["id"]})"'
-                habit_items_html += f"""
-                <div class="habit-row">
-                  <div>
-                    <div style="font-weight:600;font-size:15px">{html.escape(h["title"])}</div>
-                    <div style="margin-top:4px">{badge}</div>
-                  </div>
-                  <button class="primary check-btn" {btn_state}>{"Выполнено" if is_done else "Отметить"}</button>
-                </div>
-                """
-
-            dots_html = "".join(
-                f'<div class="day-col"><div class="dot {"active" if d in done_week else ""}">{d[-2:]}</div></div>'
-                for d in week_days
-            )
-
-            quote_txt = pick_quote()
-
-            html_page = f"""<!doctype html>
-<html lang="{lang}"{rtl_attr}>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>{html.escape(t('web_title', lang_override=lang))}</title>
-<style>
-:root {{
-  --bg-deep: #0A0F1A;
-  --bg-card: #121A2B;
-  --bg-input: #0D1322;
-  --accent-cyan: #00D8FF;
-  --accent-emerald: #00E676;
-  --accent-gold: #FFC107;
-  --text-main: #E6F1FF;
-  --text-dim: #8BA0C6;
-  --border: #1F2D4A;
-}}
-* {{ box-sizing: border-box; margin: 0; padding: 0; }}
-body {{
-  background: var(--bg-deep);
-  color: var(--text-main);
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-  padding: 16px;
-  max-width: 640px;
-  margin: 0 auto;
-}}
-header {{
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  border-bottom: 1px solid var(--border);
-  padding-bottom: 12px;
-}}
-.brand {{ font-size: 20px; font-weight: 800; color: var(--accent-cyan); }}
-.lang-sel {{
-  background: var(--bg-input);
-  color: var(--text-main);
-  border: 1px solid var(--border);
-  padding: 6px 10px;
-  border-radius: 8px;
-  font-size: 13px;
-}}
-.card {{
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 20px;
-  margin-bottom: 20px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-}}
-.quote-box {{
-  background: var(--bg-input);
-  border-left: 3px solid var(--accent-cyan);
-  padding: 12px 16px;
-  border-radius: 8px;
-  font-style: italic;
-  color: var(--text-main);
-  margin-bottom: 16px;
-  font-size: 14px;
-}}
-.dots-row {{
-  display: flex;
-  justify-content: space-between;
-  margin: 16px 0;
-}}
-.day-col {{ text-align: center; }}
-.dot {{
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: #1C263C;
-  border: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--text-dim);
-}}
-.dot.active {{
-  background: var(--accent-emerald);
-  color: #002511;
-  border-color: var(--accent-cyan);
-  box-shadow: 0 0 10px rgba(0, 230, 118, 0.4);
-}}
-.habit-row {{
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px;
-  background: var(--bg-input);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  margin-top: 10px;
-}}
-.badge {{
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: 12px;
-  font-size: 11px;
-  font-weight: 700;
-}}
-.badge.done {{ background: rgba(0, 230, 118, 0.15); color: var(--accent-emerald); }}
-.badge.todo {{ background: rgba(255, 193, 7, 0.15); color: var(--accent-gold); }}
-button.check-btn {{
-  width: auto;
-  padding: 8px 16px;
-  font-size: 13px;
-}}
-input[type="text"], button {{
-  width: 100%;
-  padding: 12px;
-  margin-top: 10px;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: var(--bg-input);
-  color: var(--text-main);
-  font-size: 15px;
-}}
-button.primary {{
-  background: linear-gradient(135deg, #00D8FF, #0088cc);
-  color: #001B2E;
-  font-weight: 700;
-  border: none;
-  cursor: pointer;
-}}
-button.primary:hover {{ opacity: 0.95; }}
-</style>
-</head>
-<body>
-<header>
-  <div class="brand">🔥 Motivator & Habits Pro</div>
-  <select class="lang-sel" onchange="location.href='/?lang='+this.value">
-    {lang_options}
-  </select>
-</header>
-
-<div class="card">
-  <div class="quote-box">“{html.escape(quote_txt)}”</div>
-  <h3>Активность за последние 7 дней</h3>
-  <div class="dots-row">
-    {dots_html}
-  </div>
-  <a href="/api/card" target="_blank"><button style="background:#1F2D4A;color:#00D8FF">🖼 Скачать визуальную карточку прогресса</button></a>
-</div>
-
-<div class="card">
-  <h3>Мои привычки</h3>
-  <div id="habits-list">
-    {habit_items_html or '<div style="color:var(--text-dim);margin-top:10px">Список привычек пуст. Добавьте первую привычку ниже!</div>'}
-  </div>
-
-  <form method="POST" action="/api/add_habit" style="margin-top:16px">
-    <input type="text" name="title" placeholder="{html.escape(t('ph_habit_name', lang_override=lang))}" required>
-    <button type="submit" class="primary">{html.escape(t('btn_add_habit', lang_override=lang))}</button>
-  </form>
-</div>
-
-<script>
-async function checkin(id) {{
-  await fetch('/api/checkin?id=' + id, {{ method: 'POST' }});
-  location.reload();
-}}
-</script>
-</body>
-</html>
-"""
-            raw = html_page.encode("utf-8")
-            self.send_response(200)
-            self.send_header("Content-Type", "text/html; charset=utf-8")
-            self.send_header("Content-Length", str(len(raw)))
-            self.end_headers()
-            self.wfile.write(raw)
+            render_studio(self, port)
 
         def do_POST(self) -> None:
             u = urllib.parse.urlparse(self.path)

@@ -14,6 +14,7 @@ Features:
 from __future__ import annotations
 
 import pybionic_core as core
+import pybionic_web as web
 import html
 import io
 import json
@@ -787,242 +788,42 @@ def setup_bot(bot: Any) -> None:
 # ---------------------------------------------------------------------------
 # Cyberpunk Web Studio HTTP Handler (Interactive Chapter Editor Table)
 # ---------------------------------------------------------------------------
-WEB_STUDIO_HTML = """<!DOCTYPE html>
-<html lang="ru">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Audiobook Chapterizer Studio</title>
-<style>
-  :root {
-    --bg-dark: #0a0f1d;
-    --card-bg: #111a2e;
-    --accent-emerald: #10b981;
-    --accent-teal: #14b8a6;
-    --text-primary: #f1f5f9;
-    --text-muted: #94a3b8;
-    --border-color: #1e293b;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    background: radial-gradient(circle at top right, #132e27 0%, var(--bg-dark) 100%);
-    color: var(--text-primary);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    min-height: 100vh;
-    padding: 24px 16px;
-  }
-  .container { max-width: 950px; margin: 0 auto; }
-  header {
-    text-align: center;
-    margin-bottom: 24px;
-    padding-bottom: 16px;
-    border-bottom: 1px solid var(--border-color);
-  }
-  h1 {
-    font-size: 2.2rem;
-    font-weight: 800;
-    background: linear-gradient(135deg, var(--accent-emerald) 0%, var(--accent-teal) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin-bottom: 8px;
-  }
-  .badge {
-    display: inline-block;
-    padding: 4px 12px;
-    border-radius: 9999px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    background: rgba(16, 185, 129, 0.15);
-    color: var(--accent-emerald);
-    border: 1px solid rgba(16, 185, 129, 0.3);
-    margin-bottom: 8px;
-    text-transform: uppercase;
-  }
-  p.subtitle { color: var(--text-muted); font-size: 0.95rem; }
+def render_studio(handler: Any) -> None:
+    lang = web.resolve_lang(handler)
+    T = web.translator(lang)
+    up = web.card(T("w_card_file"), web.dropzone("bf", T("drop_or_click"), T("w_formats"), accept="audio/*", icon_name="music")
+                  + web.progress("scan"), icon_name="upload")
+    ch = web.card(T("w_card_chapters"), web.note(T("w_edit_hint"), icon_name="list")
+                  + web.table(["#", T("w_start"), T("w_end"), T("w_ch_title")], [], T("w_no_chapters"), id="chtab", raw=True)
+                  + '<div class="pb-row">' + web.button(T("w_build_m4b"), "b-m4b", icon_name="download", disabled=True)
+                  + web.button(T("w_build_zip"), "b-zip", kind="ghost", icon_name="folder", disabled=True) + "</div>"
+                  + web.progress("build"), icon_name="list", aside='<span class="pb-tag" id="chcount">0</span>')
+    hero = web.hero(T("w_title"), T("w_hero"), "📚", chips=["M4B", "ZIP", "MP3 · M4A · FLAC · WAV"])
+    web.send_page(handler, lang, title=T("w_title"), emoji="📚", brand="#d97706", port=WEB_PORT,
+                  hero_html=hero, body=up + ch, script=AB_JS)
 
-  .card {
-    background: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 16px;
-    padding: 24px;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
-    margin-bottom: 24px;
-  }
-  .card h2 {
-    font-size: 1.15rem;
-    margin-bottom: 16px;
-    color: var(--accent-emerald);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
 
-  .dropzone {
-    border: 2px dashed rgba(16, 185, 129, 0.3);
-    border-radius: 12px;
-    padding: 24px 16px;
-    text-align: center;
-    cursor: pointer;
-    background: rgba(0, 0, 0, 0.2);
-    transition: all 0.2s;
-  }
-  .dropzone:hover { border-color: var(--accent-emerald); }
-
-  .chapter-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 16px;
-    font-size: 0.85rem;
-  }
-  .chapter-table th, .chapter-table td {
-    padding: 10px 12px;
-    text-align: left;
-    border-bottom: 1px solid #1e293b;
-  }
-  .chapter-table th { color: var(--text-muted); font-weight: 600; }
-  .chapter-table input {
-    background: #0d1527;
-    border: 1px solid #1e293b;
-    border-radius: 6px;
-    padding: 6px 10px;
-    color: var(--text-primary);
-    width: 100%;
-    outline: none;
-  }
-  .chapter-table input:focus { border-color: var(--accent-emerald); }
-
-  .btn-row {
-    display: flex;
-    gap: 12px;
-    margin-top: 16px;
-  }
-  .action-btn {
-    flex: 1;
-    padding: 14px;
-    border-radius: 10px;
-    border: none;
-    background: linear-gradient(135deg, var(--accent-emerald) 0%, var(--accent-teal) 100%);
-    color: #051410;
-    font-weight: 700;
-    font-size: 0.95rem;
-    cursor: pointer;
-    transition: transform 0.1s ease;
-  }
-  .action-btn:hover { transform: translateY(-1px); }
-  .action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-</style>
-</head>
-<body>
-<div class="container">
-  <header>
-    <div class="badge">Audiobook Studio • Port 8099</div>
-    <h1>Audiobook Chapterizer Studio</h1>
-    <p class="subtitle">Автодетектор глав по тишине, экспорт в M4B и нарезка треков в ZIP</p>
-  </header>
-
-  <div class="card">
-    <h2>📁 1. Выберите файл книги или подкаста</h2>
-    <div class="dropzone" id="dropzone" onclick="document.getElementById('fileInput').click()">
-      <strong id="filePrompt">Нажмите или перетащите аудиофайл книги</strong>
-      <p style="font-size:0.8rem; color:var(--text-muted); margin-top:4px;">MP3, M4A, FLAC, WAV (до 2 ГБ)</p>
-    </div>
-    <input type="file" id="fileInput" accept="audio/*" onchange="onFileSelected(this)" style="display:none">
-  </div>
-
-  <div class="card" id="chaptersCard" style="display:none;">
-    <h2>📑 2. Интерактивная таблица глав</h2>
-    <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:12px;">
-      Вы можете отредактировать названия глав перед созданием книги M4B или ZIP архива:
-    </p>
-
-    <table class="chapter-table">
-      <thead>
-        <tr>
-          <th style="width:10%;">#</th>
-          <th style="width:25%;">Начало (сек)</th>
-          <th style="width:25%;">Конец (сек)</th>
-          <th style="width:40%;">Название главы</th>
-        </tr>
-      </thead>
-      <tbody id="chapterTableBody"></tbody>
-    </table>
-
-    <div class="btn-row">
-      <button id="btnBuildM4b" class="action-btn" onclick="buildOutput('m4b')">📥 Скачать M4B с главами</button>
-      <button id="btnBuildZip" class="action-btn" style="background:#1e293b; color:var(--text-primary);" onclick="buildOutput('split')">✂️ Скачать ZIP с треками</button>
-    </div>
-  </div>
-</div>
-
-<script>
-let currentFile = null;
-let detectedChapters = [];
-
-function onFileSelected(input) {
-  if (input.files && input.files[0]) {
-    currentFile = input.files[0];
-    document.getElementById('filePrompt').innerText = 'Анализ пауз тишины: ' + currentFile.name + '…';
-    scanSilence();
-  }
-}
-
-async function scanSilence() {
-  const formData = new FormData();
-  formData.append('file', currentFile);
-  try {
-    const resp = await fetch('/api/detect', { method: 'POST', body: formData });
-    if (!resp.ok) throw new Error(await resp.text());
-    detectedChapters = await resp.json();
-
-    const tbody = document.getElementById('chapterTableBody');
-    tbody.innerHTML = '';
-    detectedChapters.forEach((ch, idx) => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = 
-        '<td>' + (idx + 1) + '</td>' +
-        '<td>' + ch.start_sec.toFixed(1) + 's</td>' +
-        '<td>' + ch.end_sec.toFixed(1) + 's</td>' +
-        '<td><input type="text" value="' + ch.title + '" onchange="detectedChapters[' + idx + '].title = this.value"></td>';
-      tbody.appendChild(tr);
-    });
-
-    document.getElementById('filePrompt').innerText = 'Файл: ' + currentFile.name + ' (найдено глав: ' + detectedChapters.length + ')';
-    document.getElementById('chaptersCard').style.display = 'block';
-  } catch (err) {
-    alert('Ошибка анализа: ' + err.message);
-  }
-}
-
-async function buildOutput(mode) {
-  if (!currentFile || !detectedChapters.length) return;
-  const btn = mode === 'm4b' ? document.getElementById('btnBuildM4b') : document.getElementById('btnBuildZip');
-  btn.disabled = true;
-  btn.innerText = 'Сборка ' + mode.toUpperCase() + '…';
-
-  const formData = new FormData();
-  formData.append('file', currentFile);
-  formData.append('mode', mode);
-  formData.append('chapters', JSON.stringify(detectedChapters));
-
-  try {
-    const resp = await fetch('/api/build', { method: 'POST', body: formData });
-    if (!resp.ok) throw new Error(await resp.text());
-    const data = await resp.json();
-
-    const a = document.createElement('a');
-    a.href = '/download/' + data.filename;
-    a.download = data.filename;
-    a.click();
-  } catch (err) {
-    alert('Ошибка сборки: ' + err.message);
-  } finally {
-    btn.disabled = false;
-    btn.innerText = mode === 'm4b' ? '📥 Скачать M4B с главами' : '✂️ Скачать ZIP с треками';
-  }
-}
-</script>
-</body>
-</html>
+AB_JS = r"""
+const $=s=>document.querySelector(s);let file=null,chapters=[];
+const fmt=s=>{s=+s||0;const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=Math.floor(s%60);return (h?h+':'+String(m).padStart(2,'0'):m)+':'+String(x).padStart(2,'0')};
+function paint(){const tb=$('#chtab tbody');$('#chcount').textContent=chapters.length;
+  $('#b-m4b').disabled=$('#b-zip').disabled=!chapters.length;
+  if(!chapters.length){tb.innerHTML=`<tr class="pb-empty-row"><td colspan="4">${pb.esc(pb.t('w_no_chapters'))}</td></tr>`;return}
+  tb.innerHTML=chapters.map((c,i)=>`<tr><td>${i+1}</td><td>${fmt(c.start_sec)}</td><td>${fmt(c.end_sec)}</td>
+    <td><input class="pb-input" data-i="${i}" value="${pb.esc(c.title)}" style="min-height:36px;padding:6px 10px"></td></tr>`).join('')}
+$('#chtab').addEventListener('input',e=>{const i=e.target.dataset.i;if(i!=null)chapters[i].title=e.target.value});
+$('#bf-zone').addEventListener('pb:files',async e=>{file=e.detail[0]||null;chapters=[];paint();if(!file)return;
+  const fd=new FormData();fd.append('file',file);
+  try{const d=await pb.upload('/api/detect',fd,p=>pb.progress('scan',p<100?p:null,p<100?pb.t('uploading',{pct:p}):pb.t('w_scanning')));
+    if(!Array.isArray(d))throw new Error(d.error||pb.t('error'));chapters=d;pb.progress('scan',100,pb.t('w_found',{n:d.length}));paint()}
+  catch(err){pb.hide('scan');pb.toast(pb.t('error')+': '+err.message,true)}});
+async function build(mode,btn){if(!file||!chapters.length)return;pb.busy(btn,true);
+  const fd=new FormData();fd.append('file',file);fd.append('mode',mode);fd.append('chapters',JSON.stringify(chapters));
+  try{const d=await pb.upload('/api/build',fd,p=>pb.progress('build',p<100?p:null,p<100?pb.t('uploading',{pct:p}):pb.t('w_building')));
+    if(d.error||!d.filename)throw new Error(d.error||pb.t('error'));pb.progress('build',100,pb.t('done'));
+    const a=document.createElement('a');a.href='/download/'+encodeURIComponent(d.filename);a.download=d.filename;document.body.appendChild(a);a.click();a.remove();pb.toast(pb.t('done'))}
+  catch(err){pb.hide('build');pb.toast(pb.t('error')+': '+err.message,true)}finally{pb.busy(btn,false)}}
+$('#b-m4b').onclick=e=>build('m4b',e.currentTarget);$('#b-zip').onclick=e=>build('split',e.currentTarget);
 """
 
 
@@ -1035,11 +836,7 @@ class WebStudioHandler(BaseHTTPRequestHandler):
         path = parsed.path
 
         if path in ("/", "/index.html"):
-            self.send_response(HTTPStatus.OK)
-            self.send_header("Content-Type", "text/html; charset=utf-8")
-            self.send_header("Cache-Control", "no-cache")
-            self.end_headers()
-            self.wfile.write(WEB_STUDIO_HTML.encode("utf-8"))
+            render_studio(self)
             return
 
         if path == "/api/status":

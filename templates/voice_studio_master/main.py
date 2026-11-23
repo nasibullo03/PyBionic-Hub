@@ -12,6 +12,7 @@ Features:
 from __future__ import annotations
 
 import pybionic_core as core
+import pybionic_web as web
 import html
 import io
 import json
@@ -699,307 +700,58 @@ def setup_bot(bot: Any) -> None:
 # ---------------------------------------------------------------------------
 # Cyberpunk Web Studio HTTP Handler (Mic recording + Live Playback)
 # ---------------------------------------------------------------------------
-WEB_STUDIO_HTML = """<!DOCTYPE html>
-<html lang="ru">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Voice Studio Master</title>
-<style>
-  :root {
-    --bg-dark: #090d16;
-    --card-bg: #121824;
-    --accent-gold: #ffb703;
-    --accent-orange: #fb8500;
-    --accent-cyan: #00f5ff;
-    --text-primary: #f3f4f6;
-    --text-muted: #9ca3af;
-    --border-color: #1f293d;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    background: radial-gradient(circle at top right, #1f1d36 0%, var(--bg-dark) 100%);
-    color: var(--text-primary);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    min-height: 100vh;
-    padding: 24px 16px;
-  }
-  .container { max-width: 900px; margin: 0 auto; }
-  header {
-    text-align: center;
-    margin-bottom: 28px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid var(--border-color);
-  }
-  h1 {
-    font-size: 2.2rem;
-    font-weight: 800;
-    background: linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-orange) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin-bottom: 8px;
-  }
-  .badge {
-    display: inline-block;
-    padding: 4px 12px;
-    border-radius: 9999px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    background: rgba(255, 183, 3, 0.15);
-    color: var(--accent-gold);
-    border: 1px solid rgba(255, 183, 3, 0.3);
-    margin-bottom: 8px;
-    text-transform: uppercase;
-  }
-  p.subtitle { color: var(--text-muted); font-size: 0.95rem; }
+VOICE_FX = ["podcast_clean", "radio_broadcast", "deep_pitch", "chipmunk", "vocoder_robot", "cathedral_reverb", "megaphone", "lofi_tape"]
+VOICE_FX_EMOJI = {"podcast_clean": "🎙", "radio_broadcast": "📻", "deep_pitch": "👹", "chipmunk": "🐿", "vocoder_robot": "🤖",
+                  "cathedral_reverb": "🏛", "megaphone": "📢", "lofi_tape": "📼"}
+VOICE_CSS = """<style>
+.vs-mic{display:grid;justify-items:center;gap:10px;padding:8px 0}
+.vs-mic button{width:96px;height:96px;border-radius:50%;border:0;cursor:pointer;color:#fff;background:linear-gradient(135deg,var(--brand),var(--brand2));
+box-shadow:0 14px 34px -12px var(--brand);display:grid;place-items:center;transition:transform .2s var(--ease)}
+.vs-mic button:hover{transform:scale(1.05)}.vs-mic button.rec{background:var(--bad);animation:vsrec 1.3s infinite}
+@keyframes vsrec{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--bad) 55%,transparent)}100%{box-shadow:0 0 0 22px transparent}}
+.vs-or{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.08em}
+.vs-or::before,.vs-or::after{content:"";flex:1;height:1px;background:var(--line)}
+#fx .pb-seg-btn{justify-items:start;text-align:start}#fx{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+</style>"""
 
-  .grid { display: grid; grid-template-columns: 1fr; gap: 24px; }
-  @media(min-width: 768px) { .grid { grid-template-columns: 1fr 1fr; } }
 
-  .card {
-    background: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 16px;
-    padding: 24px;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
-  }
-  .card h2 {
-    font-size: 1.15rem;
-    margin-bottom: 16px;
-    color: var(--accent-gold);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
+def render_studio(handler: Any) -> None:
+    lang = web.resolve_lang(handler)
+    T = web.translator(lang)
+    src = web.card(T("w_card_source"),
+        f'<div class="vs-mic"><button id="mic" type="button" aria-label="{web.esc(T("w_record"), quote=True)}">{web.icon("mic", 38)}</button>'
+        f'<p class="pb-hint" id="mic-st">{web.esc(T("w_record"))}</p></div>'
+        f'<div class="vs-or">{web.esc(T("w_or_file"))}</div>'
+        + web.dropzone("vf", T("drop_or_click"), T("w_formats"), accept="audio/*,video/*", icon_name="music"), icon_name="mic")
+    fx = web.segmented("fx", [(k, f"{VOICE_FX_EMOJI[k]} {T('w_fx_' + k)}") for k in VOICE_FX], "podcast_clean",
+                       sub={k: T("w_fx_" + k + "_sub") for k in VOICE_FX})
+    fx_card = web.card(T("w_card_fx"), fx + web.button(T("w_apply"), "go", icon_name="sparkles", disabled=True)
+                       + web.progress("prog") + web.result_box("res"), icon_name="sparkles")
+    hero = web.hero(T("w_title"), T("w_hero"), "🎙", chips=["EBU R128", "8 FX", "MP3"])
+    web.send_page(handler, lang, title=T("w_title"), emoji="🎙", brand="#e0457b", port=WEB_PORT,
+                  hero_html=hero, body=VOICE_CSS + web.grid(src, fx_card, min_width=340), script=VOICE_JS)
 
-  .mic-box {
-    text-align: center;
-    padding: 24px;
-    background: rgba(0, 0, 0, 0.3);
-    border-radius: 12px;
-    border: 1px dashed rgba(255, 183, 3, 0.3);
-    margin-bottom: 16px;
-  }
-  .mic-btn {
-    width: 72px;
-    height: 72px;
-    border-radius: 50%;
-    border: none;
-    background: linear-gradient(135deg, var(--accent-gold), var(--accent-orange));
-    color: #090d16;
-    font-size: 28px;
-    cursor: pointer;
-    box-shadow: 0 0 20px rgba(255, 183, 3, 0.4);
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
-  .mic-btn.recording {
-    background: #ef4444;
-    box-shadow: 0 0 25px rgba(239, 68, 68, 0.8);
-    animation: pulse 1.2s infinite;
-  }
-  @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.08); } 100% { transform: scale(1); } }
 
-  .fx-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 16px;
-  }
-  .fx-card {
-    background: #172033;
-    border: 1px solid #23304a;
-    border-radius: 10px;
-    padding: 12px;
-    cursor: pointer;
-    transition: all 0.15s ease;
-  }
-  .fx-card:hover, .fx-card.active {
-    border-color: var(--accent-gold);
-    background: rgba(255, 183, 3, 0.12);
-  }
-  .fx-title { font-weight: 700; font-size: 0.9rem; margin-bottom: 4px; }
-  .fx-desc { font-size: 0.75rem; color: var(--text-muted); }
-
-  .action-btn {
-    width: 100%;
-    padding: 14px;
-    border-radius: 10px;
-    border: none;
-    background: linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-orange) 100%);
-    color: #090d16;
-    font-weight: 700;
-    font-size: 1rem;
-    cursor: pointer;
-    box-shadow: 0 4px 15px rgba(255, 183, 3, 0.3);
-    transition: transform 0.1s ease;
-  }
-  .action-btn:hover { transform: translateY(-1px); }
-  .action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-  audio { width: 100%; margin-top: 16px; border-radius: 8px; }
-  .download-btn {
-    display: block;
-    text-align: center;
-    background: var(--accent-gold);
-    color: #090d16;
-    font-weight: 700;
-    padding: 12px;
-    border-radius: 8px;
-    text-decoration: none;
-    margin-top: 12px;
-  }
-</style>
-</head>
-<body>
-<div class="container">
-  <header>
-    <div class="badge">Studio Master • Port 8097</div>
-    <h1>Voice Studio Master</h1>
-    <p class="subtitle">Студийная постобработка голоса, компрессия EBU R128 и вокальные FX</p>
-  </header>
-
-  <div class="grid">
-    <div class="card">
-      <h2>🎙 1. Запись или загрузка</h2>
-      <div class="mic-box">
-        <button id="micBtn" class="mic-btn" onclick="toggleRecording()">🎤</button>
-        <p id="micStatus" style="font-size:0.85rem; margin-top:10px; color:var(--text-muted);">Нажмите микрофон для записи</p>
-      </div>
-
-      <div style="text-align:center; margin-bottom:12px; color:var(--text-muted); font-size:0.8rem;">— ИЛИ ВЫБЕРИТЕ ФАЙЛ —</div>
-      <input type="file" id="audioFileInput" accept="audio/*,video/*" onchange="onFileChosen(this)" style="display:none">
-      <button class="action-btn" style="background:#1f293d; color:var(--text-primary); box-shadow:none;" onclick="document.getElementById('audioFileInput').click()">📁 Загрузить аудио/голосовое</button>
-      <p id="fileChosenLabel" style="font-size:0.8rem; margin-top:8px; color:var(--accent-gold); text-align:center;"></p>
-    </div>
-
-    <div class="card">
-      <h2>✨ 2. Выберите эффект</h2>
-      <div class="fx-grid">
-        <div class="fx-card active" onclick="selectFx('podcast_clean', this)">
-          <div class="fx-title">🎙 Подкаст Clean</div>
-          <div class="fx-desc">EBU R128, компрессор, срез инфрагула</div>
-        </div>
-        <div class="fx-card" onclick="selectFx('radio_broadcast', this)">
-          <div class="fx-title">📻 Радио Эфир</div>
-          <div class="fx-desc">300-3400 Гц + мягкий сатуратор</div>
-        </div>
-        <div class="fx-card" onclick="selectFx('deep_pitch', this)">
-          <div class="fx-title">👹 Глубокий Бас</div>
-          <div class="fx-desc">Снижение питча на 4 полутона</div>
-        </div>
-        <div class="fx-card" onclick="selectFx('chipmunk', this)">
-          <div class="fx-title">🐿 Бурундук / Аниме</div>
-          <div class="fx-desc">Повышение тональности на 5 полутонов</div>
-        </div>
-        <div class="fx-card" onclick="selectFx('vocoder_robot', this)">
-          <div class="fx-title">🤖 Вокодер / Робот</div>
-          <div class="fx-desc">Модуляция частоты и тремоло</div>
-        </div>
-        <div class="fx-card" onclick="selectFx('cathedral_reverb', this)">
-          <div class="fx-title">🏛 Соборное Эхо</div>
-          <div class="fx-desc">Глубокая пространственная реверберация</div>
-        </div>
-        <div class="fx-card" onclick="selectFx('megaphone', this)">
-          <div class="fx-title">📢 Мегафон / Рация</div>
-          <div class="fx-desc">Акустический перегруз рации</div>
-        </div>
-        <div class="fx-card" onclick="selectFx('lofi_tape', this)">
-          <div class="fx-title">📼 Lo-Fi Кассета</div>
-          <div class="fx-desc">Винтажная лента с флаттером</div>
-        </div>
-      </div>
-
-      <button id="renderBtn" class="action-btn" onclick="applyEffect()" disabled>⚡ Применить студийный эффект</button>
-
-      <div id="resultBlock" style="display:none; margin-top:16px;">
-        <h3 style="color:var(--accent-gold); font-size:1rem; margin-bottom:8px;">🎧 Результат:</h3>
-        <audio id="audioPlayer" controls></audio>
-        <a id="downloadBtn" class="download-btn" href="#" download>📥 Скачать обработанный звук</a>
-      </div>
-    </div>
-  </div>
-</div>
-
-<script>
-let currentBlob = null;
-let currentFx = 'podcast_clean';
-let mediaRecorder = null;
-let audioChunks = [];
-
-function selectFx(fx, el) {
-  currentFx = fx;
-  document.querySelectorAll('.fx-card').forEach(c => c.classList.remove('active'));
-  el.classList.add('active');
-}
-
-function onFileChosen(input) {
-  if (input.files && input.files[0]) {
-    currentBlob = input.files[0];
-    document.getElementById('fileChosenLabel').innerText = 'Выбран файл: ' + currentBlob.name;
-    document.getElementById('renderBtn').disabled = false;
-  }
-}
-
-async function toggleRecording() {
-  const btn = document.getElementById('micBtn');
-  const status = document.getElementById('micStatus');
-  if (mediaRecorder && mediaRecorder.state === 'recording') {
-    mediaRecorder.stop();
-    btn.classList.remove('recording');
-    btn.innerText = '🎤';
-    status.innerText = 'Запись остановлена. Готово к обработке.';
-  } else {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      mediaRecorder = new MediaRecorder(stream);
-      audioChunks = [];
-      mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-      mediaRecorder.onstop = () => {
-        currentBlob = new Blob(audioChunks, { type: 'audio/ogg' });
-        document.getElementById('fileChosenLabel').innerText = 'Запись с микрофона готова (' + (currentBlob.size / 1024).toFixed(1) + ' KB)';
-        document.getElementById('renderBtn').disabled = false;
-      };
-      mediaRecorder.start();
-      btn.classList.add('recording');
-      btn.innerText = '⏹';
-      status.innerText = 'Идет запись… Нажмите для остановки';
-    } catch(err) {
-      alert('Ошибка доступа к микрофону: ' + err.message);
-    }
-  }
-}
-
-async function applyEffect() {
-  if (!currentBlob) return;
-  const btn = document.getElementById('renderBtn');
-  btn.disabled = true;
-  btn.innerText = 'Обработка на сервере…';
-
-  const formData = new FormData();
-  formData.append('file', currentBlob, 'recording.ogg');
-  formData.append('effect', currentFx);
-  formData.append('format', 'mp3');
-
-  try {
-    const resp = await fetch('/api/process', { method: 'POST', body: formData });
-    if (!resp.ok) throw new Error(await resp.text());
-    const data = await resp.json();
-
-    const player = document.getElementById('audioPlayer');
-    player.src = '/download/' + data.filename;
-    document.getElementById('downloadBtn').href = '/download/' + data.filename;
-    document.getElementById('downloadBtn').download = data.filename;
-    document.getElementById('resultBlock').style.display = 'block';
-  } catch (err) {
-    alert('Ошибка: ' + err.message);
-  } finally {
-    btn.disabled = false;
-    btn.innerText = '⚡ Применить студийный эффект';
-  }
-}
-</script>
-</body>
-</html>
+VOICE_JS = r"""
+const $=s=>document.querySelector(s);let blob=null,rec=null,chunks=[];const go=$('#go');
+const ready=b=>{blob=b;go.disabled=!b};
+$('#vf-zone').addEventListener('pb:files',e=>ready(e.detail[0]||null));
+$('#mic').onclick=async()=>{const btn=$('#mic'),st=$('#mic-st');
+  if(rec&&rec.state==='recording'){rec.stop();btn.classList.remove('rec');return}
+  try{const stream=await navigator.mediaDevices.getUserMedia({audio:true});rec=new MediaRecorder(stream);chunks=[];
+    rec.ondataavailable=e=>chunks.push(e.data);
+    rec.onstop=()=>{stream.getTracks().forEach(t=>t.stop());const b=new Blob(chunks,{type:rec.mimeType||'audio/webm'});ready(b);st.textContent=pb.t('w_rec_ready',{size:pb.bytes(b.size)})};
+    rec.start();btn.classList.add('rec');st.textContent=pb.t('w_recording');
+  }catch(err){pb.toast(pb.t('w_mic_denied'),true)}};
+go.onclick=async()=>{if(!blob){pb.toast(pb.t('w_need_file'),true);return}
+  pb.busy(go,true);pb.hide('res');
+  const fd=new FormData();fd.append('file',blob,blob.name||'recording.ogg');fd.append('effect',$('#fx').dataset.value);fd.append('format','mp3');
+  try{const d=await pb.upload('/api/process',fd,p=>pb.progress('prog',p<100?p:null,p<100?pb.t('uploading',{pct:p}):pb.t('processing')));
+    if(d.error||!d.filename)throw new Error(d.error||pb.t('error'));
+    pb.progress('prog',100,pb.t('done'));const u='/download/'+encodeURIComponent(d.filename);const r=$('#res');r.className='pb-result';r.hidden=false;
+    r.innerHTML=`<b>${pb.t('w_result_title')}</b><audio controls src="${u}"></audio><a class="pb-btn pb-btn-primary" href="${u}" download="${pb.esc(d.filename)}">${pb.t('download')}</a>`;
+    pb.toast(pb.t('done'));
+  }catch(err){pb.hide('prog');pb.toast(pb.t('error')+': '+err.message,true)}finally{pb.busy(go,false)}};
 """
 
 
@@ -1012,11 +764,7 @@ class WebStudioHandler(BaseHTTPRequestHandler):
         path = parsed.path
 
         if path in ("/", "/index.html"):
-            self.send_response(HTTPStatus.OK)
-            self.send_header("Content-Type", "text/html; charset=utf-8")
-            self.send_header("Cache-Control", "no-cache")
-            self.end_headers()
-            self.wfile.write(WEB_STUDIO_HTML.encode("utf-8"))
+            render_studio(self)
             return
 
         if path == "/api/status":

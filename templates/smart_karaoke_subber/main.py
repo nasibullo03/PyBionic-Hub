@@ -13,6 +13,7 @@ Features:
 from __future__ import annotations
 
 import pybionic_core as core
+import pybionic_web as web
 import html
 import http.server
 import json
@@ -424,6 +425,35 @@ def render_karaoke_video(
 # Offline Web Studio (Port 8095)
 # ---------------------------------------------------------------------------
 
+def render_studio(handler: Any, port: int) -> None:
+    lang = web.resolve_lang(handler)
+    T = web.translator(lang)
+    left = web.card(T("w_card_song"), web.dropzone("mf", T("web_drop_prompt"), "MP3, WAV, OGG, MP4, MOV, MKV", accept="audio/*,video/*", icon_name="music")
+                    + web.field(T("web_lyrics_prompt"), web.textarea("lyrics", T("w_lyrics_ph"), rows=9), hint=T("w_lyrics_hint")), icon_name="music")
+    styles = [("neon", "✨ Neon"), ("gold", "🌟 Gold"), ("tiktok", "📱 TikTok"), ("minimal", "⚪ Minimal")]
+    sub = {"neon": T("w_st_neon"), "gold": T("w_st_gold"), "tiktok": T("w_st_tiktok"), "minimal": T("w_st_minimal")}
+    right = web.card(T("web_style_label"), web.segmented("style", styles, "neon", sub=sub)
+                     + web.button(T("web_btn_render"), "go", disabled=True) + web.progress("prog") + web.result_box("res"), icon_name="sparkles")
+    hero = web.hero(T("w_title"), T("web_subtitle"), "🎤", chips=["LRC", "MP4", "Neon · Gold · TikTok"])
+    web.send_page(handler, lang, title=T("w_title"), emoji="🎤", brand="#ec4899", port=port,
+                  hero_html=hero, body=web.grid(left, right, min_width=330), script=KARAOKE_JS)
+
+
+KARAOKE_JS = r"""
+const $=s=>document.querySelector(s);let file=null;const go=$('#go');
+$('#mf-zone').addEventListener('pb:files',e=>{file=e.detail[0]||null;go.disabled=!file});
+go.onclick=async()=>{if(!file){pb.toast(pb.t('need_file'),true);return}
+  if(!$('#lyrics').value.trim()){pb.toast(pb.t('w_need_lyrics'),true);$('#lyrics').focus();return}
+  pb.busy(go,true);pb.hide('res');
+  const fd=new FormData();fd.append('media',file);fd.append('lyrics',$('#lyrics').value);fd.append('style',$('#style').dataset.value);
+  try{const d=await pb.upload('/api/render',fd,p=>pb.progress('prog',p<100?p:null,p<100?pb.t('uploading',{pct:p}):pb.t('w_rendering')));
+    if(!d.ok)throw new Error(d.error||pb.t('error'));pb.progress('prog',100,pb.t('done'));
+    const r=$('#res');r.className='pb-result';r.hidden=false;
+    r.innerHTML=`<video controls playsinline src="${pb.esc(d.download_url)}"></video><a class="pb-btn pb-btn-primary" href="${pb.esc(d.download_url)}" download>${pb.t('download')} · ${pb.esc(d.size_kb)} KB</a>`;
+    pb.toast(pb.t('done'))}catch(err){pb.hide('prog');pb.toast(pb.t('error')+': '+err.message,true)}finally{pb.busy(go,false)}};
+"""
+
+
 def start_web_studio(port: int = 8095) -> None:
     cache_dir = get_cache_dir()
 
@@ -465,286 +495,7 @@ def start_web_studio(port: int = 8095) -> None:
                 self.send_error(404)
                 return
 
-            lang = urllib.parse.parse_qs(u.query).get("lang", [current_lang()])[0]
-            rtl_attr = ' dir="rtl"' if is_rtl(lang) else ""
-
-            lang_options = "\n".join(
-                f'<option value="{code}"{" selected" if code == lang else ""}>{html.escape(label)}</option>'
-                for code, label in SUPPORTED_LANGUAGES
-            )
-
-            html_page = f"""<!doctype html>
-<html lang="{lang}"{rtl_attr}>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>{html.escape(t('web_title', lang_override=lang))}</title>
-<style>
-:root {{
-  --bg-deep: #0A0F1A;
-  --bg-card: #121A2B;
-  --bg-input: #0D1322;
-  --accent-cyan: #00D8FF;
-  --accent-magenta: #FF0055;
-  --accent-gold: #FFC107;
-  --accent-emerald: #00E676;
-  --text-main: #E6F1FF;
-  --text-dim: #8BA0C6;
-  --border: #1F2D4A;
-}}
-* {{ box-sizing: border-box; margin: 0; padding: 0; }}
-body {{
-  background: var(--bg-deep);
-  color: var(--text-main);
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-  padding: 16px;
-  max-width: 720px;
-  margin: 0 auto;
-}}
-header {{
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  border-bottom: 1px solid var(--border);
-  padding-bottom: 12px;
-}}
-.brand {{ font-size: 20px; font-weight: 800; color: var(--accent-cyan); }}
-.lang-sel {{
-  background: var(--bg-input);
-  color: var(--text-main);
-  border: 1px solid var(--border);
-  padding: 6px 10px;
-  border-radius: 8px;
-  font-size: 13px;
-}}
-.card {{
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 20px;
-  margin-bottom: 20px;
-  box-shadow: 0 4px 20px rgba(0, 216, 255, 0.1);
-}}
-.drop-zone {{
-  border: 2px dashed var(--accent-cyan);
-  border-radius: 14px;
-  padding: 26px 16px;
-  text-align: center;
-  background: var(--bg-input);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  margin-bottom: 16px;
-}}
-.drop-zone:hover {{
-  border-color: var(--accent-emerald);
-  background: rgba(0, 230, 118, 0.05);
-}}
-.lyrics-box {{
-  width: 100%;
-  height: 120px;
-  background: var(--bg-input);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  color: var(--text-main);
-  padding: 12px;
-  font-family: monospace;
-  font-size: 13px;
-  resize: vertical;
-  margin-bottom: 16px;
-}}
-.control-group {{
-  margin-bottom: 14px;
-}}
-.control-group label {{
-  display: block;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-dim);
-  margin-bottom: 6px;
-}}
-.options-grid {{
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-  margin-bottom: 16px;
-}}
-.style-btn {{
-  background: var(--bg-input);
-  border: 1px solid var(--border);
-  color: var(--text-main);
-  padding: 10px 6px;
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: bold;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.2s;
-}}
-.style-btn.active {{
-  border-color: var(--accent-cyan);
-  background: rgba(0, 216, 255, 0.15);
-  color: var(--accent-cyan);
-}}
-.btn-action {{
-  width: 100%;
-  background: linear-gradient(135deg, var(--accent-cyan), #0066FF);
-  color: #001529;
-  font-weight: 800;
-  padding: 14px;
-  border: none;
-  border-radius: 12px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: transform 0.1s;
-}}
-.btn-action:hover {{ opacity: 0.95; transform: translateY(-1px); }}
-.btn-action:disabled {{ opacity: 0.5; cursor: not-allowed; }}
-.result-box {{
-  display: none;
-  margin-top: 20px;
-  padding: 16px;
-  border-radius: 12px;
-  background: rgba(0, 230, 118, 0.1);
-  border: 1px solid var(--accent-emerald);
-  text-align: center;
-}}
-.btn-download {{
-  display: inline-block;
-  margin: 6px 4px;
-  background: var(--accent-emerald);
-  color: #003314;
-  font-weight: bold;
-  padding: 10px 18px;
-  border-radius: 8px;
-  text-decoration: none;
-}}
-.spinner {{
-  display: none;
-  margin: 15px auto;
-  width: 36px;
-  height: 36px;
-  border: 4px solid var(--border);
-  border-top-color: var(--accent-cyan);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}}
-@keyframes spin {{ to {{ transform: rotate(360deg); }} }}
-</style>
-</head>
-<body>
-<header>
-  <div class="brand">🎤 Smart Karaoke Studio</div>
-  <select class="lang-sel" onchange="location.href='?lang='+this.value">
-    {lang_options}
-  </select>
-</header>
-
-<div class="card">
-  <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
-    <div style="font-size: 32px; margin-bottom: 6px;">🎵</div>
-    <div style="font-weight: 600;">{html.escape(t('web_drop_prompt', lang_override=lang))}</div>
-    <div style="font-size: 12px; color: var(--text-dim); margin-top: 4px;" id="fileInfoLabel">MP3, WAV, OGG, MP4, MOV, MKV</div>
-    <input type="file" id="fileInput" accept="audio/*,video/*" style="display:none" onchange="handleFileSelect(this.files[0])">
-  </div>
-
-  <div class="control-group">
-    <label>{html.escape(t('web_lyrics_prompt', lang_override=lang))}</label>
-    <textarea class="lyrics-box" id="lyricsInput" placeholder="Line 1 of song\nLine 2 of song\nOr [00:12.30] Synced LRC format..."></textarea>
-  </div>
-
-  <div class="control-group">
-    <label>{html.escape(t('web_style_label', lang_override=lang))}</label>
-    <div class="options-grid">
-      <div class="style-btn active" id="btnStyleNeon" onclick="selectStyle('neon')">✨ Neon</div>
-      <div class="style-btn" id="btnStyleGold" onclick="selectStyle('gold')">🌟 Gold</div>
-      <div class="style-btn" id="btnStyleTiktok" onclick="selectStyle('tiktok')">📱 TikTok</div>
-      <div class="style-btn" id="btnStyleMinimal" onclick="selectStyle('minimal')">⚪ Minimal</div>
-    </div>
-  </div>
-
-  <button class="btn-action" id="btnSubmit" onclick="startRender()" disabled>
-    {html.escape(t('web_btn_render', lang_override=lang))}
-  </button>
-
-  <div class="spinner" id="spinner"></div>
-
-  <div class="result-box" id="resultBox">
-    <div style="font-weight: bold; color: var(--accent-emerald);">✅ Karaoke render complete!</div>
-    <a href="#" class="btn-download" id="downloadVideo">{html.escape(t('web_download', lang_override=lang))}</a>
-  </div>
-</div>
-
-<script>
-let selectedFile = null;
-let currentStyle = 'neon';
-
-function selectStyle(s) {{
-  currentStyle = s;
-  document.querySelectorAll('.style-btn').forEach(b => b.classList.remove('active'));
-  if (s === 'neon') document.getElementById('btnStyleNeon').classList.add('active');
-  if (s === 'gold') document.getElementById('btnStyleGold').classList.add('active');
-  if (s === 'tiktok') document.getElementById('btnStyleTiktok').classList.add('active');
-  if (s === 'minimal') document.getElementById('btnStyleMinimal').classList.add('active');
-}}
-
-function handleFileSelect(file) {{
-  if (!file) return;
-  selectedFile = file;
-  document.getElementById('fileInfoLabel').innerText = file.name + ' (' + (file.size/1024/1024).toFixed(1) + ' MB)';
-  document.getElementById('btnSubmit').disabled = false;
-}}
-
-const dz = document.getElementById('dropZone');
-dz.addEventListener('dragover', (e) => {{ e.preventDefault(); dz.style.borderColor = 'var(--accent-emerald)'; }});
-dz.addEventListener('dragleave', (e) => {{ e.preventDefault(); dz.style.borderColor = 'var(--accent-cyan)'; }});
-dz.addEventListener('drop', (e) => {{
-  e.preventDefault();
-  dz.style.borderColor = 'var(--accent-cyan)';
-  if (e.dataTransfer.files.length) handleFileSelect(e.dataTransfer.files[0]);
-}});
-
-async function startRender() {{
-  if (!selectedFile) return;
-  const btn = document.getElementById('btnSubmit');
-  const sp = document.getElementById('spinner');
-  const resBox = document.getElementById('resultBox');
-  btn.disabled = true;
-  sp.style.display = 'block';
-  resBox.style.display = 'none';
-
-  const fd = new FormData();
-  fd.append('media', selectedFile);
-  fd.append('lyrics', document.getElementById('lyricsInput').value);
-  fd.append('style', currentStyle);
-
-  try {{
-    const resp = await fetch('/api/render', {{ method: 'POST', body: fd }});
-    const data = await resp.json();
-    sp.style.display = 'none';
-    btn.disabled = false;
-    if (data.ok) {{
-      resBox.style.display = 'block';
-      const dlVid = document.getElementById('downloadVideo');
-      dlVid.href = data.download_url;
-      dlVid.innerText = '⬇️ Download ' + data.filename + ' (' + data.size_kb + ' KB)';
-    }} else {{
-      alert('Error: ' + (data.error || 'Karaoke render failed'));
-    }}
-  }} catch (err) {{
-    sp.style.display = 'none';
-    btn.disabled = false;
-    alert('Server error: ' + err);
-  }}
-}}
-</script>
-</body>
-</html>"""
-            self.send_response(200)
-            self.send_header("Content-Type", "text/html; charset=utf-8")
-            self.send_header("Content-Length", str(len(html_page.encode("utf-8"))))
-            self.end_headers()
-            self.wfile.write(html_page.encode("utf-8"))
+            render_studio(self, port)
 
         def do_POST(self) -> None:
             if self.path == "/api/render":

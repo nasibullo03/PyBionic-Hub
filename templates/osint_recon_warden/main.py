@@ -1,4 +1,6 @@
 import pybionic_core as core
+import pybionic_web as web
+from typing import Any
 import os
 import sys
 if hasattr(sys.stdout, "reconfigure"):
@@ -105,213 +107,71 @@ class StudioHandler(BaseHTTPRequestHandler):
             self.wfile.write(json.dumps(STATE["last_result"] or {}).encode("utf-8"))
             return
 
-        # Render HTML UI
-        self.send_response(200)
-        self.send_header("Content-Type", "text/html; charset=utf-8")
-        self.end_headers()
-        html = self._render_html()
-        self.wfile.write(html.encode("utf-8"))
+        render_studio(self)
 
-    def _render_html(self):
-        last = STATE["last_result"] or {}
-        dns = last.get("dns", {})
-        ssl_info = last.get("ssl", {})
-        hdrs = last.get("headers", {})
-        target = html.escape(str(last.get("target", "None")))
-        score = last.get("security_score", 0)
-        badge = html.escape(str(last.get("score_badge", "N/A"))) + f" ({score}/100)"
 
-        ips_str = ", ".join(dns.get("ipv4", [])) or "None"
-        issuer = ssl_info.get("issuer", "N/A")
-        expires = ssl_info.get("expires", "N/A")
-        cipher = ssl_info.get("cipher", "N/A")
-        # всё, что пришло от пользователя или чужого сервера, экранируем перед вставкой в HTML
-        target, badge, ips_str, issuer, expires, cipher = (
-            html_escape(str(v), quote=True) for v in (target, badge, ips_str, issuer, expires, cipher)
-        )
+def render_studio(handler: Any) -> None:
+    lang = web.resolve_lang(handler)
+    T = web.translator(lang)
+    css = ("<style>.os-search{display:flex;gap:10px;flex-wrap:wrap}.os-search .pb-input-wrap{flex:1;min-width:220px}"
+           ".os-score{display:flex;align-items:center;gap:22px;flex-wrap:wrap}.os-ring{--p:0;--c:var(--brand);width:128px;height:128px;border-radius:50%;flex:none;display:grid;place-items:center;"
+           "background:conic-gradient(var(--c) calc(var(--p)*1%),var(--surface2) 0);transition:--p .8s}"
+           ".os-ring b{width:100px;height:100px;border-radius:50%;background:var(--solid);display:grid;place-items:center;font-size:30px;font-weight:800;line-height:1}"
+           ".os-ring b small{display:block;font-size:12px;font-weight:500;color:var(--muted)}"
+           ".os-grade{font-size:20px;font-weight:800}.os-target{font-family:ui-monospace,Consolas,monospace;color:var(--muted);word-break:break-all}"
+           ".os-kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}.os-kv div{padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:var(--surface2);min-width:0}"
+           ".os-kv span{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}.os-kv b{font-weight:600;word-break:break-word;font-size:14px}"
+           ".os-chk{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}.os-chk:last-child{border:0}"
+           ".os-chk .ok,.os-chk .no{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;flex:none}.os-chk .ok{background:#22c55e22;color:#22c55e}.os-chk .no{background:#ef444422;color:#ef4444}"
+           ".os-chk div{flex:1;min-width:0}.os-chk b{display:block;font-weight:600;font-size:14px}.os-chk small{color:var(--muted);font-size:12.5px}"
+           ".os-sans{display:flex;flex-wrap:wrap;gap:6px}.os-sans span{font-size:12px;padding:4px 9px;border-radius:99px;background:var(--surface2);border:1px solid var(--line);font-family:ui-monospace,Consolas,monospace}</style>")
+    search = web.card(T("w_card_scan"),
+        '<form class="os-search" id="f">' + web.input_("target", "example.com", icon_name="globe", autocomplete="off", spellcheck="false")
+        + web.button(T("w_scan"), "go", type="submit", icon_name="search") + "</form>" + web.progress("prog")
+        + web.note(T("w_scan_note"), "info", "shield"), icon_name="search")
+    res = ('<div id="res" hidden>'
+           + web.card(T("w_card_score"), '<div class="os-score"><div class="os-ring" id="ring"><b><span id="sc">0</span><small>/100</small></b></div>'
+                      '<div><div class="os-grade" id="grade"></div><div class="os-target" id="tgt"></div><p class="pb-hint" id="when"></p></div></div>', icon_name="shield")
+           + web.grid(
+               web.card(T("w_card_net"), '<div class="os-kv" id="kv"></div><div class="os-sans" id="sans" style="margin-top:12px"></div>', icon_name="globe"),
+               web.card(T("w_card_headers"), '<div id="hdrs"></div>', icon_name="lock"), min_width=330)
+           + "</div>")
+    empty = web.empty_state(T("w_empty"), "search", id="empty")
+    st = web.card(T("statistics"), web.stats([(T("w_st_scans"), "0", "s1", "search"), (T("w_st_last"), "—", "s2", "globe")]), icon_name="chart")
+    hero = web.hero(T("w_title"), T("w_hero"), "🛰", chips=["DNS", "TLS", "HSTS · CSP", "A–F"])
+    web.send_page(handler, lang, title=T("w_title"), emoji="🛰", brand="#14b8a6", port=PORT,
+                  hero_html=hero, body=css + search + empty + res + st, script=OSINT_JS)
 
-        return f"""<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>OSINT Recon Warden Studio</title>
-<style>
-  :root {{
-    --bg: #090d16;
-    --card: #131a29;
-    --card-border: #1f2a40;
-    --primary: #00e5ff;
-    --success: #00e676;
-    --warning: #ffb300;
-    --danger: #ff1744;
-    --text: #e0e6ed;
-    --muted: #78909c;
-  }}
-  * {{ box-sizing: border-box; margin: 0; padding: 0; }}
-  body {{
-    background: var(--bg);
-    color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, monospace;
-    padding: 20px;
-  }}
-  .header {{
-    text-align: center;
-    margin-bottom: 24px;
-    padding-bottom: 16px;
-    border-bottom: 1px solid var(--card-border);
-  }}
-  .header h1 {{
-    color: var(--primary);
-    font-size: 26px;
-    letter-spacing: 1px;
-    margin-bottom: 6px;
-  }}
-  .header p {{ color: var(--muted); font-size: 14px; }}
-  .container {{ max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }}
-  .card {{
-    background: var(--card);
-    border: 1px solid var(--card-border);
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-  }}
-  .card-title {{
-    color: var(--primary);
-    font-size: 16px;
-    font-weight: 600;
-    margin-bottom: 14px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }}
-  .search-box {{
-    display: flex;
-    gap: 10px;
-  }}
-  input[type="text"] {{
-    flex: 1;
-    background: #0b101c;
-    border: 1px solid var(--card-border);
-    border-radius: 8px;
-    padding: 12px 16px;
-    color: #fff;
-    font-size: 15px;
-    outline: none;
-  }}
-  input[type="text"]:focus {{ border-color: var(--primary); }}
-  button {{
-    background: var(--primary);
-    color: #000;
-    font-weight: bold;
-    border: none;
-    border-radius: 8px;
-    padding: 12px 24px;
-    cursor: pointer;
-    transition: 0.2s;
-  }}
-  button:hover {{ filter: brightness(1.2); }}
-  .grid {{
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 16px;
-  }}
-  .stat-block {{
-    background: #0b101c;
-    border-radius: 8px;
-    padding: 14px;
-    border: 1px solid var(--card-border);
-  }}
-  .stat-label {{ color: var(--muted); font-size: 12px; margin-bottom: 4px; }}
-  .stat-val {{ font-size: 14px; word-break: break-all; color: #fff; }}
-  .score-badge {{
-    font-size: 18px;
-    font-weight: bold;
-    color: var(--success);
-  }}
-  .check-item {{
-    display: flex;
-    justify-content: space-between;
-    padding: 6px 0;
-    border-bottom: 1px dashed #1a2336;
-    font-size: 13px;
-  }}
-</style>
-</head>
-<body>
-<div class="container">
-  <div class="header">
-    <h1>🛰 OSINT RECON WARDEN</h1>
-    <p>Domain Security Infrastructure & Certificate Deep Analyzer (Offline Web Studio)</p>
-  </div>
 
-  <div class="card">
-    <div class="card-title"><span>🎯 TARGET RECONNAISSANCE</span></div>
-    <div class="search-box">
-      <input type="text" id="targetInput" value="{target}" placeholder="e.g. cloudflare.com, google.com">
-      <button onclick="runScan()">SCAN TARGET</button>
-    </div>
-  </div>
+OSINT_JS = r"""
+const $=s=>document.querySelector(s);
+const HDR=[['hsts','Strict-Transport-Security','w_h_hsts'],['csp','Content-Security-Policy','w_h_csp'],['x_frame_options','X-Frame-Options','w_h_xfo'],
+  ['x_content_type','X-Content-Type-Options','w_h_xcto'],['referrer_policy','Referrer-Policy','w_h_ref']];
+const ICO_OK='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+const ICO_NO='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>';
+function grade(s){return s>=90?['A','#22c55e']:s>=75?['B','#84cc16']:s>=55?['C','#f59e0b']:s>=35?['D','#f97316']:['F','#ef4444']}
+function show(r){if(!r||!r.target)return;$('#empty').hidden=true;$('#res').hidden=false;
+  const s=+r.security_score||0,[g,c]=grade(s);const ring=$('#ring');ring.style.setProperty('--c',c);ring.style.setProperty('--p',s);pb.count($('#sc'),s);
+  $('#grade').textContent=pb.t('w_grade',{g});$('#grade').style.color=c;$('#tgt').textContent=r.target;
+  try{$('#when').textContent=new Date(r.timestamp).toLocaleString(PB_LANG)}catch(e){}
+  const d=r.dns||{},t=r.ssl||{},na=v=>(v&&v!=='N/A')?v:'—';
+  const days=t.valid&&t.days_left!==undefined?pb.t('w_days_left',{n:t.days_left}):'';
+  const kv=[[pb.t('w_ipv4'),(d.ipv4||[]).join(', ')||'—'],[pb.t('w_ipv6'),(d.ipv6||[]).slice(0,3).join(', ')||'—'],[pb.t('w_issuer'),na(t.issuer)],
+    [pb.t('w_expires'),na(t.expires)+(days?' · '+days:'')],[pb.t('w_cipher'),na(t.cipher)],[pb.t('w_http'),r.headers&&r.headers.status?String(r.headers.status):'—']];
+  $('#kv').innerHTML=kv.map(([k,v])=>`<div><span>${pb.esc(k)}</span><b>${pb.esc(v)}</b></div>`).join('');
+  $('#sans').innerHTML=(t.sans||[]).map(x=>`<span>${pb.esc(x)}</span>`).join('');
+  const h=r.headers||{};$('#hdrs').innerHTML=HDR.map(([k,name,desc])=>`<div class="os-chk"><span class="${h[k]?'ok':'no'}">${h[k]?ICO_OK:ICO_NO}</span>
+    <div><b>${name}</b><small>${pb.esc(pb.t(desc))}</small></div></div>`).join('');
+  $('#s2').textContent=r.target}
+async function status(){const d=await pb.json('/api/status').catch(()=>null);if(d){pb.count($('#s1'),d.scanned_count||0);if(d.last_target)$('#s2').textContent=d.last_target}}
+$('#f').addEventListener('submit',async e=>{e.preventDefault();const v=$('#target').value.trim().replace(/^https?:\/\//,'').replace(/\/.*$/,'');
+  if(!v)return pb.toast(pb.t('w_need_target'),true);const b=$('#go');pb.busy(b,true);pb.progress('prog',null,pb.t('w_scanning',{t:v}));
+  try{const r=await fetch('/api/scan?target='+encodeURIComponent(v));const d=await r.json();if(!r.ok||d.error)throw new Error(d.error||('HTTP '+r.status));
+    pb.hide('prog');show(d);status();$('#res').scrollIntoView({behavior:'smooth',block:'start'})}
+  catch(err){pb.hide('prog');pb.toast(pb.t('error')+': '+err.message,true)}finally{pb.busy(b,false)}});
+pb.json('/api/last').then(r=>{show(r);if(r&&r.target)$('#target').value=r.target}).catch(()=>{});status();
+"""
 
-  <div class="card">
-    <div class="card-title">
-      <span>📊 AUDIT SUMMARY: <code style="color:#fff">{target}</code></span>
-      <span class="score-badge">{badge}</span>
-    </div>
-    <div class="grid">
-      <div class="stat-block">
-        <div class="stat-label">IPv4 RESOLUTION</div>
-        <div class="stat-val">{ips_str}</div>
-      </div>
-      <div class="stat-block">
-        <div class="stat-label">SSL ISSUER</div>
-        <div class="stat-val">{issuer}</div>
-      </div>
-      <div class="stat-block">
-        <div class="stat-label">CERTIFICATE VALIDITY</div>
-        <div class="stat-val">{expires}</div>
-      </div>
-      <div class="stat-block">
-        <div class="stat-label">CIPHER SUITE</div>
-        <div class="stat-val">{cipher}</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-title"><span>🛡 HTTP SECURITY HEADERS AUDIT</span></div>
-    <div class="check-item">
-      <span>Strict-Transport-Security (HSTS)</span>
-      <span>{'🟢 YES' if hdrs.get('hsts') else '❌ NO'}</span>
-    </div>
-    <div class="check-item">
-      <span>Content-Security-Policy (CSP)</span>
-      <span>{'🟢 YES' if hdrs.get('csp') else '❌ NO'}</span>
-    </div>
-    <div class="check-item">
-      <span>X-Frame-Options (Clickjacking Protection)</span>
-      <span>{'🟢 YES' if hdrs.get('x_frame_options') else '❌ NO'}</span>
-    </div>
-    <div class="check-item">
-      <span>X-Content-Type-Options (MIME Sniffing)</span>
-      <span>{'🟢 YES' if hdrs.get('x_content_type') else '❌ NO'}</span>
-    </div>
-    <div class="check-item">
-      <span>Referrer-Policy</span>
-      <span>{'🟢 YES' if hdrs.get('referrer_policy') else '❌ NO'}</span>
-    </div>
-  </div>
-</div>
-
-<script>
-function runScan() {{
-  const target = document.getElementById('targetInput').value.trim();
-  if(!target) return alert('Enter target domain');
-  window.location.href = '/api/scan?target=' + encodeURIComponent(target);
-}}
-</script>
-</body>
-</html>"""
 
 class ThreadedStudioServer(ThreadingHTTPServer):
     allow_reuse_address = True

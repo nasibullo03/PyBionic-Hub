@@ -1,4 +1,6 @@
 import pybionic_core as core
+import pybionic_web as web
+from typing import Any
 import os
 import sys
 if hasattr(sys.stdout, "reconfigure"):
@@ -78,176 +80,54 @@ class StudioHandler(BaseHTTPRequestHandler):
             self.wfile.write(json.dumps({"success": res, "reason": reason}).encode("utf-8"))
             return
 
-        # Render HTML UI
-        self.send_response(200)
-        self.send_header("Content-Type", "text/html; charset=utf-8")
-        self.end_headers()
-        html = self._render_html()
-        self.wfile.write(html.encode("utf-8"))
+        render_studio(self)
 
-    def _render_html(self):
-        stats = shield_engine.get_shield_statistics()
-        c = shield_engine.create_challenge_for_user(1001)
 
-        opts_html = "".join([f'<button class="opt-btn" onclick="checkAnswer({opt})">{opt}</button>' for opt in c["options"]])
+def render_studio(handler: Any) -> None:
+    lang = web.resolve_lang(handler)
+    T = web.translator(lang)
+    css = ("<style>.ar-eq{font-family:'Unbounded','Onest',system-ui,sans-serif;font-weight:700;font-size:clamp(34px,6vw,52px);text-align:center;padding:26px 10px;"
+           "border-radius:20px;background:linear-gradient(135deg,color-mix(in srgb,var(--brand) 16%,transparent),color-mix(in srgb,var(--brand2) 10%,transparent));border:1px solid var(--line);letter-spacing:.02em}"
+           ".ar-opts{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px}"
+           ".ar-opt{font:inherit;font-size:22px;font-weight:800;padding:18px;border-radius:16px;border:1px solid var(--line);background:var(--surface2);color:var(--text);cursor:pointer;transition:transform .15s,border-color .2s,background .2s}"
+           ".ar-opt:hover{transform:translateY(-2px);border-color:var(--brand)}.ar-opt:disabled{cursor:default;transform:none}"
+           ".ar-opt.ok{background:#22c55e22;border-color:#22c55e;color:#22c55e}.ar-opt.bad{background:#ef444422;border-color:#ef4444;color:#ef4444;animation:arShake .4s}"
+           "@keyframes arShake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}"
+           ".ar-timer{height:6px;border-radius:99px;background:var(--surface2);overflow:hidden;margin-top:14px}.ar-timer i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--brand),var(--brand2));transition:width 1s linear}"
+           ".ar-res{min-height:26px;margin-top:12px;text-align:center;font-weight:600}"
+           ".ar-steps{counter-reset:s;display:grid;gap:10px;margin:0;padding:0;list-style:none}.ar-steps li{counter-increment:s;display:flex;gap:12px;align-items:flex-start;font-size:14px}"
+           ".ar-steps li:before{content:counter(s);flex:none;width:26px;height:26px;border-radius:8px;display:grid;place-items:center;font-weight:700;font-size:13px;color:#fff;background:linear-gradient(135deg,var(--brand),var(--brand2))}</style>")
+    test = web.card(T("w_card_test"),
+        '<p class="pb-hint" style="margin-top:0">' + web.esc(T("w_test_hint")) + "</p>"
+        + '<div class="ar-eq" id="eq">…</div><div class="ar-opts" id="opts"></div>'
+        + '<div class="ar-timer"><i id="timer"></i></div><div class="ar-res" id="res"></div>'
+        + '<div class="pb-row" style="justify-content:center">' + web.button(T("w_new"), "new", kind="ghost", icon_name="refresh") + "</div>",
+        icon_name="zap")
+    steps = "".join(f"<li>{web.esc(T(k))}</li>" for k in ("w_step1", "w_step2", "w_step3", "w_step4"))
+    how = web.card(T("w_card_how"), f'<ol class="ar-steps">{steps}</ol>' + web.note(T("w_how_note"), "info", "shield"), icon_name="shield")
+    st = web.stats([(T("w_st_checks"), "0", "s0", "list"), (T("w_st_verified"), "0", "s1", "check"),
+                    (T("w_st_blocked"), "0", "s2", "x"), (T("w_st_avg"), "0", "s3", "clock")])
+    hero = web.hero(T("w_title"), T("w_hero"), "🛡", chips=[T("w_chip_captcha"), T("w_chip_raid"), T("w_chip_nolinks")])
+    web.send_page(handler, lang, title=T("w_title"), emoji="🛡", brand="#8b5cf6", port=PORT,
+                  hero_html=hero, body=css + st + web.grid(test, how, min_width=330), script=ANTIRAID_JS)
 
-        return f"""<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Anti-Raid Math Shield Studio</title>
-<style>
-  :root {{
-    --bg: #0b0f19;
-    --card: #151c2e;
-    --card-border: #222d4a;
-    --primary: #00e5ff;
-    --accent: #ff0055;
-    --success: #00e676;
-    --text: #e0e6ed;
-    --muted: #8899a6;
-  }}
-  * {{ box-sizing: border-box; margin: 0; padding: 0; }}
-  body {{
-    background: var(--bg);
-    color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, monospace;
-    padding: 20px;
-  }}
-  .container {{ max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }}
-  .header {{
-    text-align: center;
-    border-bottom: 1px solid var(--card-border);
-    padding-bottom: 16px;
-  }}
-  .header h1 {{ color: var(--primary); font-size: 26px; letter-spacing: 1px; }}
-  .header p {{ color: var(--muted); font-size: 14px; margin-top: 4px; }}
-  .card {{
-    background: var(--card);
-    border: 1px solid var(--card-border);
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-  }}
-  .card-title {{
-    color: var(--primary);
-    font-size: 16px;
-    font-weight: 600;
-    margin-bottom: 14px;
-    display: flex;
-    justify-content: space-between;
-  }}
-  .grid {{
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 16px;
-  }}
-  .stat-block {{
-    background: #0d1322;
-    border: 1px solid var(--card-border);
-    border-radius: 8px;
-    padding: 16px;
-    text-align: center;
-  }}
-  .stat-label {{ color: var(--muted); font-size: 12px; margin-bottom: 6px; }}
-  .stat-val {{ font-size: 22px; font-weight: bold; color: #fff; }}
-  .challenge-box {{
-    background: #0d1322;
-    border: 2px dashed var(--primary);
-    border-radius: 12px;
-    padding: 24px;
-    text-align: center;
-  }}
-  .eq-text {{ font-size: 32px; font-weight: bold; color: var(--primary); margin: 16px 0; }}
-  .options-grid {{
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-    max-width: 320px;
-    margin: 0 auto;
-  }}
-  .opt-btn {{
-    background: #1f2b48;
-    color: #fff;
-    border: 1px solid var(--primary);
-    padding: 14px;
-    font-size: 18px;
-    font-weight: bold;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: 0.2s;
-  }}
-  .opt-btn:hover {{
-    background: var(--primary);
-    color: #000;
-  }}
-  #resultBox {{
-    margin-top: 14px;
-    font-weight: bold;
-    font-size: 16px;
-  }}
-</style>
-</head>
-<body>
-<div class="container">
-  <div class="header">
-    <h1>🛡 ANTI-RAID MATH SHIELD</h1>
-    <p>Zero-Inline Telegram Keyboard Math CAPTCHA & Group Raid Guard (Offline Web Studio)</p>
-  </div>
 
-  <div class="card">
-    <div class="card-title"><span>📊 PROTECTION TELEMETRY</span><span style="color:var(--success)">{stats['raid_mode']}</span></div>
-    <div class="grid">
-      <div class="stat-block">
-        <div class="stat-label">TOTAL VERIFIED</div>
-        <div class="stat-val" style="color:var(--success)">{stats['verified']}</div>
-      </div>
-      <div class="stat-block">
-        <div class="stat-label">BLOCKED RAIDS</div>
-        <div class="stat-val" style="color:var(--accent)">{stats['blocked']}</div>
-      </div>
-      <div class="stat-block">
-        <div class="stat-label">AVG RESPONSE TIME</div>
-        <div class="stat-val">{stats['avg_time']:.1f}s</div>
-      </div>
-      <div class="stat-block">
-        <div class="stat-label">ACTIVE STUDIO PORT</div>
-        <div class="stat-val" style="color:var(--primary)">{PORT}</div>
-      </div>
-    </div>
-  </div>
+ANTIRAID_JS = r"""
+const $=s=>document.querySelector(s);let tick=null,left=0,total=60;
+async function stats(){const d=await pb.json('/api/status').catch(()=>null);if(d&&d.stats){const s=d.stats;pb.count($('#s0'),s.total_checks||0);pb.count($('#s1'),s.verified||0);pb.count($('#s2'),s.blocked||0);
+  $('#s3').textContent=(+s.avg_time||0).toFixed(1)+' '+pb.t('w_sec')}}
+function timer(){clearInterval(tick);left=total;$('#timer').style.width='100%';tick=setInterval(()=>{left--;$('#timer').style.width=Math.max(0,left*100/total)+'%';if(left<=0){clearInterval(tick);lock();res(false,'timeout')}},1000)}
+function lock(){document.querySelectorAll('.ar-opt').forEach(b=>b.disabled=true)}
+function res(ok,reason){const r=$('#res');r.style.color=ok?'#22c55e':'#ef4444';r.textContent=ok?'✅ '+pb.t('w_ok'):'❌ '+pb.t('w_fail_'+(['timeout','wrong_answer','no_challenge'].includes(reason)?reason:'wrong_answer'))}
+async function load(){$('#res').textContent='';const c=await pb.json('/api/challenge').catch(()=>null);if(!c){pb.toast(pb.t('error_conn'),true);return}
+  total=+c.timeout||60;$('#eq').textContent=c.equation+' = ?';
+  $('#opts').innerHTML=c.options.map(o=>`<button class="ar-opt" type="button" data-v="${+o}">${+o}</button>`).join('');
+  document.querySelectorAll('.ar-opt').forEach(b=>b.onclick=async()=>{lock();clearInterval(tick);
+    const d=await pb.json('/api/verify?answer='+b.dataset.v).catch(()=>({success:false,reason:'error'}));
+    b.classList.add(d.success?'ok':'bad');res(d.success,d.reason);stats();setTimeout(load,2200)});timer()}
+$('#new').onclick=load;load();stats();
+"""
 
-  <div class="card">
-    <div class="card-title"><span>⚡ INTERACTIVE CHALLENGE TEST</span></div>
-    <div class="challenge-box">
-      <p style="color:var(--muted)">Simulate member challenge verification:</p>
-      <div class="eq-text">{c['equation']} = ?</div>
-      <div class="options-grid">
-        {opts_html}
-      </div>
-      <div id="resultBox"></div>
-    </div>
-  </div>
-</div>
-
-<script>
-function checkAnswer(val) {{
-  fetch('/api/verify?answer=' + val)
-    .then(r => r.json())
-    .then(d => {{
-      const rb = document.getElementById('resultBox');
-      if(d.success) {{
-        rb.innerHTML = '<span style="color:var(--success)">✅ VERIFICATION SUCCESSFUL! Human confirmed.</span>';
-      }} else {{
-        rb.innerHTML = '<span style="color:var(--accent)">❌ FAILED: ' + d.reason + '</span>';
-      }}
-      setTimeout(() => location.reload(), 1500);
-    }});
-}}
-</script>
-</body>
-</html>"""
 
 class ThreadedStudioServer(ThreadingHTTPServer):
     allow_reuse_address = True

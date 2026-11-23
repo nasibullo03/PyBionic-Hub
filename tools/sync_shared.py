@@ -13,7 +13,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent / "templates"
-SHARED = ["i18n.py", "pybionic_core.py"]
+SHARED = ["i18n.py", "pybionic_core.py", "pybionic_web.py"]
 
 
 def bot_dirs() -> list[Path]:
@@ -30,7 +30,8 @@ def main() -> int:
             if dst.exists() and dst.read_bytes() == src:
                 continue
             # копию ядра кладём только тем ботам, что его импортируют
-            if name == "pybionic_core.py" and "pybionic_core" not in (d / "main.py").read_text(encoding="utf-8"):
+            # копии модулей кладём только тем ботам, что их импортируют
+            if name != "i18n.py" and name[:-3] not in (d / "main.py").read_text(encoding="utf-8"):
                 continue
             if check:
                 bad.append(str(dst.relative_to(ROOT)))
